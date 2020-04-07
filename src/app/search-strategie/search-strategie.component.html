@@ -1,0 +1,102 @@
+<br/>
+<hr/>
+<h3>Selections de tri :</h3>
+<hr/>
+<br/>
+<div *ngIf="currentUser.Id != 0" class="form-group row">
+        <label class="form-check-label col-sm-2">Choisir sa team</label>
+        <select class="form-control col-sm-2" NgModel (change)="choixMaTeam(MaTeam)" #MaTeam>
+            <option value="0"></option>
+            <option *ngFor="let MaTeam of selectMesTeams" value={{MaTeam.Id}}>{{MaTeam.NomTeam}}</option>
+        </select>
+        <label class="col-sm-1 col-form-label">Boss</label>
+    <select class="form-control col-sm-3" NgModel (change)="changeBoss(Boss)" #Boss>
+        <option value="0"></option>
+        <option *ngFor="let boss of selectBoss" value={{boss.Id}}>{{boss.NomFR}}</option>
+    </select>
+
+</div>
+<div *ngIf="MaTeam.Id == 0" class="form-group row">
+    <label class="col-sm-1 col-form-label">Continent</label>
+    <select class="form-control col-sm-2" NgModel (change)="changeContinent(Continent)" #Continent>
+        <option value="0"></option>
+        <option *ngFor="let zone of selectContinent">{{zone.ContinentFR}}</option>
+    </select>
+    <label class="col-sm-1 col-form-label">Zone</label>
+    <select class="form-control col-sm-3" NgModel (change)="changeZone(Zone)" #Zone>
+        <option value="0"></option>
+        <option *ngFor="let zone of selectZone" value={{zone.Id}}>{{zone.ZoneFR}}</option>
+    </select>
+    <label class="col-sm-1 col-form-label">Boss</label>
+    <select class="form-control col-sm-3" NgModel (change)="changeBoss(Boss)" #Boss>
+        <option value="0"></option>
+        <option *ngFor="let boss of selectBoss" value={{boss.Id}}>{{boss.NomFR}}</option>
+    </select>
+</div>
+<div *ngIf="MaTeam.Id == 0" class="form-group row">
+    <label class="col-sm-1 col-form-label">Classe 1</label>
+    <select class="form-control col-sm-2" NgModel (change)="changeClasse1(Classe1)" #Classe1>
+        <option value="0"></option>
+        <option *ngFor="let classe of selectClasse" value={{classe.Id}}>{{classe.NomFR}}</option>
+    </select>
+
+    <label class="col-sm-1 col-form-label">Classe 2</label>
+    <select class="form-control col-sm-2" NgModel (change)="changeClasse2(Classe2)" #Classe2>
+        <option value="0"></option>
+        <option *ngFor="let classe of selectClasse" value={{classe.Id}}>{{classe.NomFR}}</option>
+    </select>
+
+    <label class="col-sm-1 col-form-label">Classe 3</label>
+    <select class="form-control col-sm-2" NgModel (change)="changeClasse3(Classe3)" #Classe3>
+        <option value="0"></option>
+        <option *ngFor="let classe of selectClasse" value={{classe.Id}}>{{classe.NomFR}}</option>
+    </select>
+
+    <label class="col-sm-1 col-form-label">Classe 4</label>
+    <select class="form-control col-sm-2" NgModel (change)="changeClasse4(Classe4)" #Classe4>
+        <option value="0"></option>
+        <option *ngFor="let classe of selectClasse" value={{classe.Id}}>{{classe.NomFR}}</option>
+    </select>
+</div>
+<button type="button" class="btn btn-primary" (click)="chercherEnregistrements()">Chercher</button>
+
+<br/>
+<hr/>
+<h3>Affichage des Enregistrements :</h3>
+<hr/>
+<br/>
+
+<ng-container *ngIf="!Enregistrements.length"><div *ngIf="messageIndication !=''" class="alert alert-danger" role="alert">{{messageIndication}}</div></ng-container>
+
+<ng-container class="centered" *ngFor="let Enregistrement of Enregistrements">
+    <div class="mx-auto col-sm-8" >
+        <div class="row">
+            <div class="col-sm-3"><b>Continent :</b> {{Enregistrement.BossZone.Zone.ContinentFR}}</div>
+            <div class="col-sm-5"><b>Zone :</b> {{Enregistrement.BossZone.Zone.ZoneFR}}</div>
+            <div class="col-sm-4"><b>Boss :</b> {{Enregistrement.BossZone.Boss.NomFR}}</div>
+        </div>
+        <div class="row">
+            <div class="col-sm-3"><b>Posteur :</b> {{Enregistrement.Utilisateur.Pseudo}}</div>
+            <div class="col-sm-7"><b>Team :</b> {{Enregistrement.Team.Classe1.NomFR}} - {{Enregistrement.Team.Classe2.NomFR}} - {{Enregistrement.Team.Classe3.NomFR}} - {{Enregistrement.Team.Classe4.NomFR}}</div>
+            
+        </div>
+        <div class="row">
+            <img [src]="publicSanitizeIMG(Enregistrement.ImagePath1)" height="390px"> 
+            <img [src]="publicSanitizeIMG(Enregistrement.ImagePath2)" height="390px">  
+            <img [src]="publicSanitizeIMG(Enregistrement.ImagePath3)" height="390px">  
+            <img [src]="publicSanitizeIMG(Enregistrement.ImagePath4)" height="390px">
+        </div>
+        <div class="row">
+             <ng-container *ngIf="currentUser.Id != 0">
+                <img *ngIf="VerifFavori(Enregistrement.Id)" src="http://192.168.1.2:8081/fav.png" height="30px" (click)="retraitFavori(Enregistrement.Id)">
+                <img *ngIf="!VerifFavori(Enregistrement.Id)" src="http://192.168.1.2:8081/nofav.png" height="30px" (click)="mettreFavori(Enregistrement.Id)" >
+                <img *ngIf="VerifVote(Enregistrement.Id) != 1 " src="http://192.168.1.2:8081/plus.png" height="30px" (click)="VotePlus(Enregistrement.Id)">
+                <img *ngIf="VerifVote(Enregistrement.Id) != 0" src="http://192.168.1.2:8081/croix.png" height="30px" (click)="DeleteVote(Enregistrement.Id)">
+                <img *ngIf="VerifVote(Enregistrement.Id) != -1" src="http://192.168.1.2:8081/moins.png" height="30px" (click)="VoteMoins(Enregistrement.Id)">
+             </ng-container>
+            <div class="col-sm-2"><b>Note :</b> {{Enregistrement.Note}}</div>
+        </div>
+    </div>
+        <hr/>
+</ng-container>
+<br/><br/><br/><br/>

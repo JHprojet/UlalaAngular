@@ -1,0 +1,72 @@
+<br/>
+<ng-container *ngIf="UploadOK != '' || UploadFail != ''">
+    <div *ngIf="UploadOK != ''" class="alert alert-success" role="alert">{{UploadOK}}</div>
+    <div *ngIf="UploadFail != ''" class="alert alert-danger" role="alert">{{UploadFail}}</div>
+</ng-container>
+<hr/>
+<h2>Ajouter une stratégie</h2>
+<hr/>
+<br/>
+<div class="form-group row">
+    <label class="col-sm-1 col-form-label">Continent</label>
+    <select class="form-control col-sm-2" NgModel (change)="changeContinent(Continent)" #Continent>
+        <option value="0"></option>
+        <option *ngFor="let zone of selectContinent">{{zone.ContinentFR}}</option>
+    </select>
+    <label class="col-sm-1 col-form-label">Zone</label>
+    <select class="form-control col-sm-3" NgModel (change)="changeZone(Zone)" #Zone>
+        <option value="0"></option>
+        <option *ngFor="let zone of selectZone" value={{zone.Id}}>{{zone.ZoneFR}}</option>
+    </select>
+    <label class="col-sm-1 col-form-label">Boss</label>
+    <select class="form-control col-sm-3" NgModel (change)="changeBoss(Boss)" #Boss>
+            <option value="0"></option>
+            <option *ngFor="let boss of selectBoss" value={{boss.Id}}>{{boss.NomFR}}</option>
+    </select>
+</div>
+<ng-container *ngIf="messageBossZone != ''">
+    <div class="alert alert-danger" role="alert"> {{messageBossZone}}</div>
+</ng-container>
+
+
+<br/>
+<div class="form-group row">
+    <label class="col-sm-1 col-form-label">Classe 1</label>
+    <select class="form-control col-sm-2" NgModel (change)="changeClasse1(Classe1)" #Classe1>
+        <option value="0"></option>
+        <option *ngFor="let classe of selectClasse" value={{classe.Id}}>{{classe.NomFR}}</option>
+    </select>
+
+    <label class="col-sm-1 col-form-label">Classe 2</label>
+    <select class="form-control col-sm-2" NgModel (change)="changeClasse2(Classe2)" #Classe2>
+        <option value="0"></option>
+        <option *ngFor="let classe of selectClasse" value={{classe.Id}}>{{classe.NomFR}}</option>
+    </select>
+
+    <label class="col-sm-1 col-form-label">Classe 3</label>
+    <select class="form-control col-sm-2" NgModel (change)="changeClasse3(Classe3)" #Classe3>
+        <option value="0"></option>
+        <option *ngFor="let classe of selectClasse" value={{classe.Id}}>{{classe.NomFR}}</option>
+    </select>
+
+    <label class="col-sm-1 col-form-label">Classe 4</label>
+    <select class="form-control col-sm-2" NgModel (change)="changeClasse4(Classe4)" #Classe4>
+        <option value="0"></option>
+        <option *ngFor="let classe of selectClasse" value={{classe.Id}}>{{classe.NomFR}}</option>
+    </select>
+</div>
+<ng-container *ngIf="messageClasse != ''">
+    <div class="alert alert-danger" role="alert"> {{messageClasse}}</div>
+</ng-container>
+<br/>
+<div class="form-group row">
+    <label class="col-sm-1 col-form-label">Images</label>
+    <input type="file" class="form-control-file col-sm-7"  id="inputImages" multiple="multiple" (change)="checkImages(input)" #input>
+</div>
+<ng-container *ngIf="errorImage != ''">
+    <div class="alert alert-danger" role="alert"> {{errorImage}}</div>
+</ng-container>
+    <br/>
+    <button *ngIf="errorImage == '' && messageClasse == '' && messageBossZone == '' " class="btn btn-primary" type="submit" (click)="upload()">Envoyer</button>
+
+

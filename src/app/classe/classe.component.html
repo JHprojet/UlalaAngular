@@ -1,0 +1,16 @@
+<br/>
+<h2>Classes de personnage</h2>
+<br/><br/>
+<div class="form-group row">
+    <label class="col-sm-2 col-form-label">Liste des classes : </label>
+    <select class="form-control col-sm-2" NgModel (change)="changeClasse(Classe)" #Classe>
+        <option value="0"></option>
+        <option *ngFor="let classe of selectClasse" value={{classe.Id}}>{{classe.NomFR}}</option>
+    </select>
+</div>
+<ng-container *ngIf="ClasseActive.Id != null">
+<br/><h4>Informations sur le {{ClasseActive.NomFR}}</h4><br/>
+<p>A remplir via la Base de donnée</p>
+
+
+</ng-container>

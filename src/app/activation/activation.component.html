@@ -1,0 +1,19 @@
+<br/>
+<h2>Activation</h2>
+<br/>
+<p>Bonjour {{Pseudo}}, veuillez entrer votre clef d'activation reçu par mail.</p>
+
+<input type="text" [(ngModel)]="token" name="token">
+<button type="button" class="btn btn-btn" (click)="envoiToken()"></button>
+<br/><br/>
+<ng-container *ngIf="MessageOK !='' || MessageNOK !=''">
+    <div *ngIf="MessageOK !=''" class="alert alert-success">{{MessageOK}}</div>
+    <div *ngIf="MessageNOK !=''" class="alert alert-danger">{{MessageNOK}}</div>
+</ng-container>
+
+<p>Vous n'avez pas reçu votre clef d'activation par mail? <a class="link" (click)='RenvoiToken()'>Cliquez ici!</a></p>
+
+<ng-container *ngIf="MessageRenvoiOK !='' || MessageRenvoiNOK !=''">
+    <div *ngIf="MessageRenvoiOK !=''" class="alert alert-success">{{MessageRenvoiOK}}</div>
+    <div *ngIf="MessageRenvoiNOK !=''" class="alert alert-danger">{{MessageRenvoiNOK}}</div>
+</ng-container>

@@ -1,0 +1,65 @@
+<br/>
+<h2>Mes Teams favorites :</h2>
+<br/>
+<ng-container *ngFor="let element of mesTeams">
+Nom Team : {{element.NomTeam}}
+Continent : {{element.Zone.ContinentFR}}
+Zone : {{element.Zone.ZoneFR}}
+Clases : {{element.Team.Classe1.NomFR}} - {{element.Team.Classe2.NomFR}} - {{element.Team.Classe3.NomFR}} - {{element.Team.Classe4.NomFR}}
+<button class="btn btn-primary" type="button" (click)="DeleteTeam(element.Id)">Supprimer</button>
+
+</ng-container>
+
+<hr/>
+<h2>Ajouter une teams à mes favoris :</h2>
+<br/>
+<div class="form-group row">
+    <label class="col-sm-2 col-form-label">Nom de la team</label>
+    <input type="text" class="form-control col-sm-2" [(ngModel)]="nomTeam" (change)="CheckNomTeam()" name="nomTeam">
+    <label class="col-sm-1 col-form-label">Continent</label>
+    <select class="form-control col-sm-2" NgModel (change)="changeContinent(Continent)" #Continent>
+        <option value="0"></option>
+        <option *ngFor="let zone of selectContinent">{{zone.ContinentFR}}</option>
+    </select>
+    <label class="col-sm-1 col-form-label">Zone</label>
+    <select class="form-control col-sm-3" NgModel (change)="changeZone(Zone)" #Zone>
+        <option value="0"></option>
+        <option *ngFor="let zone of selectZone" value={{zone.Id}}>{{zone.ZoneFR}}</option>
+    </select>
+</div>
+<ng-container *ngIf="messageBossZone != '' || messageNomTeam != ''">
+    <div *ngIf="messageBossZone != '' && messageNomTeam ==''" class="alert alert-danger" role="alert"> {{messageBossZone}}</div>
+    <div *ngIf="messageNomTeam != ''" class="alert alert-danger" role="alert"> {{messageNomTeam}}</div>
+</ng-container>
+
+<br/>
+<div class="form-group row">
+    <label class="col-sm-1 col-form-label">Classe 1</label>
+    <select class="form-control col-sm-2" NgModel (change)="changeClasse1(Classe1)" #Classe1>
+        <option value="0"></option>
+        <option *ngFor="let classe of selectClasse" value={{classe.Id}}>{{classe.NomFR}}</option>
+    </select>
+
+    <label class="col-sm-1 col-form-label">Classe 2</label>
+    <select class="form-control col-sm-2" NgModel (change)="changeClasse2(Classe2)" #Classe2>
+        <option value="0"></option>
+        <option *ngFor="let classe of selectClasse" value={{classe.Id}}>{{classe.NomFR}}</option>
+    </select>
+
+    <label class="col-sm-1 col-form-label">Classe 3</label>
+    <select class="form-control col-sm-2" NgModel (change)="changeClasse3(Classe3)" #Classe3>
+        <option value="0"></option>
+        <option *ngFor="let classe of selectClasse" value={{classe.Id}}>{{classe.NomFR}}</option>
+    </select>
+
+    <label class="col-sm-1 col-form-label">Classe 4</label>
+    <select class="form-control col-sm-2" NgModel (change)="changeClasse4(Classe4)" #Classe4>
+        <option value="0"></option>
+        <option *ngFor="let classe of selectClasse" value={{classe.Id}}>{{classe.NomFR}}</option>
+    </select>
+</div>
+<ng-container *ngIf="messageClasse != ''">
+    <div class="alert alert-danger" role="alert"> {{messageClasse}}</div>
+</ng-container>
+<br/>
+<button *ngIf="messageClasse == '' && messageBossZone == '' && messageNomTeam == '' " class="btn btn-primary" type="submit" (click)="upload()">Envoyer</button>

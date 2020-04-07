@@ -1,0 +1,15 @@
+<br/>
+<h2>Liste des boss par zone</h2>
+<br/>
+    <table class="table">
+        <tr>
+            <th>Continent</th>
+            <th>Zone</th>
+            <th>Boss</th>
+        </tr>
+        <tr *ngFor="let elem of BossZone">
+            <td>{{elem.Zone.ContinentFR}}</td>
+            <td>{{elem.Zone.ZoneFR}}</td>
+            <td>{{elem.Boss.NomFR}}</td>
+        </tr>
+    </table>
