@@ -1,5 +1,5 @@
 <nav class="navbar navbar-expand-lg navbar-light bg-light">
-  <a routerLink='/home'><img class="logo" src="../assets/images/Logo.png" height="50px"/></a>
+  <a routerLink='/'><img class="logo" src="../assets/images/Logo.png" height="50px"/></a>
   <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
     <span class="navbar-toggler-icon"></span>
   </button>
@@ -40,7 +40,7 @@
           Mes infos
         </a>
         <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-          <a class="dropdown-item" routerLink='/prefs'>Mes préférences</a>
+          <a class="dropdown-item" routerLink='/prefs'>Mes teams persos</a>
           <a class="dropdown-item" routerLink='/pass'>Changer mon mot de passe</a>
           <a class="dropdown-item" routerLink='/myinfos'>Mes informations</a>
         </div>
@@ -56,13 +56,13 @@
 </nav>
 
 <div class="container">
-<ng-container *ngIf="ErrorLogin != '' || OkLogin != '' || NotConnected != '' || Disconnected != ''">
+<ng-container *ngIf="MessageRecupPassword != '' || ErrorLogin != '' || OkLogin != '' || NotConnected != '' || Disconnected != ''">
   <br/>
   <div *ngIf="ErrorLogin != ''" class="alert alert-danger">{{ErrorLogin}}</div>
+  <div *ngIf="MessageRecupPassword != ''" class="alert alert-info"><a class="link" routerLink='/RetrievePassword'>{{MessageRecupPassword}}</a></div>
   <div *ngIf="NotConnected != ''" class="alert alert-danger">{{NotConnected}}</div>
   <div *ngIf="OkLogin != ''" class="alert alert-success">{{OkLogin}}</div>
   <div *ngIf="Disconnected != ''" class="alert alert-success">{{Disconnected}}</div>
-  <br/>
 </ng-container>
 <router-outlet></router-outlet>
 </div>

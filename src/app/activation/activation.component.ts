@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { AppComponent } from '../app.component';
 import { UtilisateurDAL } from '../service/utilisateur-dal';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-activation',
@@ -9,7 +10,7 @@ import { UtilisateurDAL } from '../service/utilisateur-dal';
 })
 export class ActivationComponent implements OnInit {
 
-  constructor(private utilisateurService:UtilisateurDAL,private appService:AppComponent) { }
+  constructor(private router:Router,private utilisateurService:UtilisateurDAL,private appService:AppComponent) { }
   Pseudo:string;
   Id:number;
   token:string;
@@ -35,7 +36,9 @@ export class ActivationComponent implements OnInit {
     this.utilisateurService.UpdateToken(this.Id,this.token).subscribe(result => {
       this.utilisateurService.getUtilisateur(this.Id).subscribe(result => {
         this.appService.data["User"] = result;
-        this.MessageOK = "Merci, votre compte à bien été activé, vous pouvez naviguer sur le site."
+        this.MessageOK = "Merci, votre compte à bien été activé, vous allez être rediriger dans un instant. Bonne navigation!";
+        setTimeout(() => this.MessageOK='',3000);
+        this.router.navigateByUrl('');
       })
     }, error => {
       this.MessageNOK = "Clef d'activation erronée, merci de recommencer."

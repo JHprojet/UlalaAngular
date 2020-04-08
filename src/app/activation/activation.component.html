@@ -4,7 +4,7 @@
 <p>Bonjour {{Pseudo}}, veuillez entrer votre clef d'activation reçu par mail.</p>
 
 <input type="text" [(ngModel)]="token" name="token">
-<button type="button" class="btn btn-btn" (click)="envoiToken()"></button>
+<button type="button" class="btn btn-btn" (click)="envoiToken()">Envoyer mon code d'activation</button>
 <br/><br/>
 <ng-container *ngIf="MessageOK !='' || MessageNOK !=''">
     <div *ngIf="MessageOK !=''" class="alert alert-success">{{MessageOK}}</div>

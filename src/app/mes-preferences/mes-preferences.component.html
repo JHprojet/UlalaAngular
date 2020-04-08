@@ -1,17 +1,29 @@
 <br/>
-<h2>Mes Teams favorites :</h2>
+<h2>Mes Teams persos :</h2>
 <br/>
-<ng-container *ngFor="let element of mesTeams">
-Nom Team : {{element.NomTeam}}
-Continent : {{element.Zone.ContinentFR}}
-Zone : {{element.Zone.ZoneFR}}
-Clases : {{element.Team.Classe1.NomFR}} - {{element.Team.Classe2.NomFR}} - {{element.Team.Classe3.NomFR}} - {{element.Team.Classe4.NomFR}}
-<button class="btn btn-primary" type="button" (click)="DeleteTeam(element.Id)">Supprimer</button>
-
-</ng-container>
-
+    <table class="table table-striped">
+        <thead class="thead-dark">
+            <tr>
+                <th>Nom Team</th>
+                <th>Continent</th>
+                <th>Zone</th>
+                <th>Classes</th>
+                <th>Supprimer</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr *ngFor="let element of mesTeams">
+                <td>{{element.NomTeam}}</td>
+                <td>{{element.Zone.ContinentFR}}</td>
+                <td>{{element.Zone.ZoneFR}}</td>
+                <td>{{element.Team.Classe1.NomFR}} - {{element.Team.Classe2.NomFR}} - {{element.Team.Classe3.NomFR}} - {{element.Team.Classe4.NomFR}}</td>
+                <td><button class="btn btn-primary" type="button" (click)="DeleteTeam(element.Id)">Supprimer</button></td>
+            </tr>
+        </tbody>  
+    </table>
+    <br/>
 <hr/>
-<h2>Ajouter une teams à mes favoris :</h2>
+<h2>Ajouter une teams perso :</h2>
 <br/>
 <div class="form-group row">
     <label class="col-sm-2 col-form-label">Nom de la team</label>

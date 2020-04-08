@@ -23,6 +23,7 @@ import { HttpClientModule } from '@angular/common/http';
 import { StorageServiceModule} from 'angular-webstorage-service';
 import { MonJeton } from 'src/assets/services/Jeton';
 import { ActivationComponent } from './activation/activation.component';
+import { RetrievePasswordComponent } from './retrieve-password/retrieve-password.component';
 
 
 @NgModule({
@@ -44,6 +45,7 @@ import { ActivationComponent } from './activation/activation.component';
     MesStrategieComponent,
     InscriptionComponent,
     ActivationComponent,
+    RetrievePasswordComponent,
   ],
   imports: [
     HttpClientModule,

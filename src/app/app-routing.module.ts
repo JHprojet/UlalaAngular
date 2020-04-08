@@ -17,13 +17,14 @@ import { SearchStrategieComponent } from './search-strategie/search-strategie.co
 import { FavStrategieComponent } from './fav-strategie/fav-strategie.component';
 import { InscriptionComponent } from './inscription/inscription.component';
 import { ActivationComponent } from './activation/activation.component';
+import { RetrievePasswordComponent } from './retrieve-password/retrieve-password.component';
 
 
 const routes: Routes = [];
 
 @NgModule({
   imports: [RouterModule.forRoot([
-    {path : 'home', component: HomeComponent},
+    {path : '', component: HomeComponent},
     {path : 'contact', component: ContactComponent},
     {path : 'rgpd', component: RgpdComponent},
     {path : 'classes', component: ClasseComponent},
@@ -38,7 +39,8 @@ const routes: Routes = [];
     {path : 'searchstrat', component: SearchStrategieComponent},
     {path : 'favstrat', component: FavStrategieComponent},
     {path : 'inscription', component: InscriptionComponent},
-    {path : 'activation', component: ActivationComponent}
+    {path : 'activation', component: ActivationComponent},
+    {path : 'RetrievePassword', component: RetrievePasswordComponent}
   ])],
   exports: [RouterModule]
 })

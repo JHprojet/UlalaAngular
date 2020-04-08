@@ -1,5 +1,5 @@
 import {Injectable} from "@angular/core";
-import { HttpClient, HttpHeaders, HttpResponse } from '@angular/common/http';
+import { HttpClient, HttpHeaders, HttpResponse, HttpParams } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
 import { retry, catchError } from 'rxjs/operators';
 import { Utilisateur } from "../models/utilisateur";
@@ -15,6 +15,12 @@ const httpOptions = {
 @Injectable({ providedIn: 'root' })
 export class UtilisateurDAL {
     constructor(private http: HttpClient) { }
+    GenererNouveauPassword(Mail:string) {
+      return this.http.post(EndPoint+'Login/?Mail='+Mail ,httpOptions).pipe(catchError(this.handleError))
+    }
+    changePassword(Id:number,NewPassword:string) {
+      return this.http.post(EndPoint+'Login/?IdUtilisateur='+Id, JSON.stringify(NewPassword) ,httpOptions).pipe(catchError(this.handleError))
+    }
     RenvoiToken(Id:number) {
       return this.http.post(EndPoint+'Login/?IdU='+Id, httpOptions).pipe(catchError(this.handleError))
     }

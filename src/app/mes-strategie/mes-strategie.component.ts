@@ -123,10 +123,10 @@ export class MesStrategieComponent implements OnInit {
   {
     this.selectZone = [];
     this.selectBoss = [];
-    this.IdBZ = "";
+    this.messageIndication = "Veuillez sélectionner une Zone."
+    this.IdBZ = "-1";
     if (Continent.value == 0) this.messageIndication = "";
     else {
-    this.messageIndication = "Veuillez sélectionner une Zone."
     this.zoneService.getZones().subscribe(response => {     
       response.forEach(item => {
         if (item.ContinentFR == Continent.value) {
@@ -201,6 +201,7 @@ export class MesStrategieComponent implements OnInit {
   {
     this.Enregistrements = [];
     if (this.IdBZ == '0') this.messageIndication = "Veuillez sélectionner un Boss.";
+    else if (this.IdBZ == '-1') this.messageIndication = "Veuillez sélectionner une Zone.";
     else
     {
       if (this.MaTeam.Id != 0)

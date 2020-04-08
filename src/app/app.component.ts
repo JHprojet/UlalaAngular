@@ -3,6 +3,7 @@ import {SESSION_STORAGE, WebStorageService} from 'angular-webstorage-service';
 import { Utilisateur } from './models/utilisateur';
 import { UtilisateurDAL } from './service/utilisateur-dal';
 import { Router } from '@angular/router';
+import { ActivationComponent } from './activation/activation.component';
 
 @Component({
   selector: 'app-root',
@@ -18,6 +19,7 @@ export class AppComponent {
   OkLogin:string ="";
   NotConnected:string="";
   Disconnected:string="";
+  MessageRecupPassword:string="";
 
   constructor(private router:Router,@Inject(SESSION_STORAGE) private session: WebStorageService, private UtilisateurService:UtilisateurDAL) { 
     this.getFromSession("User");
@@ -25,6 +27,7 @@ export class AppComponent {
 
   Connection()
   {
+    this.MessageRecupPassword="";
     this.ErrorLogin = "";
     this.OkLogin = "";
     this.UtilisateurService.CheckUser(new Utilisateur({Pseudo:this.login, Password:this.password})).subscribe(result => {
@@ -44,8 +47,10 @@ export class AppComponent {
         }  
       });
     },error => {
+      this.MessageRecupPassword="Perdu votre mot de passe? Cliquez ici pour recevoir un nouveau mot de passe par mail";
       this.ErrorLogin = "Utilisateur ou Mot de passe invalide";
       setTimeout(() => this.ErrorLogin = "", 3000);
+      setTimeout(() => this.MessageRecupPassword = "", 7000);
     });
   }
 
