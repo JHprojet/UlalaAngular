@@ -13,6 +13,10 @@ import { TeamDal } from '../service/team-dal';
 import { ClasseDAL } from '../service/classe-dal';
 import { Team } from '../models/team';
 import { Router } from '@angular/router';
+import { Subject, zip } from 'rxjs';
+
+const Continent$ = new Subject<boolean>();
+const Zone$ = new Subject<boolean>();
 
 @Component({
   selector: 'app-mes-preferences',
@@ -20,6 +24,7 @@ import { Router } from '@angular/router';
   styleUrls: ['./mes-preferences.component.css']
 })
 export class MesPreferencesComponent implements OnInit {
+  edit:boolean;
   utilisateur:Utilisateur;
   teamAdd:MesTeams;
   mesTeams:MesTeams[];
@@ -38,7 +43,8 @@ export class MesPreferencesComponent implements OnInit {
   nomTeam:string;
   messageNomTeam:string;
   errorUpload:string;
-  
+  teamId:number;
+
   constructor(private routerService:Router,private classeService:ClasseDAL,private teamService:TeamDal,private bossZoneService:BosszoneDAL,private bossService:BossDAL,private zoneService:ZoneDAL,private appService:AppComponent, private mesteamsService:MesTeamsDAL) { }
   
   ngOnInit(): void {
@@ -46,6 +52,8 @@ export class MesPreferencesComponent implements OnInit {
     {
       this.routerService.navigateByUrl("/")
     }
+    this.teamId = 0;
+    this.edit = false;
     this.errorUpload="";
     this.nomTeam="";
     this.messageNomTeam="";
@@ -90,13 +98,19 @@ export class MesPreferencesComponent implements OnInit {
     this.IdBZ = "";
     if (Continent.value == 0) this.messageBossZone = "Veuillez sélectionner un Continent.";
     else {
-    this.messageBossZone = "Veuillez sélectionner une Zone."
-    this.zoneService.getZones(this.appService.data["TK"]).subscribe(response => {     
-      response.forEach(item => {
-        if (item.ContinentFR == Continent.value) {
-          this.selectZone.push(item);
+      this.messageBossZone = "Veuillez sélectionner une Zone."
+      this.zoneService.getZones(this.appService.data["TK"]).subscribe(response => { 
+        let i = 0;
+        let j = response.length;
+        response.forEach(item => {
+          i++;
+          if (item.ContinentFR == Continent.value) this.selectZone.push(item);
+          if (item.ContinentFR == Continent && this.edit) 
+          {
+            this.selectZone.push(item);
+            Continent$.next(true);
           }
-        })
+        });
       });
     }
   }
@@ -110,9 +124,14 @@ export class MesPreferencesComponent implements OnInit {
     this.messageBossZone = "";
     this.bossZoneService.getBossZones(this.appService.data["TK"]).subscribe(response => {
       response.forEach(item => {
-        if (item.Zone.Id == Z.value) 
+        if (item.Zone.Id == Z.value) this.teamAdd.Zone = new Zone({Id:item.Zone.Id});
+        if (item.Zone.Id == Z && this.edit) 
+        {
           this.teamAdd.Zone = new Zone({Id:item.Zone.Id});
+          Zone$.next(true);
+        }
         });
+        
       });
     }
   }
@@ -190,4 +209,85 @@ export class MesPreferencesComponent implements OnInit {
       this.ngOnInit();
     });
   }
+
+  public EditTeam(id)
+  {
+    this.messageClasse = "";
+    this.edit = true;
+    this.mesteamsService.getMaTeam(id, this.appService.data['TK']).subscribe(result => {
+      this.nomTeam = result.NomTeam;
+      this.teamId = result.Id;
+      let C1Select = (document.getElementById("C1") as HTMLSelectElement);
+      let C2Select = (document.getElementById("C2") as HTMLSelectElement);
+      let C3Select = (document.getElementById("C3") as HTMLSelectElement);
+      let C4Select = (document.getElementById("C4") as HTMLSelectElement);
+      let myContinentSelect = (document.getElementById("T") as HTMLSelectElement);
+      for(var i, j = 0; i = myContinentSelect.options[j]; j++) {
+        if(i.value == result.Zone.ContinentFR) {
+          myContinentSelect.selectedIndex = j;
+            break;
+        }
+      }
+      
+      for(var i, j = 0; i = C1Select.options[j]; j++) {
+        if(i.value == result.Team.Classe1.Id) {
+          C1Select.selectedIndex = j;
+          this.Idclasse1 = j;
+            break;
+        }
+      }
+      
+      for(var i, j = 0; i = C2Select.options[j]; j++) {
+        if(i.value == result.Team.Classe2.Id) {
+          C2Select.selectedIndex = j;
+          this.Idclasse2 = j;
+            break;
+        }
+      }
+      
+      for(var i, j = 0; i = C3Select.options[j]; j++) {
+        if(i.value == result.Team.Classe3.Id) {
+          C3Select.selectedIndex = j;
+          this.Idclasse3 = j;
+            break;
+        }
+      }
+     
+      for(var i, j = 0; i = C4Select.options[j]; j++) {
+        if(i.value == result.Team.Classe4.Id) {
+          C4Select.selectedIndex = j;
+          this.Idclasse4 = j;
+            break;
+        }
+      }
+      this.changeContinent(result.Zone.ContinentFR);
+      this.changeZone(result.Zone.Id);
+      
+       zip(Continent$, Zone$).subscribe(() => {
+        let myZoneSelect = (document.getElementById("Z") as HTMLSelectElement);
+        for(var i, j = 0; i = myZoneSelect.options[j]; j++) {
+          if(i.value == result.Zone.Id) {
+            myZoneSelect.selectedIndex = j;
+              break;
+          }
+        }
+      });
+    });
+  }
+
+  public update()
+  {
+    this.teamAdd.Utilisateur = new Utilisateur({Id:this.appService.data["User"].Id});
+    this.teamAdd.NomTeam = this.nomTeam;
+
+    this.mesteamsService.putMaTeam(this.teamAdd, this.teamId, this.appService.data['TK']).subscribe(() => {
+      this.mesteamsService.getMeTeamsByUserId(this.utilisateur.Id, this.appService.data['TK']).subscribe(result =>{
+        this.mesTeams = result;
+      });
+    }, error => {
+      this.errorUpload = "Un problème est survenue, merci de réessayer."
+    })
+    this.ngOnInit();
+  }
+  
 }

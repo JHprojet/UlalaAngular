@@ -1,0 +1,79 @@
+<br/>
+<h2>Gestion Admin des Utilisateurs</h2>
+<br/>
+
+
+<div class="col-sm-12 form-group row">
+    <label class="col-sm-2 col-form-label">Le mail contient :</label>
+    <div class="col-sm-2">
+        <input type="text" value="{{SearchMail}}" class="form-control" [(ngModel)]="SearchMail" name="SearchMail">
+    </div>
+    <label class="col-sm-2 col-form-label">Le pseudo contient :</label>
+    <div class="col-sm-3">
+        <input type="text" value="{{SearchPseudo}}" class="form-control" [(ngModel)]="SearchPseudo" name="SearchPseudo">
+    </div>
+    <label class="col-sm-1 col-form-label">Role : </label>
+    <select class="form-control col-sm-2" NgModel (change)="changeRole(Role)" #Role>
+        <option value=""></option>
+        <option *ngFor="let Role of SelectRole" value={{Role}}>{{Role}}</option>
+    </select>
+</div>
+    
+<div class="col-sm-12 mx-auto form-group row" style="width: 300px;">
+    <button (click)="search()" type="submit" class=" btn btn-secondary btn-lg">Chercher un utilisateur</button>
+</div>
+<hr/>
+<br/>
+<div *ngIf="message != ''" class="alert alert-danger" role="alert">
+    {{message}}
+</div>
+<ng-container *ngIf="edit">
+    <div class="col-sm-12 form-group row">
+        <div class="col-sm-3">
+            <input type="text" class="form-control" value="{{EditPseudo}}"  [(ngModel)]="EditPseudo" name="EditPseudo">
+        </div>
+        <div class="col-sm-3">
+            <input type="text" class="form-control" value="{{EditMail}}" [(ngModel)]="EditMail" name="EditMail">
+        </div>
+        <div class="col-sm-2">
+            <select id="R" class="form-control" NgModel (change)="changeEditRole(Role)" #Role>
+                <option *ngFor="let Role of SelectRole" value={{Role}}>{{Role}}</option>
+            </select>
+        </div>
+        <div class="col-sm-2">
+            <select id="A" class="form-control" NgModel (change)="changeEditActif(Actif)" #Actif>
+                <option value="0">0</option>
+                <option value="1">1</option>
+            </select>
+        </div>
+        <div class="col-sm-2">
+            <button class="btn btn-primary" type="button" (click)="Modifier()">Valider</button>
+        </div>
+    </div>
+<br/>
+</ng-container>
+
+
+    <table class="table table-striped">
+        <thead class="thead-dark">
+            <tr>
+                <th>Id</th>
+                <th>Pseudo</th>
+                <th>Mail</th>
+                <th>Role</th>
+                <th>Actif</th>
+                <th>Editer</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr *ngFor="let elem of Users">
+                <td>{{elem.Id}}</td>
+                <td>{{elem.Pseudo}}</td>
+                <td>{{elem.Mail}}</td>
+                <td>{{elem.Role}} </td>
+                <td>{{elem.Actif}}</td>
+                <td><button class="btn btn-primary" type="button" (click)="Edit(elem.Id)">Editer</button></td>
+            </tr>
+        </tbody>  
+    </table>
+    <br/><br/><br/>

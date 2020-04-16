@@ -10,19 +10,19 @@ const EndPoint = "http://localhost:44312/api/";
 export class ZoneDAL {
     constructor(private http: HttpClient) { }
     getZones(Token:string): Observable<Zone[]> {
-        return this.http.get<Zone[]>(EndPoint+'Zone', this.GetHeader(Token)).pipe(catchError(this.handleError))
+        return this.http.get<Zone[]>(EndPoint+'Zone', this.GetHeader(Token))
     }
     getZone(id:number, Token:string): Observable<Zone> {
-        return this.http.get<Zone>(EndPoint+'Zone/'+id, this.GetHeader(Token)).pipe(catchError(this.handleError))
+        return this.http.get<Zone>(EndPoint+'Zone/'+id, this.GetHeader(Token))
     }
     postZone(monObjet: Zone, Token:string): Observable<Zone> {
-        return this.http.post<Zone>(EndPoint+'Zone', monObjet, this.GetHeader(Token)).pipe(catchError(this.handleError))
+        return this.http.post<Zone>(EndPoint+'Zone', monObjet, this.GetHeader(Token))
     }
     putZone(monObjet: Zone, id: number, Token:string): Observable<Zone> {
-        return this.http.put<Zone>(EndPoint+'Zone/'+id, monObjet, this.GetHeader(Token)).pipe(catchError(this.handleError))
+        return this.http.put<Zone>(EndPoint+'Zone/'+id, monObjet, this.GetHeader(Token))
     }
     deleteZone(id: number, Token:string): Observable<Zone> {
-        return this.http.delete<Zone>(EndPoint+'Zone/'+id, this.GetHeader(Token)).pipe(catchError(this.handleError))
+        return this.http.delete<Zone>(EndPoint+'Zone/'+id, this.GetHeader(Token))
       }
     handleError(error) {
       let errorMessage = '';

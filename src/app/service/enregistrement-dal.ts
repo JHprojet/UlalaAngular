@@ -12,23 +12,22 @@ export class EnregistrementDAL {
     constructor(private http: HttpClient) { }
     
     getEnregistrements(Token:string): Observable<Enregistrement[]> {
-        return this.http.get<Enregistrement[]>(EndPoint+'Enregistrement', this.GetHeader(Token)).pipe(catchError(this.handleError))
+        return this.http.get<Enregistrement[]>(EndPoint+'Enregistrement', this.GetHeader(Token))
     }
     getEnregistrement(id:number, Token:string): Observable<Enregistrement> {
-        return this.http.get<Enregistrement>(EndPoint+'Enregistrement/'+id, this.GetHeader(Token)).pipe(catchError(this.handleError))
+        return this.http.get<Enregistrement>(EndPoint+'Enregistrement/'+id, this.GetHeader(Token))
     }
     getEnregistrementsByInfos(U:string, BZ:string, IdC1:string, IdC2:string, IdC3:string, IdC4:string, Token:string): Observable<Enregistrement[]> {
-      console.log(Token); 
-      return this.http.get<Enregistrement[]>(EndPoint+'Enregistrement/?U='+U+'&BZ='+BZ+'&C1='+IdC1+'&C2='+IdC2+'&C3='+IdC3+'&C4='+IdC4, this.GetHeader(Token)).pipe(catchError(this.handleError))
+      return this.http.get<Enregistrement[]>(EndPoint+'Enregistrement/?U='+U+'&BZ='+BZ+'&C1='+IdC1+'&C2='+IdC2+'&C3='+IdC3+'&C4='+IdC4, this.GetHeader(Token))
     }
     postEnregistrement(monObjet: Enregistrement, Token:string): Observable<Enregistrement> {
-        return this.http.post<Enregistrement>(EndPoint+'Enregistrement', monObjet, this.GetHeader(Token)).pipe(catchError(this.handleError))
+        return this.http.post<Enregistrement>(EndPoint+'Enregistrement', monObjet, this.GetHeader(Token))
     }
     putEnregistrement(monObjet: Enregistrement, id: number, Token:string): Observable<Enregistrement> {
-        return this.http.put<Enregistrement>(EndPoint+'Enregistrement/'+id, monObjet, this.GetHeader(Token)).pipe(catchError(this.handleError))
+        return this.http.put<Enregistrement>(EndPoint+'Enregistrement/'+id, monObjet, this.GetHeader(Token))
     }
     deleteEnregistrement(id: number, Token:string): Observable<Enregistrement> {
-        return this.http.delete<Enregistrement>(EndPoint+'Enregistrement/'+id, this.GetHeader(Token)).pipe(catchError(this.handleError))
+        return this.http.delete<Enregistrement>(EndPoint+'Enregistrement/'+id, this.GetHeader(Token))
       }
     handleError(error) {
       let errorMessage = '';

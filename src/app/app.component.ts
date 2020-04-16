@@ -78,7 +78,6 @@ export class AppComponent {
     {
       this.UtilisateurService.GetAnonymeToken().subscribe(result => {
         this.data["TKA"] = result;
-        console.log(this.data["TKA"]);
       })
     }
    }

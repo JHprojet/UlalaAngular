@@ -10,19 +10,19 @@ const EndPoint = "http://localhost:44312/api/";
 export class ClasseDAL {
     constructor(private http: HttpClient) { }
     getClasses(Token:string): Observable<Classe[]> {
-        return this.http.get<Classe[]>(EndPoint+'Classe', this.GetHeader(Token)).pipe(catchError(this.handleError))
+        return this.http.get<Classe[]>(EndPoint+'Classe', this.GetHeader(Token))
     }
     getClasse(id:number, Token:string): Observable<Classe> {
-        return this.http.get<Classe>(EndPoint+'Classe/'+id, this.GetHeader(Token)).pipe(catchError(this.handleError))
+        return this.http.get<Classe>(EndPoint+'Classe/'+id, this.GetHeader(Token))
     }
     postClasse(monObjet: Classe, Token:string): Observable<Classe> {
-        return this.http.post<Classe>(EndPoint+'Classe', monObjet, this.GetHeader(Token)).pipe(catchError(this.handleError))
+        return this.http.post<Classe>(EndPoint+'Classe', monObjet, this.GetHeader(Token))
     }
     putClasse(monObjet: Classe, id: number, Token:string): Observable<Classe> {
-        return this.http.put<Classe>(EndPoint+'Classe/'+id, monObjet, this.GetHeader(Token)).pipe(catchError(this.handleError))
+        return this.http.put<Classe>(EndPoint+'Classe/'+id, monObjet, this.GetHeader(Token))
     }
     deleteClasse(id: number, Token:string): Observable<Classe> {
-        return this.http.delete<Classe>(EndPoint+'Classe/'+id, this.GetHeader(Token)).pipe(catchError(this.handleError))
+        return this.http.delete<Classe>(EndPoint+'Classe/'+id, this.GetHeader(Token))
       }
     handleError(error) {
       let errorMessage = '';

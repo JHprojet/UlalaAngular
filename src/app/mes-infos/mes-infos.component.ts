@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { AppComponent } from '../app.component';
 import { Router } from '@angular/router';
+import { Utilisateur } from '../models/utilisateur';
 
 @Component({
   selector: 'app-mes-infos',
@@ -10,12 +11,15 @@ import { Router } from '@angular/router';
 export class MesInfosComponent implements OnInit {
 
   constructor(private appService:AppComponent, private routerService:Router) { }
+  User:Utilisateur;
+  
 
   ngOnInit(): void {
     if(!this.appService.data["TKA"])
     {
-      this.routerService.navigateByUrl("/")
+      this.routerService.navigateByUrl("/");
     }
+    this.User = this.appService.data["User"];
   }
 
 }

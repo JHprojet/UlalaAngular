@@ -16,16 +16,16 @@ export class VoteDAL {
         return this.http.get<Vote>(EndPoint+'Vote/'+id, this.GetHeader(Token)).pipe(retry(1), catchError(this.handleError))
     }
     getVotesByUser(id:number, Token:string): Observable<Vote[]> {
-      return this.http.get<Vote[]>(EndPoint+'Vote/?UtilisateurId='+id, this.GetHeader(Token)).pipe(catchError(this.handleError))
+      return this.http.get<Vote[]>(EndPoint+'Vote/?UtilisateurId='+id, this.GetHeader(Token))
   }
     postVote(monObjet: Vote, Token:string): Observable<Vote> {
-        return this.http.post<Vote>(EndPoint+'Vote', monObjet, this.GetHeader(Token)).pipe(catchError(this.handleError))
+        return this.http.post<Vote>(EndPoint+'Vote', monObjet, this.GetHeader(Token))
     }
     putVote(monObjet: Vote, id: number, Token:string): Observable<Vote> {
-        return this.http.put<Vote>(EndPoint+'Vote/'+id, monObjet, this.GetHeader(Token)).pipe(catchError(this.handleError))
+        return this.http.put<Vote>(EndPoint+'Vote/'+id, monObjet, this.GetHeader(Token))
     }
     deleteVote(id: number, Token:string): Observable<Vote> {
-        return this.http.delete<Vote>(EndPoint+'Vote/'+id, this.GetHeader(Token)).pipe(catchError(this.handleError))
+        return this.http.delete<Vote>(EndPoint+'Vote/'+id, this.GetHeader(Token))
       }
     handleError(error) {
       let errorMessage = '';

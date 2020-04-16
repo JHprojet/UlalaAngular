@@ -11,19 +11,19 @@ const EndPoint = "http://localhost:44312/api/";
 export class BossDAL {
     constructor(private http: HttpClient) { }
     getBosses(Token:string): Observable<Boss[]> {
-        return this.http.get<Boss[]>(EndPoint+'Boss', this.GetHeader(Token)).pipe(catchError(this.handleError))
+        return this.http.get<Boss[]>(EndPoint+'Boss', this.GetHeader(Token))
     }
     getBoss(id:number, Token:string): Observable<Boss> {
-        return this.http.get<Boss>(EndPoint+'Boss/'+id, this.GetHeader(Token)).pipe(catchError(this.handleError))
+        return this.http.get<Boss>(EndPoint+'Boss/'+id, this.GetHeader(Token))
     }
     postBoss(monObjet: Boss, Token:string): Observable<Boss> {
-        return this.http.post<Boss>(EndPoint+'Boss', monObjet, this.GetHeader(Token)).pipe(catchError(this.handleError))
+        return this.http.post<Boss>(EndPoint+'Boss', monObjet, this.GetHeader(Token))
     }
     putBoss(monObjet: Boss, id: number, Token:string): Observable<Boss> {
-        return this.http.put<Boss>(EndPoint+'Boss/'+id, monObjet, this.GetHeader(Token)).pipe(catchError(this.handleError))
+        return this.http.put<Boss>(EndPoint+'Boss/'+id, monObjet, this.GetHeader(Token))
     }
     deleteBoss(id: number, Token:string): Observable<Boss> {
-        return this.http.delete<Boss>(EndPoint+'Boss/'+id, this.GetHeader(Token)).pipe(catchError(this.handleError))
+        return this.http.delete<Boss>(EndPoint+'Boss/'+id, this.GetHeader(Token))
       }
     handleError(error) {
       let errorMessage = '';

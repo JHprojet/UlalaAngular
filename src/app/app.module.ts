@@ -21,6 +21,7 @@ import { HttpClientModule } from '@angular/common/http';
 import { StorageServiceModule} from 'angular-webstorage-service';
 import { ActivationComponent } from './activation/activation.component';
 import { RetrievePasswordComponent } from './retrieve-password/retrieve-password.component';
+import { AdminUsersComponent } from './admin-users/admin-users.component';
 
 @NgModule({
   declarations: [
@@ -40,6 +41,7 @@ import { RetrievePasswordComponent } from './retrieve-password/retrieve-password
     InscriptionComponent,
     ActivationComponent,
     RetrievePasswordComponent,
+    AdminUsersComponent,
   ],
   imports: [
     HttpClientModule,

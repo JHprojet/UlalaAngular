@@ -16,6 +16,7 @@ import { SearchStrategieComponent } from './search-strategie/search-strategie.co
 import { InscriptionComponent } from './inscription/inscription.component';
 import { ActivationComponent } from './activation/activation.component';
 import { RetrievePasswordComponent } from './retrieve-password/retrieve-password.component';
+import { AdminUsersComponent } from './admin-users/admin-users.component';
 
 
 const routes: Routes = [];
@@ -38,7 +39,8 @@ const routes: Routes = [];
     {path : 'favstrat', component: SearchStrategieComponent},
     {path : 'inscription', component: InscriptionComponent},
     {path : 'activation', component: ActivationComponent},
-    {path : 'RetrievePassword', component: RetrievePasswordComponent}
+    {path : 'RetrievePassword', component: RetrievePasswordComponent},
+    {path : 'admusers', component: AdminUsersComponent},
   ])],
   exports: [RouterModule]
 })

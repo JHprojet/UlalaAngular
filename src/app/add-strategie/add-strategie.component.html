@@ -20,60 +20,87 @@
    Type des images attendu : <p class="helpss">(Aucune autre image, ne sera acceptée)</p>
    <br/>
    <img src="http://192.168.1.2:8081/exemple.jpg" width="150px">
-
     <hr/>
 </div>
 <br/>
-<div class="form-group row">
-    <label class="col-sm-1 col-form-label">Continent</label>
-    <select class="form-control col-sm-2" NgModel (change)="changeContinent(Continent)" #Continent>
-        <option value="0"></option>
-        <option *ngFor="let zone of selectContinent">{{zone.ContinentFR}}</option>
-    </select>
-    <label class="col-sm-1 col-form-label">Zone</label>
-    <select class="form-control col-sm-3" NgModel (change)="changeZone(Zone)" #Zone>
-        <option value="0"></option>
-        <option *ngFor="let zone of selectZone" value={{zone.Id}}>{{zone.ZoneFR}}</option>
-    </select>
-    <label class="col-sm-1 col-form-label">Boss</label>
-    <select class="form-control col-sm-3" NgModel (change)="changeBoss(Boss)" #Boss>
+<div *ngIf="currentUser.Id != 0" class="form-group row">
+    <ng-container *ngIf="selectMesTeams.length != 0">
+        <label class="form-check-label col-sm-2">Choisir sa team</label>
+        <select class="form-control col-sm-2" NgModel (change)="choixMaTeam(MaTeam)" #MaTeam>
+            <option value="0"></option>
+            <option *ngFor="let MaTeam of selectMesTeams" value={{MaTeam.Id}}>{{MaTeam.NomTeam}}</option>
+        </select>
+        <label class="col-sm-1 col-form-label">Boss</label>
+        <select class="form-control col-sm-3" NgModel (change)="changeBoss(Boss)" #Boss>
             <option value="0"></option>
             <option *ngFor="let boss of selectBoss" value={{boss.Id}}>{{boss.NomFR}}</option>
-    </select>
+        </select>
+    </ng-container>
+    <ng-container *ngIf="selectMesTeams.length == 0">
+        <p>Vous n'avez pas encore de team favorite. Si vous souhaitez en créer afin de simplifier l'ajout de stratégie : <a routerLink='/prefs'>C'est par ici!</a></p>
+    </ng-container>
+    <br/>
 </div>
-<ng-container *ngIf="messageBossZone != ''">
-    <div class="alert alert-danger" role="alert"> {{messageBossZone}}</div>
+<ng-container *ngIf="currentUser.Id != 0">
+    <div *ngIf="messageIndication !=''" class="alert alert-danger" role="alert">{{messageIndication}}</div>
 </ng-container>
 
+    
 
-<br/>
-<div class="form-group row">
-    <label class="col-sm-1 col-form-label">Classe 1</label>
-    <select class="form-control col-sm-2" NgModel (change)="changeClasse1(Classe1)" #Classe1>
-        <option value="0"></option>
-        <option *ngFor="let classe of selectClasse" value={{classe.Id}}>{{classe.NomFR}}</option>
-    </select>
 
-    <label class="col-sm-1 col-form-label">Classe 2</label>
-    <select class="form-control col-sm-2" NgModel (change)="changeClasse2(Classe2)" #Classe2>
-        <option value="0"></option>
-        <option *ngFor="let classe of selectClasse" value={{classe.Id}}>{{classe.NomFR}}</option>
-    </select>
+<ng-container *ngIf="MaTeam.Id == 0">
+    <div class="form-group row">
+        <label class="col-sm-1 col-form-label">Continent</label>
+        <select class="form-control col-sm-2" NgModel (change)="changeContinent(Continent)" #Continent>
+            <option value="0"></option>
+            <option *ngFor="let zone of selectContinent">{{zone.ContinentFR}}</option>
+        </select>
+        <label class="col-sm-1 col-form-label">Zone</label>
+        <select class="form-control col-sm-3" NgModel (change)="changeZone(Zone)" #Zone>
+            <option value="0"></option>
+            <option *ngFor="let zone of selectZone" value={{zone.Id}}>{{zone.ZoneFR}}</option>
+        </select>
+        <label class="col-sm-1 col-form-label">Boss</label>
+        <select class="form-control col-sm-3" NgModel (change)="changeBoss(Boss)" #Boss>
+                <option value="0"></option>
+                <option *ngFor="let boss of selectBoss" value={{boss.Id}}>{{boss.NomFR}}</option>
+        </select>
+    </div>
+    <ng-container *ngIf="messageBossZone != ''">
+        <div class="alert alert-danger" role="alert"> {{messageBossZone}}</div>
+    </ng-container>
 
-    <label class="col-sm-1 col-form-label">Classe 3</label>
-    <select class="form-control col-sm-2" NgModel (change)="changeClasse3(Classe3)" #Classe3>
-        <option value="0"></option>
-        <option *ngFor="let classe of selectClasse" value={{classe.Id}}>{{classe.NomFR}}</option>
-    </select>
 
-    <label class="col-sm-1 col-form-label">Classe 4</label>
-    <select class="form-control col-sm-2" NgModel (change)="changeClasse4(Classe4)" #Classe4>
-        <option value="0"></option>
-        <option *ngFor="let classe of selectClasse" value={{classe.Id}}>{{classe.NomFR}}</option>
-    </select>
-</div>
-<ng-container *ngIf="messageClasse != ''">
-    <div class="alert alert-danger" role="alert"> {{messageClasse}}</div>
+    <br/>
+    <div class="form-group row">
+        <label class="col-sm-1 col-form-label">Classe 1</label>
+        <select class="form-control col-sm-2" NgModel (change)="changeClasse1(Classe1)" #Classe1>
+            <option value="0"></option>
+            <option *ngFor="let classe of selectClasse" value={{classe.Id}}>{{classe.NomFR}}</option>
+        </select>
+
+        <label class="col-sm-1 col-form-label">Classe 2</label>
+        <select class="form-control col-sm-2" NgModel (change)="changeClasse2(Classe2)" #Classe2>
+            <option value="0"></option>
+            <option *ngFor="let classe of selectClasse" value={{classe.Id}}>{{classe.NomFR}}</option>
+        </select>
+
+        <label class="col-sm-1 col-form-label">Classe 3</label>
+        <select class="form-control col-sm-2" NgModel (change)="changeClasse3(Classe3)" #Classe3>
+            <option value="0"></option>
+            <option *ngFor="let classe of selectClasse" value={{classe.Id}}>{{classe.NomFR}}</option>
+        </select>
+
+        <label class="col-sm-1 col-form-label">Classe 4</label>
+        <select class="form-control col-sm-2" NgModel (change)="changeClasse4(Classe4)" #Classe4>
+            <option value="0"></option>
+            <option *ngFor="let classe of selectClasse" value={{classe.Id}}>{{classe.NomFR}}</option>
+        </select>
+    </div>
+    <ng-container *ngIf="messageClasse != ''">
+        <div class="alert alert-danger" role="alert"> {{messageClasse}}</div>
+    </ng-container>
+
 </ng-container>
 <br/>
 <div class="form-group row">
@@ -88,6 +115,6 @@
     <div class="alert alert-danger" role="alert"> {{errorImage}}</div>
 </ng-container>
     <br/>
-    <button *ngIf="errorImage == '' && messageClasse == '' && messageBossZone == ''  && Loading == false" class="btn btn-primary" type="submit" (click)="upload()">Envoyer</button>
+    <button *ngIf=" ((messageClasse == '' && messageBossZone == '' && AffButtonWithDetail) || messageIndication == '') && errorImage == ''  && Loading == false" class="btn btn-primary" type="submit" (click)="upload()">Envoyer</button>
 
 

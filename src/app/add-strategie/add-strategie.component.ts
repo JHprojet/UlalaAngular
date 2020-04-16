@@ -17,6 +17,8 @@ import { Utilisateur } from '../models/utilisateur';
 import { Router } from '@angular/router';
 import { AppComponent } from '../app.component';
 import { Subject, zip } from 'rxjs';
+import { MesTeams } from '../models/mes-teams';
+import { MesTeamsDAL } from '../service/mesteams-dal';
 
 const scan1$ = new Subject<boolean>();
 const scan2$ = new Subject<boolean>();
@@ -50,24 +52,48 @@ export class AddStrategieComponent implements OnInit {
   errorImage: string;
   Images = new Array<any>();
   Enregistrement:Enregistrement;
+  messageIndication:string;
   FileNames:string[];
   UploadOK:string;
   UploadFail:string;
   Show:boolean;
   TexteButtonHelp:string;
+  selectMesTeams: MesTeams[];
+  currentUser:Utilisateur;
+  MaTeam:MesTeams;
+  AffButtonWithDetail:boolean;
+  
 
-  constructor(private appService:AppComponent,private routerService:Router, private enregistrementService:EnregistrementDAL,private imageService:ImageDAL, private classeService:ClasseDAL, private zoneService:ZoneDAL, private bossZoneService:BosszoneDAL, private bossService:BossDAL, private teamService:TeamDal) { }
+  constructor(private mesTeamsService:MesTeamsDAL,private appService:AppComponent,private routerService:Router, private enregistrementService:EnregistrementDAL,private imageService:ImageDAL, private classeService:ClasseDAL, private zoneService:ZoneDAL, private bossZoneService:BosszoneDAL, private bossService:BossDAL, private teamService:TeamDal) { }
 
   ngOnInit(): void {
     if(!this.appService.data["TKA"])
     {
       this.routerService.navigateByUrl("/")
     }
+    this.messageIndication="Si vous le souhaitez, vous pouvez choisir directement votre team perso et le boss. Sinon, ne remplir que les lignes suivantes.";
     this.Loading = false;
+    this.AffButtonWithDetail = true;
     this.Show = false;
-    this.TexteButtonHelp = "Afficher l'aide"
+    this.TexteButtonHelp = "Afficher l'aide";
+    this.MaTeam = new MesTeams({Id:0});
     this.selectClasse = new Array<Classe>();
     this.selectContinent = new Array<Zone>();
+    this.selectMesTeams = new Array<MesTeams>();
+    this.currentUser = new Utilisateur({});
+    if(this.appService.data["User"]) 
+    {
+      this.currentUser = this.appService.data["User"];
+    }
+    else this.currentUser.Id = 0;
+    
+    if (this.currentUser.Id != 0)
+    {
+      this.mesTeamsService.getMeTeamsByUserId(this.currentUser.Id, this.appService.data['TK']).subscribe(result => {
+        this.selectMesTeams = result;
+      })
+    }
+
     this.classeService.getClasses(this.appService.data["TK"]??this.appService.data["TKA"]).subscribe(result =>{
       this.selectClasse = result;
     })
@@ -88,7 +114,7 @@ export class AddStrategieComponent implements OnInit {
     this.IdBZ = "0";
     this.messageBossZone = "Veuillez sélectionner un Continent.";
     this.zoneId = 0;
-    this.errorImage = "Veuillez sélectionner les 4 images de votre stratégie."
+    this.errorImage = "Veuillez sélectionner les 4 images de votre stratégie.";
     this.Images = new Array<any>();
     this.Enregistrement = new Enregistrement( {
       Utilisateur: new Utilisateur({Id:1})
@@ -136,8 +162,13 @@ export class AddStrategieComponent implements OnInit {
   
     public changeBoss(Boss)
     {
-      if (Boss.value == 0) this.messageBossZone = "Veuillez sélectionner un Boss.";
+      if (Boss.value == 0) 
+      {
+        this.messageBossZone = "Veuillez sélectionner un Boss.";
+        this.messageIndication = "Veuillez sélectionner un Boss.";
+      }
       else {
+        if (!this.AffButtonWithDetail) this.messageIndication = "";
         this.messageBossZone = "";
         this.bossZoneService.getBossZones(this.appService.data["TK"]??this.appService.data["TKA"]).subscribe(response => {
           response.forEach(item => {
@@ -388,6 +419,38 @@ export class AddStrategieComponent implements OnInit {
     Percent = NumIdentique / NumTot * 100;
     if(Percent > 25) C$.next(true);
     else C$.next(false);
+  }
+
+  public choixMaTeam(T)
+  {
+    if (T.value == 0)
+    {
+      this.messageIndication = this.messageIndication="Si vous le souhaitez, vous pouvez choisir directement votre team perso et le boss. Sinon, ne remplir que les lignes suivantes.";
+      this.MaTeam = new MesTeams({Id:0});
+      this.AffButtonWithDetail = true;
+    }
+    else{
+      
+      this.mesTeamsService.getMaTeam(T.value, this.appService.data['TK']).subscribe(result => {
+      this.MaTeam = result;
+      this.Enregistrement.Team = new Team({});
+      this.Enregistrement.Team.Id = result.Team.Id;
+      this.AffButtonWithDetail = false;
+    })
+    this.bossZoneService.getBossZones(this.appService.data["TK"]??this.appService.data["TKA"]).subscribe(response => {
+      this.selectBoss = [];
+      this.IdBZ = "0";
+      this.messageIndication = "Veuillez sélectionner un Boss."
+      response.forEach(item => {
+        if (item.Zone.Id == this.MaTeam.Zone.Id) {
+          this.zoneId = item.Zone.Id;
+          this.bossService.getBoss(item.Boss.Id, this.appService.data["TK"]??this.appService.data["TKA"]).subscribe(response => {
+            this.selectBoss.push(response);
+            })
+          }
+        })
+      });
+    }
   }
 }
 

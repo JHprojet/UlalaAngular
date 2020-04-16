@@ -10,19 +10,19 @@ const EndPoint = "http://localhost:44312/api/";
 export class BosszoneDAL {
     constructor(private http: HttpClient) { }
     getBossZones(Token:string): Observable<BossZone[]> {
-        return this.http.get<BossZone[]>(EndPoint+'BossZone', this.GetHeader(Token)).pipe(catchError(this.handleError))
+        return this.http.get<BossZone[]>(EndPoint+'BossZone', this.GetHeader(Token))
     }
     getBossZone(id:number, Token:string): Observable<BossZone> {
-        return this.http.get<BossZone>(EndPoint+'BossZone/'+id, this.GetHeader(Token)).pipe(catchError(this.handleError))
+        return this.http.get<BossZone>(EndPoint+'BossZone/'+id, this.GetHeader(Token))
     }
     postBossZone(monObjet: BossZone, Token:string): Observable<BossZone> {
-        return this.http.post<BossZone>(EndPoint+'BossZone', monObjet, this.GetHeader(Token)).pipe(catchError(this.handleError))
+        return this.http.post<BossZone>(EndPoint+'BossZone', monObjet, this.GetHeader(Token))
     }
     putBossZone(monObjet: BossZone, id:number, Token:string): Observable<BossZone> {
-        return this.http.put<BossZone>(EndPoint+'BossZone/'+id, monObjet, this.GetHeader(Token)).pipe(catchError(this.handleError))
+        return this.http.put<BossZone>(EndPoint+'BossZone/'+id, monObjet, this.GetHeader(Token))
     }
     deleteBossZone(id: number, Token:string): Observable<BossZone> {
-        return this.http.delete<BossZone>(EndPoint+'BossZone/'+id, this.GetHeader(Token)).pipe(catchError(this.handleError))
+        return this.http.delete<BossZone>(EndPoint+'BossZone/'+id, this.GetHeader(Token))
       }
     handleError(error) {
       let errorMessage = '';

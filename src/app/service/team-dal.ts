@@ -10,22 +10,22 @@ const EndPoint = "http://localhost:44312/api/";
 export class TeamDal {
     constructor(private http: HttpClient) { }
     getTeams(Token:string): Observable<Team[]> {
-        return this.http.get<Team[]>(EndPoint+'Team', this.GetHeader(Token)).pipe(catchError(this.handleError))
+        return this.http.get<Team[]>(EndPoint+'Team', this.GetHeader(Token))
     }
     getTeamByClasses(idclasse1:number,idclasse2:number,idclasse3:number,idclasse4:number,Token:string): Observable<Team> {
-        return this.http.get<Team>(EndPoint+'Team/'+'?C1='+idclasse1+'&C2='+idclasse2+'&C3='+idclasse3+'&C4='+idclasse4, this.GetHeader(Token)).pipe(catchError(this.handleError))
+        return this.http.get<Team>(EndPoint+'Team/'+'?C1='+idclasse1+'&C2='+idclasse2+'&C3='+idclasse3+'&C4='+idclasse4, this.GetHeader(Token))
     }
     getTeam(id:number, Token): Observable<Team> {
-        return this.http.get<Team>(EndPoint+'Team/'+id, this.GetHeader(Token)).pipe(catchError(this.handleError))
+        return this.http.get<Team>(EndPoint+'Team/'+id, this.GetHeader(Token))
     }
     postTeam(monObjet: Team, Token:string): Observable<Team> {
-        return this.http.post<Team>(EndPoint+'Team', monObjet, this.GetHeader(Token)).pipe(catchError(this.handleError))
+        return this.http.post<Team>(EndPoint+'Team', monObjet, this.GetHeader(Token))
     }
     putTeam(monObjet: Team, id:number, Token:string): Observable<Team> {
-        return this.http.put<Team>(EndPoint+'Team/'+id, monObjet, this.GetHeader(Token)).pipe(catchError(this.handleError))
+        return this.http.put<Team>(EndPoint+'Team/'+id, monObjet, this.GetHeader(Token))
     }
     deleteTeam(id: number, Token:string): Observable<Team> {
-        return this.http.delete<Team>(EndPoint+'Team/'+id, this.GetHeader(Token)).pipe(catchError(this.handleError))
+        return this.http.delete<Team>(EndPoint+'Team/'+id, this.GetHeader(Token))
       }
     handleError(error) {
       let errorMessage = '';

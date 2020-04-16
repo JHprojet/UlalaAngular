@@ -10,8 +10,7 @@ const EndPoint = "http://localhost:44312/api/";
 export class ImageDAL {
     constructor(private http: HttpClient) { }
     uploadImage(image:Image, Token:string):Observable<any> {
-      console.log(image.fileName); 
-        return this.http.post<Image>(EndPoint+'image', image, this. GetHeader(Token)).pipe(catchError(this.handleError));
+        return this.http.post<Image>(EndPoint+'image', image, this. GetHeader(Token));
       }
       handleError(error) {
         let errorMessage = '';

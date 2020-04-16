@@ -45,6 +45,9 @@
           <a class="dropdown-item" routerLink='/myinfos'>Mes informations</a>
         </div>
       </li>
+      <li *ngIf="data['User'] && data['User'].Role && data['User'].Role == 'Admin'" class="nav-item active">
+        <a class="nav-link" routerLink='/admusers'>Admin</a>
+      </li>
     </ul>
     <form class="form-inline my-2 my-lg-0">
       <input *ngIf="!data['User']" class="form-control mr-sm-2" type="text" placeholder="Login" aria-label="Login" [(ngModel)]="login" name="login">

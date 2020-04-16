@@ -53,31 +53,25 @@ export class SearchStrategieComponent implements OnInit {
   route: string;
   private _enregistrement: Enregistrement[];
 
-   get Enregistrements():Enregistrement[] {
-     if (this.route == "favstrat")
-     {
-       let newTab:Enregistrement[] = new Array<Enregistrement>();
-       for (let elem of this._enregistrement)
-       {
-         for (let fav of this.myFavs) 
-         {
+  get Enregistrements():Enregistrement[] {
+    if (this.route == "favstrat")
+    {
+      let newTab:Enregistrement[] = new Array<Enregistrement>();
+      for (let elem of this._enregistrement)
+      {
+        for (let fav of this.myFavs) 
+        {
           if (elem.Id == fav.Enregistrement.Id) newTab.push(elem);
-         }
-       }
-       return newTab;
-     }
+        }
+      }
+      return newTab;
+    }
       
-     else return this._enregistrement;
-    };
-    
-
-   set Enregistrements(P:Enregistrement[]) {
+    else return this._enregistrement;
+  };
+  set Enregistrements(P:Enregistrement[]) {
     this._enregistrement = P;
-   }
-
-
-
-
+  }
 
   ngOnInit(): void {
     if(!this.appService.data ["TKA"])
