@@ -4,8 +4,25 @@
     <div *ngIf="UploadFail != ''" class="alert alert-danger" role="alert">{{UploadFail}}</div>
 </ng-container>
 <hr/>
-<h2>Ajouter une stratégie</h2>
+<div class="form-group row">
+    &nbsp;&nbsp;<h2>Ajouter une stratégie</h2>&nbsp;&nbsp;&nbsp;&nbsp;
+    <button (click)="ShowHelp()" type="button" class="btn btn-light dropdown-toggle">
+        {{TexteButtonHelp}}
+        </button>
+</div>
 <hr/>
+<div class="help" *ngIf="Show">
+    <strong>Information sur l'ajout d'une stratégie :</strong>
+    <br/><br/>
+   1 - Sélectionnez tous les champs : Continent, Zone, Boss, et les 4 classes de votre team.<br/>
+   2 - Uploadez les 4 images de votre stratégie : Les 4 images doivent avoir le même format et être en jpg ou en png.<br/><br/>
+
+   Type des images attendu : <p class="helpss">(Aucune autre image, ne sera acceptée)</p>
+   <br/>
+   <img src="http://192.168.1.2:8081/exemple.jpg" width="150px">
+
+    <hr/>
+</div>
 <br/>
 <div class="form-group row">
     <label class="col-sm-1 col-form-label">Continent</label>
@@ -61,12 +78,16 @@
 <br/>
 <div class="form-group row">
     <label class="col-sm-1 col-form-label">Images</label>
-    <input type="file" class="form-control-file col-sm-7"  id="inputImages" multiple="multiple" (change)="checkImages(input)" #input>
+    <input type="file" class="form-control-file col-sm-4"  id="inputImages" multiple="multiple" (change)="checkImages(input)" #input>
+    <div *ngIf="Loading" class="spinner-border text-dark" role="status">
+        <span class="sr-only">Loading...</span>
+      </div>
 </div>
+
 <ng-container *ngIf="errorImage != ''">
     <div class="alert alert-danger" role="alert"> {{errorImage}}</div>
 </ng-container>
     <br/>
-    <button *ngIf="errorImage == '' && messageClasse == '' && messageBossZone == '' " class="btn btn-primary" type="submit" (click)="upload()">Envoyer</button>
+    <button *ngIf="errorImage == '' && messageClasse == '' && messageBossZone == ''  && Loading == false" class="btn btn-primary" type="submit" (click)="upload()">Envoyer</button>
 
 

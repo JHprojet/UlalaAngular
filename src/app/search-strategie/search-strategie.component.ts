@@ -8,16 +8,19 @@ import { BossDAL } from '../service/boss-dal';
 import { BosszoneDAL } from '../service/bosszone-dal';
 import { EnregistrementDAL } from '../service/enregistrement-dal';
 import { Enregistrement } from '../models/enregistrement';
-import { DomSanitizer, SafeResourceUrl, SafeUrl} from '@angular/platform-browser';
 import { AppComponent } from '../app.component';
 import { Utilisateur } from '../models/utilisateur';
 import { MesTeams } from '../models/mes-teams';
 import { MesTeamsDAL } from '../service/mesteams-dal';
 import { Favori } from '../models/favori';
 import { FavoriDAL } from '../service/favori-dal';
-import { element } from 'protractor';
 import { Vote } from '../models/vote';
 import { VoteDAL } from '../service/vote-dal';
+import { zip, Subject } from 'rxjs';
+import { ActivatedRoute, Route, Router } from '@angular/router';
+
+const fav$ = new Subject<boolean>();
+const vote$ = new Subject<boolean>();
 
 @Component({
   selector: 'app-search-strategie',
@@ -26,7 +29,7 @@ import { VoteDAL } from '../service/vote-dal';
 })
 export class SearchStrategieComponent implements OnInit {
 
-  constructor(private voteService:VoteDAL,private favorisService:FavoriDAL,private mesTeamsService:MesTeamsDAL,private appService:AppComponent,private sanitizer: DomSanitizer, private classeService:ClasseDAL, private zoneService:ZoneDAL, private enregistrementService:EnregistrementDAL, private bossZoneService:BosszoneDAL,  private bossService:BossDAL) { }
+  constructor(private routerService:Router,private activatedRoute:ActivatedRoute,private voteService:VoteDAL,private favorisService:FavoriDAL,private mesTeamsService:MesTeamsDAL,private appService:AppComponent,private classeService:ClasseDAL, private zoneService:ZoneDAL, private enregistrementService:EnregistrementDAL, private bossZoneService:BosszoneDAL,  private bossService:BossDAL) { }
 
   selectContinent: Zone[];
   selectZone: Zone[];
@@ -40,15 +43,54 @@ export class SearchStrategieComponent implements OnInit {
   Idclasse4: string;
   IdBZ: string;
   U:string;
-  Enregistrements : Enregistrement[];
   messageIndication:string;
   currentUser:Utilisateur;
   MaTeam:MesTeams;
-  mesStratOnly:boolean;
   myFavs:Favori[];
   myVotes:Vote[];
+  Show:boolean;
+  TexteButtonHelp:string;
+  route: string;
+  private _enregistrement: Enregistrement[];
+
+   get Enregistrements():Enregistrement[] {
+     if (this.route == "favstrat")
+     {
+       let newTab:Enregistrement[] = new Array<Enregistrement>();
+       for (let elem of this._enregistrement)
+       {
+         for (let fav of this.myFavs) 
+         {
+          if (elem.Id == fav.Enregistrement.Id) newTab.push(elem);
+         }
+       }
+       return newTab;
+     }
+      
+     else return this._enregistrement;
+    };
+    
+
+   set Enregistrements(P:Enregistrement[]) {
+    this._enregistrement = P;
+   }
+
+
+
+
 
   ngOnInit(): void {
+    if(!this.appService.data ["TKA"])
+    {
+      this.routerService.navigateByUrl("/")
+    }
+    
+    this.Enregistrements = new Array<Enregistrement>();
+    this.activatedRoute.url.subscribe(params => {
+      this.route = params[0].path;
+    })
+    this.TexteButtonHelp = "Afficher l'aide";
+    this.Show = false;
     this.myFavs = new Array<Favori>();
     this.myVotes = new Array<Vote>();
     this.selectContinent = new Array<Zone>();
@@ -67,36 +109,36 @@ export class SearchStrategieComponent implements OnInit {
     this.messageIndication="";
     this.currentUser;
     this.MaTeam = new MesTeams({Id:0});
-    this.mesStratOnly= false;
     this.currentUser = new Utilisateur({});
-    if(this.appService.data["User"]) this.currentUser = this.appService.data["User"];
+    if(this.appService.data["User"]) 
+    {
+      this.currentUser = this.appService.data["User"];
+      if (this.route == 'mystrat') this.U = this.currentUser.Id.toString();
+    }
     else this.currentUser.Id = 0;
     
     if (this.currentUser.Id != 0)
     {
-      this.mesTeamsService.getMeTeamsByUserId(this.currentUser.Id).subscribe(result => {
+      this.mesTeamsService.getMeTeamsByUserId(this.currentUser.Id, this.appService.data['TK']).subscribe(result => {
         this.selectMesTeams = result;
       })
-      this.favorisService.getFavorisByUtilisateurId(this.currentUser.Id).subscribe(result => {
+      this.favorisService.getFavorisByUtilisateurId(this.currentUser.Id, this.appService.data['TK']).subscribe(result => {
         this.myFavs = result;
       }, error =>
       {
         this.myFavs = new Array<Favori>();
       })
-      this.voteService.getVotesByUser(this.currentUser.Id).subscribe(result => {
+      this.voteService.getVotesByUser(this.currentUser.Id, this.appService.data['TK']).subscribe(result => {
         this.myVotes = result;
       }, error =>
       {
         this.myVotes = new Array<Vote>();
       })
-      console.log(this.myFavs);
-      console.log(this.myVotes);
     }
-    
-    this.classeService.getClasses().subscribe(response => {
+    this.classeService.getClasses(this.appService.data["TK"]??this.appService.data["TKA"]).subscribe(response => {
       this.selectClasse = response;
     });
-    this.zoneService.getZones().subscribe(response => {
+    this.zoneService.getZones(this.appService.data["TK"]??this.appService.data["TKA"]).subscribe(response => {
     response.forEach(item => {
       if (this.selectContinent.findIndex(sc => sc.ContinentFR == item.ContinentFR) == -1) {
         this.selectContinent.push(item);
@@ -104,6 +146,7 @@ export class SearchStrategieComponent implements OnInit {
       });
     });
   }
+
   public choixMaTeam(Team)
   {
     if (Team.value == 0)
@@ -112,17 +155,17 @@ export class SearchStrategieComponent implements OnInit {
       this.ngOnInit();
     }
     else{
-    this.mesTeamsService.getMaTeam(Team.value).subscribe(result => {
+    this.mesTeamsService.getMaTeam(Team.value, this.appService.data['TK']).subscribe(result => {
       this.MaTeam = result;
     })
-    this.bossZoneService.getBossZones().subscribe(response => {
+    this.bossZoneService.getBossZones(this.appService.data["TK"]??this.appService.data["TKA"]).subscribe(response => {
       this.selectBoss = [];
       this.IdBZ = "0";
       this.messageIndication = "Veuillez sélectionner un Boss."
       response.forEach(item => {
         if (item.Zone.Id == this.MaTeam.Zone.Id) {
           this.zoneId = item.Zone.Id;
-          this.bossService.getBoss(item.Boss.Id).subscribe(response => {
+          this.bossService.getBoss(item.Boss.Id, this.appService.data["TK"]??this.appService.data["TKA"]).subscribe(response => {
             this.selectBoss.push(response);
             })
           }
@@ -135,11 +178,15 @@ export class SearchStrategieComponent implements OnInit {
   {
     this.selectZone = [];
     this.selectBoss = [];
-    this.messageIndication = "Veuillez sélectionner une Zone."
     this.IdBZ = "-1";
-    if (Continent.value == 0) this.messageIndication = "";
+    if (Continent.value == 0) 
+    {
+      this.messageIndication = "";
+      this.IdBZ = "";
+    }
     else {
-    this.zoneService.getZones().subscribe(response => {     
+    this.messageIndication = "Veuillez sélectionner une Zone."
+    this.zoneService.getZones(this.appService.data["TK"]??this.appService.data["TKA"]).subscribe(response => {     
       response.forEach(item => {
         if (item.ContinentFR == Continent.value) {
           this.selectZone.push(item);
@@ -150,16 +197,20 @@ export class SearchStrategieComponent implements OnInit {
   }
   public changeZone(Zone)
   {
-    if (Zone.value == 0) this.messageIndication = "Veuillez sélectionner une Zone.";
+    this.selectBoss = [];
+    this.IdBZ = "0";
+    if (Zone.value == 0) 
+    {
+    this.messageIndication = "Veuillez sélectionner une Zone.";
+    this.IdBZ = "-1";
+    }
     else {
-    this.bossZoneService.getBossZones().subscribe(response => {
-      this.selectBoss = [];
-      this.IdBZ = "0";
+    this.bossZoneService.getBossZones(this.appService.data["TK"]??this.appService.data["TKA"]).subscribe(response => {
       this.messageIndication = "Veuillez sélectionner un Boss."
       response.forEach(item => {
         if (item.Zone.Id == Zone.value) {
           this.zoneId = item.Zone.Id;
-          this.bossService.getBoss(item.Boss.Id).subscribe(response => {
+          this.bossService.getBoss(item.Boss.Id, this.appService.data["TK"]??this.appService.data["TKA"]).subscribe(response => {
             this.selectBoss.push(response);
             })
           }
@@ -174,7 +225,7 @@ export class SearchStrategieComponent implements OnInit {
     if (Boss.value == 0) this.messageIndication = "Veuillez sélectionner un Boss.";
     else {
       this.messageIndication = "";
-      this.bossZoneService.getBossZones().subscribe(response => {
+      this.bossZoneService.getBossZones(this.appService.data["TK"]??this.appService.data["TKA"]).subscribe(response => {
         response.forEach(item => {
           if (Boss.value == item.Boss.Id && this.zoneId == item.Zone.Id) 
           {
@@ -223,7 +274,7 @@ export class SearchStrategieComponent implements OnInit {
         this.Idclasse3 = this.MaTeam.Team.Classe3.Id.toString();
         this.Idclasse4 = this.MaTeam.Team.Classe4.Id.toString();
       }
-      this.enregistrementService.getEnregistrementsByInfos(this.U, this.IdBZ, this.Idclasse1, this.Idclasse2, this.Idclasse3, this.Idclasse4)
+      this.enregistrementService.getEnregistrementsByInfos(this.U, this.IdBZ, this.Idclasse1, this.Idclasse2, this.Idclasse3, this.Idclasse4, this.appService.data["TK"]?? this.appService.data["TKA"])
       .subscribe(result => {
       this.Enregistrements = result;
       }, error => {
@@ -237,12 +288,12 @@ export class SearchStrategieComponent implements OnInit {
     let Fav = new Favori({});
     Fav.Enregistrement = new Enregistrement({Id:id});
     Fav.Utilisateur = new Utilisateur({Id:this.currentUser.Id})
-    this.favorisService.postFavori(Fav).subscribe(result => { });
-    setTimeout(() =>
-    this.favorisService.getFavorisByUtilisateurId(this.currentUser.Id).subscribe(result =>{
-      this.myFavs = result;
-    }), 500);
-    
+    this.favorisService.postFavori(Fav, this.appService.data['TK']).subscribe(() => { fav$.next(true) });
+    zip(fav$).subscribe(() => {
+      this.favorisService.getFavorisByUtilisateurId(this.currentUser.Id, this.appService.data['TK']).subscribe(result =>{
+        this.myFavs = result;
+      });
+    });    
   }
 
   public retraitFavori(id)
@@ -251,7 +302,7 @@ export class SearchStrategieComponent implements OnInit {
     {
       if(elem.Enregistrement.Id == id) 
       {
-        this.favorisService.deleteFavori(elem.Id).subscribe(result => {});
+        this.favorisService.deleteFavori(elem.Id, this.appService.data['TK']).subscribe(() => {});
         this.myFavs = this.myFavs.filter(r => r.Id != elem.Id);
       }
     }
@@ -292,17 +343,17 @@ export class SearchStrategieComponent implements OnInit {
     {
       if (Vote.Enregistrement.Id == Id) 
       {
-        this.voteService.deleteVote(Vote.Id).subscribe(result => {});
+        this.voteService.deleteVote(Vote.Id, this.appService.data['TK']).subscribe(() => {});
         this.Enregistrements[this.Enregistrements.findIndex(r => r.Id == Vote.Enregistrement.Id)].Note--;
       }
     }
-    this.voteService.postVote(V).subscribe(result => { });
+    this.voteService.postVote(V, this.appService.data['TK']).subscribe(() => { vote$.next(true) });
     this.Enregistrements[this.Enregistrements.findIndex(r => r.Id == Id)].Note--;
-
-    setTimeout(() =>
-    this.voteService.getVotesByUser(this.currentUser.Id).subscribe(result =>{
-      this.myVotes = result;
-    }), 500);
+    zip(vote$).subscribe(() => {
+      this.voteService.getVotesByUser(this.currentUser.Id, this.appService.data['TK']).subscribe(result =>{
+        this.myVotes = result;
+      })
+    })
   }
 
 
@@ -316,17 +367,17 @@ export class SearchStrategieComponent implements OnInit {
     {
       if (Vote.Enregistrement.Id == Id) 
       {
-        this.voteService.deleteVote(Vote.Id).subscribe(result => {});
+        this.voteService.deleteVote(Vote.Id, this.appService.data['TK']).subscribe(() => {});
         this.Enregistrements[this.Enregistrements.findIndex(r => r.Id == Vote.Enregistrement.Id)].Note++;
       }
     }
-    this.voteService.postVote(V).subscribe(result => { });
+    this.voteService.postVote(V, this.appService.data['TK']).subscribe(() => { vote$.next(true) });
     this.Enregistrements[this.Enregistrements.findIndex(r => r.Id == Id)].Note++;
-
-    setTimeout(() =>
-    this.voteService.getVotesByUser(this.currentUser.Id).subscribe(result =>{
-      this.myVotes = result;
-    }), 500);
+    zip(vote$).subscribe(() => {
+      this.voteService.getVotesByUser(this.currentUser.Id, this.appService.data['TK']).subscribe(result =>{
+        this.myVotes = result;
+      });
+    });
   }
 
   DeleteVote(Id)
@@ -335,7 +386,7 @@ export class SearchStrategieComponent implements OnInit {
     {
       if (Vote.Enregistrement.Id == Id) 
       {
-        this.voteService.deleteVote(Vote.Id).subscribe(result => {});
+        this.voteService.deleteVote(Vote.Id, this.appService.data['TK']).subscribe(() => {});
         if (Vote.Vote == 1) this.Enregistrements[this.Enregistrements.findIndex(r => r.Id == Vote.Enregistrement.Id)].Note--;
         if (Vote.Vote == -1) this.Enregistrements[this.Enregistrements.findIndex(r => r.Id == Vote.Enregistrement.Id)].Note++;
         this.myVotes = this.myVotes.filter(r => r.Id != Vote.Id);
@@ -343,8 +394,9 @@ export class SearchStrategieComponent implements OnInit {
     }
   }
 
-  public publicSanitizeIMG(IMG):SafeUrl
-  {
-    return this.sanitizer.bypassSecurityTrustResourceUrl(IMG);
+  public ShowHelp(){
+    this.Show = !this.Show;
+    if (this.TexteButtonHelp == "Afficher l'aide") this.TexteButtonHelp = "Cacher l'aide";
+    else if (this.TexteButtonHelp == "Cacher l'aide") this.TexteButtonHelp = "Afficher l'aide";
   }
 }

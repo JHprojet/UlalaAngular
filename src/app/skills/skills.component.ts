@@ -1,4 +1,6 @@
 import { Component, OnInit } from '@angular/core';
+import { AppComponent } from '../app.component';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-skills',
@@ -7,9 +9,13 @@ import { Component, OnInit } from '@angular/core';
 })
 export class SkillsComponent implements OnInit {
 
-  constructor() { }
+  constructor(private routerService:Router,private appService:AppComponent) { }
 
   ngOnInit(): void {
+    if(!this.appService.data ["TKA"])
+    {
+      this.routerService.navigateByUrl("/")
+    }
   }
 
 }

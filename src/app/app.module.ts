@@ -1,5 +1,5 @@
 import { BrowserModule } from '@angular/platform-browser';
-import { NgModule } from '@angular/core';
+import { NgModule, APP_INITIALIZER } from '@angular/core';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
@@ -16,15 +16,11 @@ import { ChangerPasswordComponent } from './changer-password/changer-password.co
 import { MesInfosComponent } from './mes-infos/mes-infos.component';
 import { AddStrategieComponent } from './add-strategie/add-strategie.component';
 import { SearchStrategieComponent } from './search-strategie/search-strategie.component';
-import { FavStrategieComponent } from './fav-strategie/fav-strategie.component';
-import { MesStrategieComponent } from './mes-strategie/mes-strategie.component';
 import { InscriptionComponent } from './inscription/inscription.component'
 import { HttpClientModule } from '@angular/common/http';
 import { StorageServiceModule} from 'angular-webstorage-service';
-import { MonJeton } from 'src/assets/services/Jeton';
 import { ActivationComponent } from './activation/activation.component';
 import { RetrievePasswordComponent } from './retrieve-password/retrieve-password.component';
-
 
 @NgModule({
   declarations: [
@@ -41,8 +37,6 @@ import { RetrievePasswordComponent } from './retrieve-password/retrieve-password
     MesInfosComponent,
     AddStrategieComponent,
     SearchStrategieComponent,
-    FavStrategieComponent,
-    MesStrategieComponent,
     InscriptionComponent,
     ActivationComponent,
     RetrievePasswordComponent,
@@ -58,3 +52,6 @@ import { RetrievePasswordComponent } from './retrieve-password/retrieve-password
   bootstrap: [AppComponent]
 })
 export class AppModule { }
+
+
+

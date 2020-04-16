@@ -3,7 +3,11 @@ import { AppComponent } from '../app.component';
 import { Router } from '@angular/router';
 import { UtilisateurDAL } from '../service/utilisateur-dal';
 import { Utilisateur } from '../models/utilisateur';
-import { threadId } from 'worker_threads';
+import { zip, Subject } from 'rxjs';
+
+const Check1$ = new Subject<boolean>();
+const Check2$ = new Subject<boolean>();
+const Check3$ = new Subject<boolean>();
 
 @Component({
   selector: 'app-changer-password',
@@ -12,7 +16,7 @@ import { threadId } from 'worker_threads';
 })
 export class ChangerPasswordComponent implements OnInit {
 
-  constructor(private utilisateurService:UtilisateurDAL,private appService:AppComponent, private router:Router) { }
+  constructor(private utilisateurService:UtilisateurDAL,private appService:AppComponent, private routerService:Router) { }
   CurrentPassword:string;
   NewPassword:string;
   NewPasswordVerif:string;
@@ -23,14 +27,9 @@ export class ChangerPasswordComponent implements OnInit {
   alertCurrentPassword:string;
 
   ngOnInit(): void {
-    //Check si connecté
-    this.appService.NotConnected = "";
-    this.appService.getFromSession("User");
-    if (this.appService.data["User"] == null) 
+    if(!this.appService.data["TKA"])
     {
-      this.router.navigateByUrl('/');
-      this.appService.NotConnected = "Vous devez être connecter pour accéder à cette page";
-      setTimeout(() => this.appService.NotConnected = "", 3000);
+      this.routerService.navigateByUrl("/")
     }
     this.MessageNOK ='';
     this.MessageOK ='';
@@ -45,7 +44,8 @@ export class ChangerPasswordComponent implements OnInit {
   public CheckCurrentPassword()
   {
     this.alertCurrentPassword ='';
-    this.utilisateurService.CheckUser(new Utilisateur({Password:this.CurrentPassword, Pseudo:this.appService.data["User"].Pseudo})).subscribe(result =>{
+    this.utilisateurService.CheckUser(new Utilisateur({Password:this.CurrentPassword, Pseudo:this.appService.data["User"].Pseudo}), this.appService.data["TK"]).subscribe(result =>{
+      Check1$.next(true);
     }, error => {
       this.alertCurrentPassword = 'Votre mot de passe est erroné.'
     })
@@ -57,12 +57,15 @@ export class ChangerPasswordComponent implements OnInit {
     if (this.NewPassword == "") this.alertPassword = "Champ obligatoire."
     else if (this.NewPassword.length < 7) this.alertPassword = "Votre mot de passe doit faire au moins 8 caractères."
     else if (this.NewPassword.length > 40) this.alertPassword = "Votre mot de passe doit faire 40 caractères maximum."
+    else Check2$.next(true);
   }
+  
   public CheckPasswordVerif()
   {
     this.alertPasswordVerif="";
     if (this.NewPasswordVerif == "") this.alertPasswordVerif = "Champ obligatoire."
     else if (this.NewPassword != this.NewPasswordVerif) this.alertPasswordVerif = "Vos deux mots de passe ne sont pas identiques."
+    else Check3$.next(true);
   }
 
   ChangePassword()
@@ -72,10 +75,10 @@ export class ChangerPasswordComponent implements OnInit {
     this.CheckPasswordVerif(); 
     this.MessageOK='';
     this.MessageNOK='';
-    setTimeout(() => {
-      if (this.alertCurrentPassword =='' && this.alertPassword=='' && this.alertPasswordVerif=='')
+    zip(Check1$, Check2$, Check3$).subscribe(() => {
+      if (Check1$ && Check2$ && Check3$)
       {
-        this.utilisateurService.changePassword(this.appService.data["User"].Id,this.NewPassword).subscribe(result => {
+        this.utilisateurService.changePassword(this.appService.data["User"].Id,this.NewPassword, this.appService.data['TK']).subscribe(result => {
           this.appService.data["User"].password = this.NewPassword;
           this.NewPassword ='';
           this.NewPasswordVerif='';
@@ -87,7 +90,6 @@ export class ChangerPasswordComponent implements OnInit {
           setTimeout(() => this.MessageNOK='',5000);
         })
       }
-    },1000)
+    });
   }
-
 }

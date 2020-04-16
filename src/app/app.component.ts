@@ -3,7 +3,7 @@ import {SESSION_STORAGE, WebStorageService} from 'angular-webstorage-service';
 import { Utilisateur } from './models/utilisateur';
 import { UtilisateurDAL } from './service/utilisateur-dal';
 import { Router } from '@angular/router';
-import { ActivationComponent } from './activation/activation.component';
+import { Subject } from 'rxjs';
 
 @Component({
   selector: 'app-root',
@@ -23,6 +23,7 @@ export class AppComponent {
 
   constructor(private router:Router,@Inject(SESSION_STORAGE) private session: WebStorageService, private UtilisateurService:UtilisateurDAL) { 
     this.getFromSession("User");
+    this.getAnonymeKey();
   }
 
   Connection()
@@ -30,24 +31,24 @@ export class AppComponent {
     this.MessageRecupPassword="";
     this.ErrorLogin = "";
     this.OkLogin = "";
-    this.UtilisateurService.CheckUser(new Utilisateur({Pseudo:this.login, Password:this.password})).subscribe(result => {
-      this.UtilisateurService.getUtilisateurByPseudo(this.login).subscribe(result2 => {
-        console.log(result2.body.ActivationToken);
-        if (result2.body.ActivationToken != '')
+    this.UtilisateurService.CheckUser(new Utilisateur({Pseudo:this.login, Password:this.password}), this.data["TKA"]).subscribe(result => {
+      this.saveInSession("TK", result);
+      this.UtilisateurService.getUtilisateurByPseudo(this.login, this.data["TK"]).subscribe(result2 => {
+        if (result2.ActivationToken != '')
         {
-          this.saveInSession("IdU", result2.body.Id);
-          this.saveInSession("PseudoU", result2.body.Pseudo);
+          this.saveInSession("IdU", result2.Id);
+          this.saveInSession("PseudoU", result2.Pseudo);
           this.router.navigateByUrl('activation');
         }
         else
         {
-          this.saveInSession("User", result2.body);
+          this.saveInSession("User", result2);
           this.OkLogin = "Connexion réussie.";
           setTimeout(() => this.OkLogin = "", 3000);
         }  
       });
     },error => {
-      this.MessageRecupPassword="Perdu votre mot de passe? Cliquez ici pour recevoir un nouveau mot de passe par mail";
+      this.MessageRecupPassword="Perdu votre mot de passe ou votre pseudo? Cliquez ici!";
       this.ErrorLogin = "Utilisateur ou Mot de passe invalide";
       setTimeout(() => this.ErrorLogin = "", 3000);
       setTimeout(() => this.MessageRecupPassword = "", 7000);
@@ -60,7 +61,6 @@ export class AppComponent {
     this.router.navigateByUrl('/');
     this.Disconnected = "Vous avez bien été déconnecté.";
     setTimeout(() => this.Disconnected = "", 3000);
-
   }
 
   saveInSession(key, val): void {
@@ -70,6 +70,17 @@ export class AppComponent {
 
    getFromSession(key): void {
     this.data[key]= this.session.get(key);
+   }
+
+   getAnonymeKey()
+   {
+    if (!this.data["TKA"])
+    {
+      this.UtilisateurService.GetAnonymeToken().subscribe(result => {
+        this.data["TKA"] = result;
+        console.log(this.data["TKA"]);
+      })
+    }
    }
 }
 

@@ -1,20 +1,47 @@
 <br/>
 <hr/>
-<h3>Selections de tri :</h3>
+<div class="form-group row">
+
+    &nbsp;&nbsp;<h3>Selections de tri : </h3>&nbsp;&nbsp;&nbsp;&nbsp; 
+
+        <button (click)="ShowHelp()" type="button" class="btn btn-light dropdown-toggle">
+        {{TexteButtonHelp}}
+        </button>
+</div>
 <hr/>
+<div class="help" *ngIf="Show">
+    <strong>Utilisation de la recherche :</strong>
+    <br/><br/>
+    Si vous cliquez directement sur "Chercher" Vous aurez la liste complète de tous les enregistrements.<br/>
+    Si vous souhaitez chercher des stratégies sur un Boss particulier :<br/>
+    1 - Sélectionnez un continent + une zone + un boss.<br/>
+    2 - Sélectionner si vous le souhaitez une ou plusieurs classes
+    <ng-container *ngIf="currentUser.Id != 0">
+        <br/><br/>
+        Vous pouvez également , si vous avez enregistré une team perso dans Mes infos>Mes teams persos :<br/>
+        1 - Selectionnez votre team.<br/>
+        2 - Selectionnez le boss.<br/>
+        La recherche s'effectuera automatiquement sur la zone et les classes sélectionnées dans votre team.
+    </ng-container>
+    <hr/>
+</div>
 <br/>
 <div *ngIf="currentUser.Id != 0" class="form-group row">
+    <ng-container *ngIf="selectMesTeams.length != 0">
         <label class="form-check-label col-sm-2">Choisir sa team</label>
         <select class="form-control col-sm-2" NgModel (change)="choixMaTeam(MaTeam)" #MaTeam>
             <option value="0"></option>
             <option *ngFor="let MaTeam of selectMesTeams" value={{MaTeam.Id}}>{{MaTeam.NomTeam}}</option>
         </select>
         <label class="col-sm-1 col-form-label">Boss</label>
-    <select class="form-control col-sm-3" NgModel (change)="changeBoss(Boss)" #Boss>
-        <option value="0"></option>
-        <option *ngFor="let boss of selectBoss" value={{boss.Id}}>{{boss.NomFR}}</option>
-    </select>
-
+        <select class="form-control col-sm-3" NgModel (change)="changeBoss(Boss)" #Boss>
+            <option value="0"></option>
+            <option *ngFor="let boss of selectBoss" value={{boss.Id}}>{{boss.NomFR}}</option>
+        </select>
+    </ng-container>
+    <ng-container *ngIf="selectMesTeams.length == 0">
+        <p>Vous n'avez pas encore de team favorite. Si vous souhaitez en créer afin de simplifier la recherche de stratégie : <a routerLink='/prefs'>C'est par ici!</a></p>
+    </ng-container>
 </div>
 <div *ngIf="MaTeam.Id == 0" class="form-group row">
     <label class="col-sm-1 col-form-label">Continent</label>
@@ -81,10 +108,10 @@
             
         </div>
         <div class="row">
-            <img [src]="publicSanitizeIMG(Enregistrement.ImagePath1)" height="390px"> 
-            <img [src]="publicSanitizeIMG(Enregistrement.ImagePath2)" height="390px">  
-            <img [src]="publicSanitizeIMG(Enregistrement.ImagePath3)" height="390px">  
-            <img [src]="publicSanitizeIMG(Enregistrement.ImagePath4)" height="390px">
+            <img [src]="Enregistrement.ImagePath1" height="390px"> 
+            <img [src]="Enregistrement.ImagePath2" height="390px">  
+            <img [src]="Enregistrement.ImagePath3" height="390px">  
+            <img [src]="Enregistrement.ImagePath4" height="390px">
         </div>
         <div class="row">
              <ng-container *ngIf="currentUser.Id != 0">

@@ -1,4 +1,6 @@
 import { Component, OnInit } from '@angular/core';
+import { AppComponent } from '../app.component';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-jouets',
@@ -7,9 +9,13 @@ import { Component, OnInit } from '@angular/core';
 })
 export class JouetsComponent implements OnInit {
 
-  constructor() { }
+  constructor(private appService:AppComponent, private routerService:Router) { }
 
   ngOnInit(): void {
+    if(!this.appService.data["TKA"])
+    {
+      this.routerService.navigateByUrl("/")
+    }
   }
 
 }

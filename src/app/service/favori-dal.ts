@@ -15,28 +15,40 @@ const httpOptions = {
 @Injectable({ providedIn: 'root' })
 export class FavoriDAL {
     constructor(private http: HttpClient) { }
-    getFavoris(): Observable<Favori[]> {
-        return this.http.get<Favori[]>(EndPoint+'Favoris').pipe( catchError(this.handleError))
+    getFavoris(Token:string): Observable<Favori[]> {
+        return this.http.get<Favori[]>(EndPoint+'Favoris', this.GetHeader(Token)).pipe(catchError(this.handleError))
     }
-    getFavori(id:number): Observable<Favori> {
-        return this.http.get<Favori>(EndPoint+'Favoris/'+id).pipe( catchError(this.handleError))
+    getFavori(id:number, Token:string): Observable<Favori> {
+        return this.http.get<Favori>(EndPoint+'Favoris/'+id, this.GetHeader(Token)).pipe(catchError(this.handleError))
     }
-    getFavorisByUtilisateurId(id:number): Observable<Favori[]> {
-      return this.http.get<Favori[]>(EndPoint+'Favoris/?UtilisateurId='+id).pipe( catchError(this.handleError))
+    getFavorisByUtilisateurId(id:number, Token:string): Observable<Favori[]> {
+      console.log(Token);
+      return this.http.get<Favori[]>(EndPoint+'Favoris/?UtilisateurId='+id, this.GetHeader(Token)).pipe(catchError(this.handleError))
     }
-    postFavori(monObjet: Favori): Observable<Favori> {
-        return this.http.post<Favori>(EndPoint+'Favoris', monObjet, httpOptions).pipe(catchError(this.handleError))
+    postFavori(monObjet: Favori, Token:string): Observable<Favori> {
+        return this.http.post<Favori>(EndPoint+'Favoris', monObjet, this.GetHeader(Token)).pipe(catchError(this.handleError))
     }
-    putFavori(monObjet: Favori, id: number): Observable<Favori> {
-        return this.http.put<Favori>(EndPoint+'Favoris/'+id, monObjet ,httpOptions).pipe(catchError(this.handleError))
+    putFavori(monObjet: Favori, id: number, Token:string): Observable<Favori> {
+        return this.http.put<Favori>(EndPoint+'Favoris/'+id, monObjet, this.GetHeader(Token)).pipe(catchError(this.handleError))
     }
-    deleteFavori(id: number): Observable<Favori> {
-        return this.http.delete<Favori>(EndPoint+'Favoris/'+id ,httpOptions).pipe(catchError(this.handleError))
+    deleteFavori(id: number, Token:string): Observable<Favori> {
+        return this.http.delete<Favori>(EndPoint+'Favoris/'+id, this.GetHeader(Token)).pipe(catchError(this.handleError))
       }
     handleError(error) {
       let errorMessage = '';
       if (error.error instanceof ErrorEvent) { errorMessage = `Error: ${error.error.message}`; } 
       else { errorMessage = `Error Code: ${error.status}\nMessage: ${error.message}`; }
       return throwError(errorMessage);
+    }
+    GetHeader(Token?:string)
+    {
+      let tok = Token??""
+      let httpOptions = {
+        headers: new HttpHeaders({
+          'Content-Type':  'application/json',
+          'Authorization' : tok
+        })
+      };
+      return httpOptions;
     }
 }

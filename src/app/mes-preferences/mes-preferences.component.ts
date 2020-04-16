@@ -12,6 +12,7 @@ import { BosszoneDAL } from '../service/bosszone-dal';
 import { TeamDal } from '../service/team-dal';
 import { ClasseDAL } from '../service/classe-dal';
 import { Team } from '../models/team';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-mes-preferences',
@@ -38,19 +39,23 @@ export class MesPreferencesComponent implements OnInit {
   messageNomTeam:string;
   errorUpload:string;
   
-  constructor(private classeService:ClasseDAL,private teamService:TeamDal,private bossZoneService:BosszoneDAL,private bossService:BossDAL,private zoneService:ZoneDAL,private appService:AppComponent, private mesteamsService:MesTeamsDAL) { }
+  constructor(private routerService:Router,private classeService:ClasseDAL,private teamService:TeamDal,private bossZoneService:BosszoneDAL,private bossService:BossDAL,private zoneService:ZoneDAL,private appService:AppComponent, private mesteamsService:MesTeamsDAL) { }
   
   ngOnInit(): void {
+    if(!this.appService.data["TKA"])
+    {
+      this.routerService.navigateByUrl("/")
+    }
     this.errorUpload="";
     this.nomTeam="";
     this.messageNomTeam="";
     this.teamAdd = new MesTeams({});
     this.selectClasse = new Array<Classe>();
     this.selectContinent = new Array<Zone>();
-    this.classeService.getClasses().subscribe(result =>{
+    this.classeService.getClasses(this.appService.data["TK"]??this.appService.data["TKA"]).subscribe(result =>{
       this.selectClasse = result;
     })
-    this.zoneService.getZones().subscribe(response => {
+    this.zoneService.getZones(this.appService.data["TK"]).subscribe(response => {
       response.forEach(item => {
         if (this.selectContinent.findIndex(sc => sc.ContinentFR == item.ContinentFR) == -1) {
           this.selectContinent.push(item);
@@ -70,14 +75,13 @@ export class MesPreferencesComponent implements OnInit {
     this.utilisateur = new Utilisateur({})
     this.appService.getFromSession["User"];
     this.utilisateur = this.appService.data["User"];
-    this.mesteamsService.getMeTeamsByUserId(this.utilisateur.Id).subscribe(result =>{
+    this.mesteamsService.getMeTeamsByUserId(this.utilisateur.Id, this.appService.data['TK']).subscribe(result =>{
       this.mesTeams = result;
     
     },error =>{
       this.mesTeams = new Array<MesTeams>();
     })
   }
-
 
   public changeContinent(Continent)
   {
@@ -87,7 +91,7 @@ export class MesPreferencesComponent implements OnInit {
     if (Continent.value == 0) this.messageBossZone = "Veuillez sélectionner un Continent.";
     else {
     this.messageBossZone = "Veuillez sélectionner une Zone."
-    this.zoneService.getZones().subscribe(response => {     
+    this.zoneService.getZones(this.appService.data["TK"]).subscribe(response => {     
       response.forEach(item => {
         if (item.ContinentFR == Continent.value) {
           this.selectZone.push(item);
@@ -96,6 +100,7 @@ export class MesPreferencesComponent implements OnInit {
       });
     }
   }
+
   public changeZone(Z)
   {
     this.selectBoss = [];
@@ -103,7 +108,7 @@ export class MesPreferencesComponent implements OnInit {
     if (Z.value == 0) this.messageBossZone = "Veuillez sélectionner une Zone.";
     else {
     this.messageBossZone = "";
-    this.bossZoneService.getBossZones().subscribe(response => {
+    this.bossZoneService.getBossZones(this.appService.data["TK"]).subscribe(response => {
       response.forEach(item => {
         if (item.Zone.Id == Z.value) 
           this.teamAdd.Zone = new Zone({Id:item.Zone.Id});
@@ -154,7 +159,7 @@ export class MesPreferencesComponent implements OnInit {
 
   public EcritureIdClasse()
   {
-  this.teamService.getTeamByClasses(this.Idclasse1,this.Idclasse2,this.Idclasse3,this.Idclasse4).subscribe(result => {
+  this.teamService.getTeamByClasses(this.Idclasse1,this.Idclasse2,this.Idclasse3,this.Idclasse4, this.appService.data["TK"]).subscribe(result => {
     this.teamAdd.Team = new Team({Id:result.Id});
     });
   }
@@ -163,8 +168,8 @@ export class MesPreferencesComponent implements OnInit {
   {
     this.teamAdd.Utilisateur = new Utilisateur({Id:this.appService.data["User"].Id});
     this.teamAdd.NomTeam = this.nomTeam;
-    this.mesteamsService.postMaTeam(this.teamAdd).subscribe(result => {
-      this.mesteamsService.getMeTeamsByUserId(this.utilisateur.Id).subscribe(result =>{
+    this.mesteamsService.postMaTeam(this.teamAdd, this.appService.data['TK']).subscribe(result => {
+      this.mesteamsService.getMeTeamsByUserId(this.utilisateur.Id, this.appService.data['TK']).subscribe(result =>{
         this.mesTeams = result;
       })
     }, error => {
@@ -178,12 +183,11 @@ export class MesPreferencesComponent implements OnInit {
     if(this.nomTeam.length < 3) this.messageNomTeam = "Le nom de la team doit faire au moins 3 caractères."
     else this.messageNomTeam = "";
   }
+
   public DeleteTeam(id)
   {
-    this.mesteamsService.deleteMaTeam(id).subscribe(result => {});
-    setTimeout(() => {
-    this.ngOnInit()},250);
-  
+    this.mesteamsService.deleteMaTeam(id, this.appService.data['TK']).subscribe(result => {
+      this.ngOnInit();
+    });
   }
-
 }

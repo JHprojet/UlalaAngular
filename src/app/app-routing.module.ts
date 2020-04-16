@@ -11,10 +11,8 @@ import { ListBossComponent } from './list-boss/list-boss.component';
 import { MesInfosComponent } from './mes-infos/mes-infos.component';
 import { ChangerPasswordComponent } from './changer-password/changer-password.component';
 import { MesPreferencesComponent } from './mes-preferences/mes-preferences.component';
-import { MesStrategieComponent } from './mes-strategie/mes-strategie.component';
 import { AddStrategieComponent } from './add-strategie/add-strategie.component';
 import { SearchStrategieComponent } from './search-strategie/search-strategie.component';
-import { FavStrategieComponent } from './fav-strategie/fav-strategie.component';
 import { InscriptionComponent } from './inscription/inscription.component';
 import { ActivationComponent } from './activation/activation.component';
 import { RetrievePasswordComponent } from './retrieve-password/retrieve-password.component';
@@ -34,10 +32,10 @@ const routes: Routes = [];
     {path : 'prefs', component: MesPreferencesComponent},
     {path : 'pass', component: ChangerPasswordComponent},
     {path : 'myinfos', component: MesInfosComponent},
-    {path : 'mystrat', component: MesStrategieComponent},
+    {path : 'mystrat', component: SearchStrategieComponent},
     {path : 'addstrat', component: AddStrategieComponent},
     {path : 'searchstrat', component: SearchStrategieComponent},
-    {path : 'favstrat', component: FavStrategieComponent},
+    {path : 'favstrat', component: SearchStrategieComponent},
     {path : 'inscription', component: InscriptionComponent},
     {path : 'activation', component: ActivationComponent},
     {path : 'RetrievePassword', component: RetrievePasswordComponent}

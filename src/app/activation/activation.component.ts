@@ -10,7 +10,7 @@ import { Router } from '@angular/router';
 })
 export class ActivationComponent implements OnInit {
 
-  constructor(private router:Router,private utilisateurService:UtilisateurDAL,private appService:AppComponent) { }
+  constructor(private routerService:Router,private utilisateurService:UtilisateurDAL,private appService:AppComponent) { }
   Pseudo:string;
   Id:number;
   token:string;
@@ -20,6 +20,10 @@ export class ActivationComponent implements OnInit {
   MessageRenvoiNOK:string;
 
   ngOnInit(): void {
+    if(!this.appService.data["TKA"])
+    {
+      this.routerService.navigateByUrl("/")
+    }
     this.Pseudo = this.appService.data["PseudoU"];
     this.Id = this.appService.data["IdU"];
     this.token = '';
@@ -33,15 +37,15 @@ export class ActivationComponent implements OnInit {
   {
     this.MessageNOK = '';
     this.MessageOK = '';
-    this.utilisateurService.UpdateToken(this.Id,this.token).subscribe(result => {
-      this.utilisateurService.getUtilisateur(this.Id).subscribe(result => {
+    this.utilisateurService.UpdateToken(this.Id,this.token, this.appService.data['TK']).subscribe(result => {
+      this.utilisateurService.getUtilisateur(this.Id, this.appService.data["TKA"]).subscribe(result => {
         this.appService.data["User"] = result;
         this.MessageOK = "Merci, votre compte à bien été activé, vous allez être rediriger dans un instant. Bonne navigation!";
         setTimeout(() => this.MessageOK='',3000);
-        this.router.navigateByUrl('');
+        this.routerService.navigateByUrl('');
       })
     }, error => {
-      this.MessageNOK = "Clef d'activation erronée, merci de recommencer."
+      this.MessageNOK = "Clef d'activation erronée, merci de réessayer. En cas de problème, veuillez contacter l'administrateur du site via la page de contact."
     })
   }
 
@@ -49,7 +53,7 @@ export class ActivationComponent implements OnInit {
   {
     this.MessageRenvoiOK = '';
     this.MessageRenvoiNOK = '';
-    this.utilisateurService.RenvoiToken(this.appService.data["IdU"]).subscribe(result =>{
+    this.utilisateurService.RenvoiToken(this.appService.data["IdU"], this.appService.data['TK']).subscribe(result =>{
       this.MessageRenvoiOK= "Mail renvoyé, regardez dans votre boite mail ! (Et n'oubliez pas les spams!)";
       setTimeout(() => this.MessageRenvoiOK='',5000);
     }, error => {
