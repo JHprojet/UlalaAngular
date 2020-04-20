@@ -1,8 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Inject } from '@angular/core';
 import { UtilisateurDAL } from '../service/utilisateur-dal';
 import { Subject, zip } from 'rxjs';
-import { AppComponent } from '../app.component';
 import { Router } from '@angular/router';
+import { SESSION_STORAGE, WebStorageService } from 'angular-webstorage-service';
 
 const CheckUsername$ = new Subject<boolean>();
 const CheckEmail$ = new Subject<boolean>();
@@ -31,10 +31,10 @@ export class InscriptionComponent implements OnInit {
   inscriptionReussi:string;
   Waiting:string;
   
-  constructor(private UtilisateurService:UtilisateurDAL, private appService:AppComponent, private routerService:Router) { }
+  constructor(@Inject(SESSION_STORAGE) private session: WebStorageService,private UtilisateurService:UtilisateurDAL, private routerService:Router) { }
 
   ngOnInit(): void {
-    if(!this.appService.data["TKA"])
+    if(!this.session.get("TKA"))
     {
       this.routerService.navigateByUrl("/")
     }
@@ -61,7 +61,7 @@ export class InscriptionComponent implements OnInit {
     zip(CheckUsername$,CheckEmail$,CheckEmailVerif$,CheckPassword$,CheckPasswordVerif$).subscribe(([Check1 ,Check2, Check3, Check4, Check5]) => {
       if(Check1 && Check2 && Check3 && Check4 && Check5)
       {
-        this.UtilisateurService.postUtilisateur({ Id:null, Pseudo:this.username, Mail:this.email, Password:this.password, Role:null, Actif:null, ActivationToken:null }, this.appService.data["TKA"]).subscribe(result => { 
+        this.UtilisateurService.postUtilisateur({ Id:null, Pseudo:this.username, Mail:this.email, Password:this.password, Role:null, Actif:null, ActivationToken:null }, this.session.get("TKA")).subscribe(result => { 
           this.inscriptionReussi="Vous êtes bien inscris. Vous pouvez vous connecter en haut à droite de l'écran.";
         }, error =>{
           this.inscriptionReussi="Oops il semble qu'il y ai eu un problème. Merci de recommencer.";
@@ -78,7 +78,7 @@ export class InscriptionComponent implements OnInit {
     else if (this.username.length < 3) this.alertUsername = "Votre pseudo doit faire au moins 3 caractères.";
     else if (this.username.length > 20) this.alertUsername = "Votre pseudo doit faire 20 caractères maximum."
     else if (!re.test(this.username)) this.alertUsername = "Votre pseudo ne peux pas contenir de caractères spéciaux (excepté '-' ou '_').";
-    else this.UtilisateurService.getUtilisateurByPseudo(this.username, this.appService.data["TKA"]).subscribe(() => {
+    else this.UtilisateurService.getUtilisateurByPseudo(this.username, this.session.get("TKA")).subscribe(() => {
             this.alertUsername = "L'utilisateur existe déjà. Choisissez un autre pseudo."
           }, error => CheckUsername$.next(true));     
   }
@@ -89,7 +89,7 @@ export class InscriptionComponent implements OnInit {
     this.alertEmail = "";
     if (this.email == "") this.alertEmail = "Champ obligatoire.";
     else if (!re.test(this.email)) this.alertEmail = "Merci de saisir un E-mail au bon format."
-    else this.UtilisateurService.getUtilisateurByMail(this.email, this.appService.data["TKA"]).subscribe(response => {
+    else this.UtilisateurService.getUtilisateurByMail(this.email, this.session.get("TKA")).subscribe(response => {
             this.alertEmail = "L'E-mail est déjà utilisé.";
           }, error => CheckEmail$.next(true));
   }

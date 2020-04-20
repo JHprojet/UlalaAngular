@@ -1,8 +1,6 @@
 <br/>
 <h2>Gestion Admin des Utilisateurs</h2>
 <br/>
-
-
 <div class="col-sm-12 form-group row">
     <label class="col-sm-2 col-form-label">Le mail contient :</label>
     <div class="col-sm-2">
@@ -52,8 +50,16 @@
     </div>
 <br/>
 </ng-container>
-
-
+                <div *ngIf="messageError != ''" class="alert alert-danger" role="alert">
+                    {{messageError}}
+                </div>
+                <div *ngIf="messageEchec != ''" class="alert alert-danger" role="alert">
+                    {{messageEchec}}
+                </div>
+                <div *ngIf="messageValidation != ''" class="alert alert-success" role="alert">
+                    {{messageValidation}}
+                </div>
+<br *ngIf="messageError != '' || messageValidation != '' || messageEchec != ''"/>
     <table class="table table-striped">
         <thead class="thead-dark">
             <tr>

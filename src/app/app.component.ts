@@ -78,6 +78,7 @@ export class AppComponent {
     {
       this.UtilisateurService.GetAnonymeToken().subscribe(result => {
         this.data["TKA"] = result;
+        this.saveInSession("TKA", result);
       })
     }
    }

@@ -1,4 +1,4 @@
-import { Component, OnInit, setTestabilityGetter } from '@angular/core';
+import { Component, OnInit, setTestabilityGetter, Inject, ChangeDetectorRef } from '@angular/core';
 import { Classe } from '../models/classe';
 import { ClasseDAL } from '../service/classe-dal';
 import { ZoneDAL } from '../service/zone-dal';
@@ -15,10 +15,10 @@ import { BossZone } from '../models/boss-zone';
 import { Team } from '../models/team';
 import { Utilisateur } from '../models/utilisateur';
 import { Router } from '@angular/router';
-import { AppComponent } from '../app.component';
 import { Subject, zip } from 'rxjs';
 import { MesTeams } from '../models/mes-teams';
 import { MesTeamsDAL } from '../service/mesteams-dal';
+import { SESSION_STORAGE, WebStorageService } from 'angular-webstorage-service';
 
 const scan1$ = new Subject<boolean>();
 const scan2$ = new Subject<boolean>();
@@ -38,7 +38,7 @@ export class AddStrategieComponent implements OnInit {
 
   selectClasse: Classe[];
   selectContinent: Zone[];
-  Loading: boolean;
+  Loading: string;
   selectZone: Zone[];
   selectBoss: Boss[];
   Idclasse1: number;
@@ -61,19 +61,19 @@ export class AddStrategieComponent implements OnInit {
   selectMesTeams: MesTeams[];
   currentUser:Utilisateur;
   MaTeam:MesTeams;
-  AffButtonWithDetail:boolean;
+  AffButtonWithDetail:string;
   
 
-  constructor(private mesTeamsService:MesTeamsDAL,private appService:AppComponent,private routerService:Router, private enregistrementService:EnregistrementDAL,private imageService:ImageDAL, private classeService:ClasseDAL, private zoneService:ZoneDAL, private bossZoneService:BosszoneDAL, private bossService:BossDAL, private teamService:TeamDal) { }
+  constructor(private cd:ChangeDetectorRef,@Inject(SESSION_STORAGE) private session: WebStorageService,private mesTeamsService:MesTeamsDAL,private routerService:Router, private enregistrementService:EnregistrementDAL,private imageService:ImageDAL, private classeService:ClasseDAL, private zoneService:ZoneDAL, private bossZoneService:BosszoneDAL, private bossService:BossDAL, private teamService:TeamDal) { }
 
   ngOnInit(): void {
-    if(!this.appService.data["TKA"])
+    if(!this.session.get("TKA"))
     {
       this.routerService.navigateByUrl("/")
     }
     this.messageIndication="Si vous le souhaitez, vous pouvez choisir directement votre team perso et le boss. Sinon, ne remplir que les lignes suivantes.";
-    this.Loading = false;
-    this.AffButtonWithDetail = true;
+    this.Loading = "";
+    this.AffButtonWithDetail = "Aff";
     this.Show = false;
     this.TexteButtonHelp = "Afficher l'aide";
     this.MaTeam = new MesTeams({Id:0});
@@ -81,23 +81,23 @@ export class AddStrategieComponent implements OnInit {
     this.selectContinent = new Array<Zone>();
     this.selectMesTeams = new Array<MesTeams>();
     this.currentUser = new Utilisateur({});
-    if(this.appService.data["User"]) 
+    if(this.session.get("User")) 
     {
-      this.currentUser = this.appService.data["User"];
+      this.currentUser = this.session.get("User");
     }
     else this.currentUser.Id = 0;
     
     if (this.currentUser.Id != 0)
     {
-      this.mesTeamsService.getMeTeamsByUserId(this.currentUser.Id, this.appService.data['TK']).subscribe(result => {
+      this.mesTeamsService.getMeTeamsByUserId(this.currentUser.Id, this.session.get("TK")).subscribe(result => {
         this.selectMesTeams = result;
       })
     }
 
-    this.classeService.getClasses(this.appService.data["TK"]??this.appService.data["TKA"]).subscribe(result =>{
+    this.classeService.getClasses(this.session.get("TK")??this.session.get("TKA")).subscribe(result =>{
       this.selectClasse = result;
     })
-    this.zoneService.getZones(this.appService.data["TK"]??this.appService.data["TKA"]).subscribe(response => {
+    this.zoneService.getZones(this.session.get("TK")??this.session.get("TKA")).subscribe(response => {
       response.forEach(item => {
         if (this.selectContinent.findIndex(sc => sc.ContinentFR == item.ContinentFR) == -1) {
           this.selectContinent.push(item);
@@ -131,7 +131,7 @@ export class AddStrategieComponent implements OnInit {
       if (Continent.value == 0) this.messageBossZone = "Veuillez sélectionner un Continent.";
       else {
       this.messageBossZone = "Veuillez sélectionner une Zone."
-      this.zoneService.getZones(this.appService.data["TK"]??this.appService.data["TKA"]).subscribe(response => {     
+      this.zoneService.getZones(this.session.get("TK")??this.session.get("TKA")).subscribe(response => {     
         response.forEach(item => {
           if (item.ContinentFR == Continent.value) {
             this.selectZone.push(item);
@@ -146,12 +146,12 @@ export class AddStrategieComponent implements OnInit {
       this.IdBZ = "0";
       if (Zone.value == 0) this.messageBossZone = "Veuillez sélectionner une Zone.";
       else {
-      this.bossZoneService.getBossZones(this.appService.data["TK"]??this.appService.data["TKA"]).subscribe(response => {
+      this.bossZoneService.getBossZones(this.session.get("TK")??this.session.get("TKA")).subscribe(response => {
         this.messageBossZone = "Veuillez sélectionner un Boss."
         response.forEach(item => {
           if (item.Zone.Id == Zone.value) {
             this.zoneId = item.Zone.Id;
-            this.bossService.getBoss(item.Boss.Id, this.appService.data["TK"]??this.appService.data["TKA"]).subscribe(response => {
+            this.bossService.getBoss(item.Boss.Id, this.session.get("TK")??this.session.get("TKA")).subscribe(response => {
               this.selectBoss.push(response);
               })
             }
@@ -168,9 +168,9 @@ export class AddStrategieComponent implements OnInit {
         this.messageIndication = "Veuillez sélectionner un Boss.";
       }
       else {
-        if (!this.AffButtonWithDetail) this.messageIndication = "";
+        if (this.AffButtonWithDetail == "") this.messageIndication = "";
         this.messageBossZone = "";
-        this.bossZoneService.getBossZones(this.appService.data["TK"]??this.appService.data["TKA"]).subscribe(response => {
+        this.bossZoneService.getBossZones(this.session.get("TK")??this.session.get("TKA")).subscribe(response => {
           response.forEach(item => {
             if (Boss.value == item.Boss.Id && this.zoneId == item.Zone.Id) 
             {
@@ -193,7 +193,7 @@ export class AddStrategieComponent implements OnInit {
     let reader = new FileReader();
     reader.onload = () => {
       IMG.fileAsBase64 = reader.result.toString(); // Store base64 encoded representation of file
-      this.imageService.uploadImage(IMG, this.appService.data["TK"]??this.appService.data["TKA"]) // POST to server
+      this.imageService.uploadImage(IMG, this.session.get("TK")??this.session.get("TKA")) // POST to server
         .subscribe(resp => { });
     }  
     reader.readAsDataURL(file); // Read the file
@@ -201,9 +201,9 @@ export class AddStrategieComponent implements OnInit {
   
   public upload()
   {
-    if(this.appService.data["User"])
+    if(this.session.get("User"))
     {
-      this.Enregistrement.Utilisateur.Id = this.appService.data["User"].Id
+      this.Enregistrement.Utilisateur.Id = this.session.get("User").Id
     }
     for (let item of this.Images)
     {
@@ -213,9 +213,10 @@ export class AddStrategieComponent implements OnInit {
     this.Enregistrement.ImagePath2 = "http://192.168.1.2:8081/"+this.FileNames[1];
     this.Enregistrement.ImagePath3 = "http://192.168.1.2:8081/"+this.FileNames[2];
     this.Enregistrement.ImagePath4 = "http://192.168.1.2:8081/"+this.FileNames[3];
-    this.enregistrementService.postEnregistrement(this.Enregistrement, this.appService.data["TK"]??this.appService.data["TKA"]).subscribe(result => { 
+    this.enregistrementService.postEnregistrement(this.Enregistrement, this.session.get("TK")??this.session.get("TKA")).subscribe(result => { 
       this.ngOnInit();
-      //Gérer la suppression des fichiers dans l'inpupt;
+      let ToClean = document.getElementById("inputImages") as HTMLInputElement;
+      ToClean.value = "";
       this.UploadOK = "Stratégie bien importée, merci pour votre partage!";
       setTimeout(() => this.UploadOK="",3000)
     }, error => {
@@ -292,11 +293,13 @@ export class AddStrategieComponent implements OnInit {
         this.CheckPixels(this.Images);
         zip(OkImage$).subscribe(([OkImage]) => {
           if(OkImage == true) {
-            this.Loading=false;
+            this.Loading="";
             this.errorImage = "";
+            this.cd.detectChanges();
+            this.cd.markForCheck();
           }
           else if (OkImage == false){
-            this.Loading=false;
+            this.Loading="";
             this.errorImage = "Vos 4 images doivent être comme spécifié dans l'aide (voir l'aide plus haut)."
           }
         });
@@ -323,7 +326,7 @@ export class AddStrategieComponent implements OnInit {
   //Récupération de l'id de chaque classe
   public EcritureIdClasse()
   {
-  this.teamService.getTeamByClasses(this.Idclasse1,this.Idclasse2,this.Idclasse3,this.Idclasse4, this.appService.data["TK"]??this.appService.data["TKA"]).subscribe(result => {
+  this.teamService.getTeamByClasses(this.Idclasse1,this.Idclasse2,this.Idclasse3,this.Idclasse4, this.session.get("TK")??this.session.get("TKA")).subscribe(result => {
     this.Enregistrement.Team = new Team({});
     this.Enregistrement.Team.Id = result.Id;
     });
@@ -345,11 +348,13 @@ export class AddStrategieComponent implements OnInit {
     let reader1 = new FileReader();
     let reader2 = new FileReader();
     let reader3 = new FileReader();
-    this.Loading = true;
+    this.Loading = "Load";
     var Jimp = require('jimp');
     //image0
-    reader.onload = () => {   
+    reader.onload = () => {
+       
       Jimp.read(reader.result.toString()).then(image => {
+        
         image.resize(100,220);
         image.scan(0, 0, image.bitmap.width, image.bitmap.height, function(x, y, idx) {
          tab1.push(image.getPixelColor(x, y));
@@ -427,24 +432,24 @@ export class AddStrategieComponent implements OnInit {
     {
       this.messageIndication = this.messageIndication="Si vous le souhaitez, vous pouvez choisir directement votre team perso et le boss. Sinon, ne remplir que les lignes suivantes.";
       this.MaTeam = new MesTeams({Id:0});
-      this.AffButtonWithDetail = true;
+      this.AffButtonWithDetail = "Aff";
     }
     else{
       
-      this.mesTeamsService.getMaTeam(T.value, this.appService.data['TK']).subscribe(result => {
+      this.mesTeamsService.getMaTeam(T.value, this.session.get("TK")).subscribe(result => {
       this.MaTeam = result;
       this.Enregistrement.Team = new Team({});
       this.Enregistrement.Team.Id = result.Team.Id;
-      this.AffButtonWithDetail = false;
+      this.AffButtonWithDetail = "";
     })
-    this.bossZoneService.getBossZones(this.appService.data["TK"]??this.appService.data["TKA"]).subscribe(response => {
+    this.bossZoneService.getBossZones(this.session.get("TK")??this.session.get("TKA")).subscribe(response => {
       this.selectBoss = [];
       this.IdBZ = "0";
       this.messageIndication = "Veuillez sélectionner un Boss."
       response.forEach(item => {
         if (item.Zone.Id == this.MaTeam.Zone.Id) {
           this.zoneId = item.Zone.Id;
-          this.bossService.getBoss(item.Boss.Id, this.appService.data["TK"]??this.appService.data["TKA"]).subscribe(response => {
+          this.bossService.getBoss(item.Boss.Id, this.session.get("TK")??this.session.get("TKA")).subscribe(response => {
             this.selectBoss.push(response);
             })
           }

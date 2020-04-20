@@ -1,11 +1,14 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Inject } from '@angular/core';
 import { Router } from '@angular/router';
-import { AppComponent } from '../app.component';
 import { UtilisateurDAL } from '../service/utilisateur-dal';
 import { Utilisateur } from '../models/utilisateur';
 import { zip, Subject } from 'rxjs';
+import { SESSION_STORAGE, WebStorageService } from 'angular-webstorage-service';
+import { SpawnSyncOptionsWithBufferEncoding } from 'child_process';
 
 const Users$ = new Subject<boolean>();
+const CheckMail$ = new Subject<boolean>();
+const CheckPseudo$ = new Subject<boolean>();
 
 @Component({
   selector: 'app-admin-users',
@@ -14,7 +17,7 @@ const Users$ = new Subject<boolean>();
 })
 export class AdminUsersComponent implements OnInit {
 
-  constructor(private routerService:Router,private appService:AppComponent, private utilisateurService:UtilisateurDAL) { }
+  constructor(@Inject(SESSION_STORAGE) private session: WebStorageService,private routerService:Router, private utilisateurService:UtilisateurDAL) { }
   Users:Utilisateur[];
   SearchMail:string;
   SearchPseudo:string;
@@ -27,9 +30,12 @@ export class AdminUsersComponent implements OnInit {
   EditRole:string;
   EditActif:number;
   EditUtil:Utilisateur;
+  messageError:string;
+  messageValidation:string;
+  messageEchec:string;
 
   ngOnInit(): void {
-    if(!this.appService.data["TKA"] || ((this.appService.data["TK"].Role) && this.appService.data["TK"].Role != "Admin"))
+    if(!this.session.get("TKA") || !this.session.get("TK") || !this.session.get("User") || this.session.get("User").Role != "Admin")
     {
       this.routerService.navigateByUrl("/")
     }
@@ -44,12 +50,15 @@ export class AdminUsersComponent implements OnInit {
     this.EditPseudo = "";
     this.EditRole = "";
     this.EditActif = 1;
+    this.messageError = "";
+    this.messageValidation ="";
+    this.messageEchec = "";
   }
 
   search()
   {
     this.message = "";
-    this.utilisateurService.getUtilisateurs(this.appService.data["TK"]).subscribe(result => {
+    this.utilisateurService.getUtilisateurs(this.session.get("TK")).subscribe(result => {
       this.Users = result;
       Users$.next(true);
     })
@@ -108,11 +117,53 @@ export class AdminUsersComponent implements OnInit {
 
   Modifier()
   {
+    this.EditUtil.Mail = this.EditMail;
+    this.EditUtil.Pseudo = this.EditPseudo;
     this.EditUtil.Role = this.EditRole;
     this.EditUtil.Actif = this.EditActif;
-    this.utilisateurService.putUtilisateur(this.EditUtil, this.EditUtil.Id, this.appService.data["TK"]).subscribe(() => {
-      this.search();
+    this.CheckPseudo(this.EditUtil.Pseudo, this.EditUtil.Id);
+    this.CheckMail(this.EditUtil.Mail, this.EditUtil.Id);
+    zip(CheckPseudo$, CheckMail$).subscribe(([Pseudo,Mail]) => {
+      if(!Pseudo) this.messageError = "Ce pseudo existe déjà sur un autre utilisateur";
+      else if(!Mail) this.messageError = "Ce Mail existe déjà sur un autre utilisateur";
+      else {
+        this.messageError = "";
+        this.edit = false;
+        this.utilisateurService.putUtilisateur(this.EditUtil, this.EditUtil.Id, this.session.get("TK")).subscribe(() => {
+          this.messageValidation = "Le changement a été effectué avec succès.";
+          this.search();
+          setTimeout(() => {
+            this.messageValidation="";
+          },4000)
+        }, error => {
+          this.messageEchec = "La mise à jour n'a pas fonctionnée. Tu es nul en tant qu'admin.";
+          setTimeout(() => {
+            this.messageEchec="";
+          },4000)
+        });
+      }
+        
     });
-    this.edit = false;
+    
+    
+  }
+
+  public CheckPseudo(Pseudo:string, Id:number)
+  {
+    this.utilisateurService.getUtilisateurByPseudo(Pseudo, this.session.get("TK")).subscribe(result => {
+      if(result.Id == Id) CheckPseudo$.next(true);
+      else CheckPseudo$.next(false);
+    }, error => {
+      CheckPseudo$.next(true);
+    })
+  }
+  public CheckMail(Mail:string, Id:number)
+  {
+    this.utilisateurService.getUtilisateurByMail(Mail, this.session.get("TK")).subscribe(result => {
+      if(result.Id == Id) CheckMail$.next(true);
+      else CheckMail$.next(false);
+    }, error => {
+      CheckMail$.next(true);
+    })
   }
 }

@@ -1,8 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Inject } from '@angular/core';
 import { UtilisateurDAL } from '../service/utilisateur-dal';
-import { AppComponent } from '../app.component';
 import { zip, Subject } from 'rxjs';
 import { Router } from '@angular/router';
+import { SESSION_STORAGE, WebStorageService } from 'angular-webstorage-service';
 
 const CheckMail$ = new Subject<boolean>();
 
@@ -16,10 +16,10 @@ export class RetrievePasswordComponent implements OnInit {
   MessageMail:string="";
   MessageOK:string="";
   MessageNOK:string="";
-  constructor(private routerService:Router,private appService:AppComponent,private utilisateurService:UtilisateurDAL) { }
+  constructor(@Inject(SESSION_STORAGE) private session: WebStorageService,private routerService:Router,private utilisateurService:UtilisateurDAL) { }
 
   ngOnInit(): void {
-    if(!this.appService.data ["TKA"])
+    if(!this.session.get("TKA"))
     {
       this.routerService.navigateByUrl("/")
     }
@@ -31,7 +31,7 @@ export class RetrievePasswordComponent implements OnInit {
     this.MessageMail = "";
     if (this.Mail == "") this.MessageMail = "Champ obligatoire.";
     else if (!re.test(this.Mail)) this.MessageMail = "Merci de saisir un E-mail au bon format."
-    else this.utilisateurService.getUtilisateurByMail(this.Mail, this.appService.data["TKA"]).subscribe(response => {
+    else this.utilisateurService.getUtilisateurByMail(this.Mail, this.session.get("TKA")).subscribe(response => {
               CheckMail$.next(true);
             }, error =>{
               this.MessageMail = "Aucun compte n'est lié à cet E-mail.";
@@ -44,7 +44,7 @@ export class RetrievePasswordComponent implements OnInit {
     zip(CheckMail$).subscribe(() => {
       if(this.MessageMail == '')
       {
-        this.utilisateurService.GenererNouveauPassword(this.Mail, this.appService.data['TK']).subscribe(result => {
+        this.utilisateurService.GenererNouveauPassword(this.Mail, this.session.get("TK")).subscribe(result => {
           this.MessageOK = "Votre nouveau mot de passe a été envoyé par E-mail. Pensez à vérifier vos spams!"
           setTimeout(()=> this.MessageOK ='', 5000);
           this.Mail = '';
@@ -62,7 +62,7 @@ export class RetrievePasswordComponent implements OnInit {
     zip(CheckMail$).subscribe(() => {
       if(this.MessageMail == '')
       {
-        this.utilisateurService.RetrouverPseudo(this.Mail, this.appService.data['TK']).subscribe(result => {
+        this.utilisateurService.RetrouverPseudo(this.Mail, this.session.get("TK")).subscribe(result => {
           this.MessageOK = "Votre pseudo a été envoyé par E-mail. Pensez à vérifier vos spams!"
           setTimeout(()=> this.MessageOK ='', 5000);
           this.Mail = '';

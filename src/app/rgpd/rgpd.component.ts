@@ -1,4 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Inject } from '@angular/core';
+import { SESSION_STORAGE, WebStorageService } from 'angular-webstorage-service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-rgpd',
@@ -7,9 +9,13 @@ import { Component, OnInit } from '@angular/core';
 })
 export class RgpdComponent implements OnInit {
 
-  constructor() { }
+  constructor(@Inject(SESSION_STORAGE) private session: WebStorageService,private routerService:Router) { }
 
   ngOnInit(): void {
+    if(!this.session.get("TKA"))
+    {
+      this.routerService.navigateByUrl("/")
+    }
   }
 
 }

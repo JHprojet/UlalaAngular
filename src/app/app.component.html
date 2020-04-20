@@ -45,8 +45,15 @@
           <a class="dropdown-item" routerLink='/myinfos'>Mes informations</a>
         </div>
       </li>
-      <li *ngIf="data['User'] && data['User'].Role && data['User'].Role == 'Admin'" class="nav-item active">
-        <a class="nav-link" routerLink='/admusers'>Admin</a>
+      <li *ngIf="data['User'] && data['User'].Role && data['User'].Role == 'Admin'" class="nav-item dropdown">
+        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          Admin
+        </a>
+        <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+          <a class="dropdown-item" routerLink='/admusers'>Utilisateurs</a>
+          <a class="dropdown-item" routerLink='/admstrats'>Stratégies</a>
+        </div>
+ 
       </li>
     </ul>
     <form class="form-inline my-2 my-lg-0">

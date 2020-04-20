@@ -1,7 +1,7 @@
-import { Component, OnInit } from '@angular/core';
-import { AppComponent } from '../app.component';
+import { Component, OnInit, Inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { Utilisateur } from '../models/utilisateur';
+import { SESSION_STORAGE, WebStorageService } from 'angular-webstorage-service';
 
 @Component({
   selector: 'app-mes-infos',
@@ -10,16 +10,16 @@ import { Utilisateur } from '../models/utilisateur';
 })
 export class MesInfosComponent implements OnInit {
 
-  constructor(private appService:AppComponent, private routerService:Router) { }
+  constructor(@Inject(SESSION_STORAGE) private session: WebStorageService, private routerService:Router) { }
   User:Utilisateur;
   
 
   ngOnInit(): void {
-    if(!this.appService.data["TKA"])
+    if(!this.session.get("TKA") || !this.session.get("TK"))
     {
-      this.routerService.navigateByUrl("/");
+      this.routerService.navigateByUrl("/")
     }
-    this.User = this.appService.data["User"];
+    this.User = this.session.get("User");
   }
 
 }

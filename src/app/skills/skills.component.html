@@ -1,8 +1,32 @@
 <br/>
 <h2>Les skills</h2>
 <br/>
-<p>Page de contenu en construction.</p>
-
-<ng-container *ngFor="let elem of Skills">
-    <img src="{{elem.ImagePath}}">
-</ng-container>
+<div class="form-group row">
+    <label class="col-sm-1 col-form-label">Classe : </label>
+    <select class="form-control col-sm-2" NgModel (change)="changeClasse(Classe)" #Classe>
+        <option value="0"></option>
+        <option *ngFor="let classe of selectClasse" value={{classe.Id}}>{{classe.NomFR}}</option>
+    </select>
+</div>
+<br/>
+<table class="table table-striped">
+    <thead class="thead-dark">
+        <tr>
+            <th style="width: 8%">Image</th>
+            <th style="width: 20%">Nom</th>
+            <th style="width: 47%">Description</th>
+            <th style="width: 8%">Coût</th>
+            <th style="width: 17%">Zone</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr *ngFor="let element of Skills">
+            <td><img src="{{element.ImagePath}}"></td>
+            <td >{{element.NomFR}}</td>
+            <td>{{element.DescFR}}</td>
+            <td>{{element.Cost}}</td>
+            <td>{{element.Location}}</td>
+        </tr>
+    </tbody>  
+</table>
+<br/><br/><br/>

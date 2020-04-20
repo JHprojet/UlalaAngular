@@ -115,6 +115,6 @@
     <div class="alert alert-danger" role="alert"> {{errorImage}}</div>
 </ng-container>
     <br/>
-    <button *ngIf=" ((messageClasse == '' && messageBossZone == '' && AffButtonWithDetail) || messageIndication == '') && errorImage == ''  && Loading == false" class="btn btn-primary" type="submit" (click)="upload()">Envoyer</button>
+    <button *ngIf=" ((messageClasse == '' && messageBossZone == '' && AffButtonWithDetail == 'Aff') || messageIndication == '') && errorImage == '' && Loading != 'Load'" class="btn btn-primary" type="submit" (click)="upload()">Envoyer</button>
 
 

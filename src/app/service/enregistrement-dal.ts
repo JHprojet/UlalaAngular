@@ -1,9 +1,7 @@
 import {Injectable} from "@angular/core";
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
-import { catchError } from 'rxjs/operators';
 import { Enregistrement } from "../models/enregistrement";
-
 
 const EndPoint = "http://localhost:44312/api/";
   

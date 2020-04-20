@@ -1,8 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Inject } from '@angular/core';
 import { BosszoneDAL } from '../service/bosszone-dal';
 import { BossZone } from '../models/boss-zone';
-import { AppComponent } from '../app.component';
 import { Router } from '@angular/router';
+import { SESSION_STORAGE, WebStorageService } from 'angular-webstorage-service';
 
 
 @Component({
@@ -12,16 +12,16 @@ import { Router } from '@angular/router';
 })
 export class ListBossComponent implements OnInit {
 
-  constructor(private routerService:Router,private serviceBossZone:BosszoneDAL, private appService:AppComponent) { }
+  constructor(@Inject(SESSION_STORAGE) private session: WebStorageService,private routerService:Router,private serviceBossZone:BosszoneDAL) { }
   BossZone:BossZone[];
 
   ngOnInit(): void {
-    if(!this.appService.data["TKA"])
+    if(!this.session.get("TKA"))
     {
       this.routerService.navigateByUrl("/")
     }
     this.BossZone = new Array<BossZone>();
-    this.serviceBossZone.getBossZones(this.appService.data["TK"]??this.appService.data["TKA"]).subscribe(result =>{
+    this.serviceBossZone.getBossZones(this.session.get("TK")??this.session.get("TKA")).subscribe(result =>{
       this.BossZone = result;
     })
   }

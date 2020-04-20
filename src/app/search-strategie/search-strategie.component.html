@@ -103,7 +103,10 @@
             <div class="col-sm-4"><b>Boss :</b> {{Enregistrement.BossZone.Boss.NomFR}}</div>
         </div>
         <div class="row">
-            <div class="col-sm-3"><b>Posteur :</b> {{Enregistrement.Utilisateur.Pseudo}}</div>
+            <div class="col-sm-4"><b>Posteur :</b> {{Enregistrement.Utilisateur.Pseudo}}
+                <img height="25px" src="http://192.168.1.2:8081/Follow1.png" (click)="Follow(Enregistrement.Utilisateur.Id)" *ngIf="currentUser.Id != Enregistrement.Utilisateur.Id && currentUser.Id != 0">
+                <img height="25px" src="http://192.168.1.2:8081/Unfollow.png" (click)="Unfollow(Enregistrement.Utilisateur.Id)" *ngIf="currentUser.Id != Enregistrement.Utilisateur.Id && currentUser.Id != 0">
+            </div>
             <div class="col-sm-7"><b>Team :</b> {{Enregistrement.Team.Classe1.NomFR}} - {{Enregistrement.Team.Classe2.NomFR}} - {{Enregistrement.Team.Classe3.NomFR}} - {{Enregistrement.Team.Classe4.NomFR}}</div>
             
         </div>

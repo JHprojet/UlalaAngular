@@ -1,6 +1,5 @@
 import { NgModule } from '@angular/core';
-import { Router, Routes, RouterModule } from '@angular/router';
-import { AppComponent } from './app.component';
+import { Routes, RouterModule } from '@angular/router';
 import { HomeComponent } from './home/home.component';
 import { ContactComponent } from './contact/contact.component';
 import { RgpdComponent } from './rgpd/rgpd.component';
@@ -17,6 +16,7 @@ import { InscriptionComponent } from './inscription/inscription.component';
 import { ActivationComponent } from './activation/activation.component';
 import { RetrievePasswordComponent } from './retrieve-password/retrieve-password.component';
 import { AdminUsersComponent } from './admin-users/admin-users.component';
+import { AdminStratComponent } from './admin-strat/admin-strat.component';
 
 
 const routes: Routes = [];
@@ -41,6 +41,7 @@ const routes: Routes = [];
     {path : 'activation', component: ActivationComponent},
     {path : 'RetrievePassword', component: RetrievePasswordComponent},
     {path : 'admusers', component: AdminUsersComponent},
+    {path : 'admstrats', component: AdminStratComponent}
   ])],
   exports: [RouterModule]
 })

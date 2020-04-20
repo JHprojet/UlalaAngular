@@ -1,6 +1,5 @@
 import { BrowserModule } from '@angular/platform-browser';
-import { NgModule, APP_INITIALIZER } from '@angular/core';
-
+import { NgModule } from '@angular/core';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { FormsModule } from '@angular/forms';
@@ -22,6 +21,8 @@ import { StorageServiceModule} from 'angular-webstorage-service';
 import { ActivationComponent } from './activation/activation.component';
 import { RetrievePasswordComponent } from './retrieve-password/retrieve-password.component';
 import { AdminUsersComponent } from './admin-users/admin-users.component';
+import { AdminStratComponent } from './admin-strat/admin-strat.component';
+import { ModalModule } from 'ngx-bootstrap/modal/ngx-bootstrap-modal';
 
 @NgModule({
   declarations: [
@@ -42,13 +43,15 @@ import { AdminUsersComponent } from './admin-users/admin-users.component';
     ActivationComponent,
     RetrievePasswordComponent,
     AdminUsersComponent,
+    AdminStratComponent,
   ],
   imports: [
     HttpClientModule,
     BrowserModule,
     StorageServiceModule,
     AppRoutingModule,
-    FormsModule
+    FormsModule,
+    ModalModule.forRoot()
   ],
   providers: [],
   bootstrap: [AppComponent]

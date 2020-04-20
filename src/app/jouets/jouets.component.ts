@@ -1,6 +1,6 @@
-import { Component, OnInit } from '@angular/core';
-import { AppComponent } from '../app.component';
+import { Component, OnInit, Inject } from '@angular/core';
 import { Router } from '@angular/router';
+import { SESSION_STORAGE, WebStorageService } from 'angular-webstorage-service';
 
 @Component({
   selector: 'app-jouets',
@@ -9,10 +9,10 @@ import { Router } from '@angular/router';
 })
 export class JouetsComponent implements OnInit {
 
-  constructor(private appService:AppComponent, private routerService:Router) { }
+  constructor(@Inject(SESSION_STORAGE) private session: WebStorageService, private routerService:Router) { }
 
   ngOnInit(): void {
-    if(!this.appService.data["TKA"])
+    if(!this.session.get("TKA"))
     {
       this.routerService.navigateByUrl("/")
     }

@@ -1,17 +1,10 @@
 import {Injectable} from "@angular/core";
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
-import { retry, catchError } from 'rxjs/operators';
 import { Favori } from "../models/Favori";
 
 const EndPoint = "http://localhost:44312/api/";
-const httpOptions = {
-    headers: new HttpHeaders({
-      'Content-Type':  'application/json'
-      //'Authorization': 'mon-jeton'
-    })
-  };
-  
+
 @Injectable({ providedIn: 'root' })
 export class FavoriDAL {
     constructor(private http: HttpClient) { }

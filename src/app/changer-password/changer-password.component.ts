@@ -1,9 +1,9 @@
-import { Component, OnInit } from '@angular/core';
-import { AppComponent } from '../app.component';
+import { Component, OnInit, Inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { UtilisateurDAL } from '../service/utilisateur-dal';
 import { Utilisateur } from '../models/utilisateur';
 import { zip, Subject } from 'rxjs';
+import { SESSION_STORAGE, WebStorageService } from 'angular-webstorage-service';
 
 const Check1$ = new Subject<boolean>();
 const Check2$ = new Subject<boolean>();
@@ -16,7 +16,7 @@ const Check3$ = new Subject<boolean>();
 })
 export class ChangerPasswordComponent implements OnInit {
 
-  constructor(private utilisateurService:UtilisateurDAL,private appService:AppComponent, private routerService:Router) { }
+  constructor(@Inject(SESSION_STORAGE) private session: WebStorageService,private utilisateurService:UtilisateurDAL, private routerService:Router) { }
   CurrentPassword:string;
   NewPassword:string;
   NewPasswordVerif:string;
@@ -27,7 +27,7 @@ export class ChangerPasswordComponent implements OnInit {
   alertCurrentPassword:string;
 
   ngOnInit(): void {
-    if(!this.appService.data["TKA"])
+    if(!this.session.get("TKA") || !this.session.get("TK"))
     {
       this.routerService.navigateByUrl("/")
     }
@@ -44,7 +44,7 @@ export class ChangerPasswordComponent implements OnInit {
   public CheckCurrentPassword()
   {
     this.alertCurrentPassword ='';
-    this.utilisateurService.CheckUser(new Utilisateur({Password:this.CurrentPassword, Pseudo:this.appService.data["User"].Pseudo}), this.appService.data["TK"]).subscribe(result =>{
+    this.utilisateurService.CheckUser(new Utilisateur({Password:this.CurrentPassword, Pseudo:this.session.get("User").Pseudo}), this.session.get("TK")).subscribe(result =>{
       Check1$.next(true);
     }, error => {
       this.alertCurrentPassword = 'Votre mot de passe est erroné.'
@@ -78,8 +78,8 @@ export class ChangerPasswordComponent implements OnInit {
     zip(Check1$, Check2$, Check3$).subscribe(() => {
       if (Check1$ && Check2$ && Check3$)
       {
-        this.utilisateurService.changePassword(this.appService.data["User"].Id,this.NewPassword, this.appService.data['TK']).subscribe(result => {
-          this.appService.data["User"].password = this.NewPassword;
+        this.utilisateurService.changePassword(this.session.get("User").Id,this.NewPassword, this.session.get("TK")).subscribe(result => {
+          this.session.get("User").password = this.NewPassword;
           this.NewPassword ='';
           this.NewPasswordVerif='';
           this.CurrentPassword='';

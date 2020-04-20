@@ -1,7 +1,7 @@
-import { Component, OnInit } from '@angular/core';
-import { AppComponent } from '../app.component';
+import { Component, OnInit, Inject } from '@angular/core';
 import { UtilisateurDAL } from '../service/utilisateur-dal';
 import { Router } from '@angular/router';
+import { SESSION_STORAGE, WebStorageService } from 'angular-webstorage-service';
 
 @Component({
   selector: 'app-activation',
@@ -10,7 +10,7 @@ import { Router } from '@angular/router';
 })
 export class ActivationComponent implements OnInit {
 
-  constructor(private routerService:Router,private utilisateurService:UtilisateurDAL,private appService:AppComponent) { }
+  constructor(@Inject(SESSION_STORAGE) private session: WebStorageService,private routerService:Router,private utilisateurService:UtilisateurDAL) { }
   Pseudo:string;
   Id:number;
   token:string;
@@ -20,12 +20,12 @@ export class ActivationComponent implements OnInit {
   MessageRenvoiNOK:string;
 
   ngOnInit(): void {
-    if(!this.appService.data["TKA"])
+    if(!this.session.get("TKA"))
     {
       this.routerService.navigateByUrl("/")
     }
-    this.Pseudo = this.appService.data["PseudoU"];
-    this.Id = this.appService.data["IdU"];
+    this.Pseudo = this.session.get("PseudoU");
+    this.Id = this.session.get("IdU");
     this.token = '';
     this.MessageOK = '';
     this.MessageNOK = '';
@@ -37,9 +37,9 @@ export class ActivationComponent implements OnInit {
   {
     this.MessageNOK = '';
     this.MessageOK = '';
-    this.utilisateurService.UpdateToken(this.Id,this.token, this.appService.data['TK']).subscribe(result => {
-      this.utilisateurService.getUtilisateur(this.Id, this.appService.data["TKA"]).subscribe(result => {
-        this.appService.data["User"] = result;
+    this.utilisateurService.UpdateToken(this.Id,this.token, this.session.get("TK")).subscribe(result => {
+      this.utilisateurService.getUtilisateur(this.Id, this.session.get("TKA")).subscribe(result => {
+        this.session.set("User",result);
         this.MessageOK = "Merci, votre compte à bien été activé, vous allez être rediriger dans un instant. Bonne navigation!";
         setTimeout(() => this.MessageOK='',3000);
         this.routerService.navigateByUrl('');
@@ -53,7 +53,7 @@ export class ActivationComponent implements OnInit {
   {
     this.MessageRenvoiOK = '';
     this.MessageRenvoiNOK = '';
-    this.utilisateurService.RenvoiToken(this.appService.data["IdU"], this.appService.data['TK']).subscribe(result =>{
+    this.utilisateurService.RenvoiToken(this.session.get("IdU"), this.session.get("TKA")).subscribe(result =>{
       this.MessageRenvoiOK= "Mail renvoyé, regardez dans votre boite mail ! (Et n'oubliez pas les spams!)";
       setTimeout(() => this.MessageRenvoiOK='',5000);
     }, error => {
