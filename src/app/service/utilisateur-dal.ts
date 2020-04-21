@@ -30,7 +30,7 @@ export class UtilisateurDAL {
       return this.http.post(EndPoint+'Login/?IdU='+Id, this.GetHeader(Token))
     }
     UpdateToken(Id:number, TokenAct:string, Token:string) {
-      return this.http.post(EndPoint+'Login/'+Id+'/?Token='+TokenAct, this.GetHeader(Token))
+      return this.http.post(EndPoint+'Login/'+Id, JSON.stringify(TokenAct), this.GetHeader(Token))
     }
     CheckUser(monObjet: Utilisateur, Token:string): Observable<string> {
       return this.http.post<string>(EndPoint+'Login', monObjet, this.GetHeader(Token))

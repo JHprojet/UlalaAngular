@@ -58,6 +58,7 @@ export class AppComponent {
   Disconnection()
   {
     this.saveInSession("User", null);
+    this.saveInSession("TK", null)
     this.router.navigateByUrl('/');
     this.Disconnected = "Vous avez bien été déconnecté.";
     setTimeout(() => this.Disconnected = "", 3000);

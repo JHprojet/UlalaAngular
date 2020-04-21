@@ -281,6 +281,7 @@ export class MesPreferencesComponent implements OnInit {
   {
     this.teamAdd.Utilisateur = new Utilisateur({Id:this.session.get("User").Id});
     this.teamAdd.NomTeam = this.nomTeam;
+    if(!this.teamAdd.Team) this.teamAdd.Team = new Team({Id:this.teamId});
     this.mesteamsService.putMaTeam(this.teamAdd, this.MateamId, this.session.get("TK")).subscribe(() => {
       this.mesteamsService.getMeTeamsByUserId(this.utilisateur.Id, this.session.get("TK")).subscribe(result =>{
         this.mesTeams = result;

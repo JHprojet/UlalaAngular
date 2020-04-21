@@ -37,7 +37,8 @@ export class ActivationComponent implements OnInit {
   {
     this.MessageNOK = '';
     this.MessageOK = '';
-    this.utilisateurService.UpdateToken(this.Id,this.token, this.session.get("TK")).subscribe(result => {
+    console.log(this.session.get("TKA"));
+    this.utilisateurService.UpdateToken(this.Id, this.token, this.session.get("TKA")).subscribe(result => {
       this.utilisateurService.getUtilisateur(this.Id, this.session.get("TKA")).subscribe(result => {
         this.session.set("User",result);
         this.MessageOK = "Merci, votre compte à bien été activé, vous allez être rediriger dans un instant. Bonne navigation!";

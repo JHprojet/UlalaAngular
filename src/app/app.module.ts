@@ -43,7 +43,7 @@ import { ModalModule } from 'ngx-bootstrap/modal/ngx-bootstrap-modal';
     ActivationComponent,
     RetrievePasswordComponent,
     AdminUsersComponent,
-    AdminStratComponent,
+    AdminStratComponent
   ],
   imports: [
     HttpClientModule,
