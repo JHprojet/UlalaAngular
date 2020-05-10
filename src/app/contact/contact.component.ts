@@ -1,7 +1,5 @@
-import { Component, OnInit, Inject } from '@angular/core';
-import { AppComponent } from '../app.component';
-import { Router } from '@angular/router';
-import { SESSION_STORAGE, WebStorageService } from 'angular-webstorage-service';
+import { Component, OnInit } from '@angular/core';
+import { AccessComponent } from '../helpeur/access-component';
 
 @Component({
   selector: 'app-contact',
@@ -10,13 +8,10 @@ import { SESSION_STORAGE, WebStorageService } from 'angular-webstorage-service';
 })
 export class ContactComponent implements OnInit {
 
-  constructor(@Inject(SESSION_STORAGE) private session: WebStorageService,private routerService:Router) { }
+  constructor(private accessService:AccessComponent) { }
 
   ngOnInit(): void {
-    if(!this.session.get("TKA"))
-    {
-      this.routerService.navigateByUrl("/")
-    }
+    this.accessService.getAnonymeKey();
   }
-
+  //Component à faire
 }

@@ -1,65 +1,109 @@
-
-<br/>
-<div class="container mx-auto" class="alert alert-success" *ngIf="inscriptionReussi != ''">{{inscriptionReussi}}</div>
-
-<div class="container mx-auto col-sm-7" *ngIf="inscriptionReussi == ''">
+<!-- Message Error/Success -->
+<br *ngIf="Success != undefined"/>
+<div class="container mx-auto" class="alert alert-success" *ngIf="Success != undefined && Success">Vous êtes bien inscris. Vous pouvez vous connecter en haut à droite de l'écran.</div>
+<div class="container mx-auto" class="alert alert-danger" *ngIf="Success != undefined && !Success">Oops il semble qu'il y ai eu un problème. Merci de recommencer.</div>
+<!-- Formulaire d'inscription -->
+<div class="container mx-auto col-sm-7">
     <br/>
     <h4 class="mx-auto" style="width: 300px">Formulaire d'inscription</h4>
     <br/>
-    <form>
+    <form [formGroup]="inscriptionForm" (ngSubmit)="onSubmit()">
+        <!-- Champ Pseudo -->
         <div class="col-sm-12 form-group row">
-            <label class="col-sm-4 col-form-label">Username : </label>
+            <label class="col-sm-4 col-form-label">Pseudo : </label>
             <div class="col-sm-8">
-                <input type="text" class="form-control" value="{{username}}" [(ngModel)]="username" name="username">
-                <br *ngIf="alertUsername != ''"/>
-                <div *ngIf="alertUsername != ''" class="alert alert-danger" role="alert">
-                    {{alertUsername}}
-                  </div>
+                <input id="pseudo" type="text" class="form-control" formControlName="pseudo">
             </div>
         </div>
-            <div class="col-sm-12 form-group row">
+        <!-- Message validation Pseudo -->
+        <div *ngIf="inscriptionForm.controls.pseudo.invalid && (inscriptionForm.controls.pseudo.dirty || inscriptionForm.controls.pseudo.touched)" class="alert alert-danger">
+            <div *ngIf="inscriptionForm.controls.pseudo.errors.required">
+                Le pseudo doit être renseigné.
+            </div>
+            <div *ngIf="inscriptionForm.controls.pseudo.errors.minlength">
+                Votre pseudo ne peux pas faire moins de 3 caractères.
+            </div>
+            <div *ngIf="inscriptionForm.controls.pseudo.errors.maxlength">
+                Votre pseudo ne peux pas faire plus de 20 caractères.
+            </div>
+            <div *ngIf="inscriptionForm.controls.pseudo.errors?.PseudoExist">
+                Ce pseudo est déjà pris! Faites preuve de plus d'imagination que diable!
+            </div>
+        </div>
+        <!-- Champ E-mail -->
+        <div class="col-sm-12 form-group row">
             <label class="col-sm-4 col-form-label">E-mail : </label>
             <div class="col-sm-8">
-                <input type="email" class="form-control" value="{{email}}" [(ngModel)]="email" name="email">
-                <br *ngIf="alertEmail != ''"/>
-                <div *ngIf="alertEmail != ''" class="alert alert-danger" role="alert">
-                    {{alertEmail}}
-                  </div>
+                <input type="email" class="form-control" formControlName="email">
             </div>
         </div>
+        <!-- Message Validation E-mail -->
+        <div *ngIf="inscriptionForm.controls.email.invalid && (inscriptionForm.controls.email.dirty || inscriptionForm.controls.email.touched)" class="alert alert-danger">
+            <div *ngIf="inscriptionForm.controls.email.errors.required">
+                L'E-mail doit être renseigné.
+            </div>
+            <div *ngIf="inscriptionForm.controls.email.errors.emailFormat">
+                Le format de l'e-mail est incorrect.
+            </div>
+            <div *ngIf="inscriptionForm.controls.email.errors?.MailExist && (inscriptionForm.touched || inscriptionForm.dirty)">
+                Cet E-mail est déjà utilisé. Pour retrouver vos informations : <a class="link" routerLink='/RetrievePassword'>Cliquez ici!</a> 
+            </div>
+        </div>
+        <!-- Champ Vérification E-mail -->
         <div class="col-sm-12 form-group row">
             <label class="col-sm-4 col-form-label">Confirmer E-mail : </label>
             <div class="col-sm-8">
-                <input type="text" class="form-control" value="{{emailVerif}}" [(ngModel)]="emailVerif" name="emailVerif">
-                <br *ngIf="alertEmailVerif != ''"/>
-                <div *ngIf="alertEmailVerif != ''" class="alert alert-danger" role="alert">
-                    {{alertEmailVerif}}
-                  </div>
+                <input type="text" class="form-control" formControlName="emailVerif">
             </div>
         </div>
+        <!-- Message Validation Vérification E-mail -->
+        <div *ngIf="inscriptionForm.controls.emailVerif.invalid && (inscriptionForm.controls.emailVerif.dirty || inscriptionForm.controls.emailVerif.touched)" class="alert alert-danger">
+            <div *ngIf="inscriptionForm.controls.emailVerif.errors.required">
+                L'E-mail doit être renseigné.
+            </div>
+        </div>
+        <div *ngIf="inscriptionForm.errors?.EmailMatch && (inscriptionForm.touched || inscriptionForm.dirty)" class="cross-validation-error-message alert alert-danger">
+            Les deux E-mails doivent correspondre.
+        </div>
+        <!-- Champ Password -->
         <div class="col-sm-12 form-group row">
             <label class="col-sm-4 col-form-label">Password : </label>
             <div class="col-sm-8">
-                <input type="password" class="form-control"  value="{{password}}" [(ngModel)]="password" name="password">
-                <br *ngIf="alertPassword != ''"/>
-                <div *ngIf="alertPassword != ''" class="alert alert-danger" role="alert">
-                    {{alertPassword}}
-                  </div>
+                <input type="password" class="form-control" formControlName="password">
             </div>
         </div>
+        <!-- Message Validation Password -->
+        <div *ngIf="inscriptionForm.controls.password.invalid && (inscriptionForm.controls.password.dirty || inscriptionForm.controls.password.touched)" class="alert alert-danger">
+            <div *ngIf="inscriptionForm.controls.password.errors.required">
+                Le mot de passe doit être renseigné.
+            </div>
+            <div *ngIf="inscriptionForm.controls.password.errors.minlength">
+                Votre mot de passe ne peux pas faire moins de 8 caractères.
+            </div>
+            <div *ngIf="inscriptionForm.controls.password.errors.maxlength">
+                Votre mot de passe ne peux pas faire plus de 40 caractères.
+            </div>
+        </div>
+        <!-- Champ Vérification Password -->
         <div class="col-sm-12 form-group row">
             <label class="col-sm-4 col-form-label">Confirmer Password :</label>
             <div class="col-sm-8">
-                <input type="password" class="form-control" value="{{passwordVerif}}" [(ngModel)]="passwordVerif" name="passwordVerif">
-                <br *ngIf="alertPasswordVerif != ''"/>
-                <div *ngIf="alertPasswordVerif != ''" class="alert alert-danger" role="alert">
-                    {{alertPasswordVerif}}
-                  </div>
+                <input type="password" class="form-control" formControlName="passwordVerif">
             </div>
         </div>
+        <!-- Message Validation Vérification Password -->
+        <div *ngIf="inscriptionForm.controls.passwordVerif.invalid && (inscriptionForm.controls.passwordVerif.dirty || inscriptionForm.controls.passwordVerif.touched)" class="alert alert-danger">
+            <div *ngIf="inscriptionForm.controls.passwordVerif.errors.required">
+                Le mot de passe doit être renseigné.
+            </div>
+        </div>
+        <div *ngIf="inscriptionForm.errors?.PasswordMatch && (inscriptionForm.touched || inscriptionForm.dirty)" class="cross-validation-error-message alert alert-danger">
+            Les deux mots de passe doivent correspondre.
+        </div>
+        <!-- Bouton de Validation -->
         <br/>
         <div class="col-sm-12 mx-auto form-group row" style="width: 300px;">
-            <button (click)="EnvoiFormulaire()" type="submit" class=" btn btn-secondary btn-lg">Je m'inscris maintenant ! </button>
+            <button type="submit" [disabled]="!inscriptionForm.valid" class=" btn btn-secondary btn-lg">Je m'inscris maintenant ! </button>
         </div>
     </form>
 </div>

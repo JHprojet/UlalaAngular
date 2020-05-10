@@ -1,9 +1,8 @@
 import { Component, OnInit, Inject } from '@angular/core';
-import { Router } from '@angular/router';
 import { UtilisateurDAL } from '../service/utilisateur-dal';
 import { Utilisateur } from '../models/utilisateur';
 import { zip, Subject } from 'rxjs';
-import { SESSION_STORAGE, WebStorageService } from 'angular-webstorage-service';
+import { AccessComponent } from '../helpeur/access-component';
 
 const Check1$ = new Subject<boolean>();
 const Check2$ = new Subject<boolean>();
@@ -16,7 +15,7 @@ const Check3$ = new Subject<boolean>();
 })
 export class ChangerPasswordComponent implements OnInit {
 
-  constructor(@Inject(SESSION_STORAGE) private session: WebStorageService,private utilisateurService:UtilisateurDAL, private routerService:Router) { }
+  constructor(private accessService:AccessComponent,private utilisateurService:UtilisateurDAL) { }
   CurrentPassword:string;
   NewPassword:string;
   NewPasswordVerif:string;
@@ -26,11 +25,10 @@ export class ChangerPasswordComponent implements OnInit {
   alertPasswordVerif:string;
   alertCurrentPassword:string;
 
+  // /!\ A transformer en FormBuilder pour simplifier le component
+
   ngOnInit(): void {
-    if(!this.session.get("TKA") || !this.session.get("TK"))
-    {
-      this.routerService.navigateByUrl("/")
-    }
+    this.accessService.CheckAccess("User");
     this.MessageNOK ='';
     this.MessageOK ='';
     this.alertPassword ='';
@@ -41,16 +39,18 @@ export class ChangerPasswordComponent implements OnInit {
     this.NewPasswordVerif='';
   }
 
+  //Vérification du mot de passer actuel
   public CheckCurrentPassword()
   {
     this.alertCurrentPassword ='';
-    this.utilisateurService.CheckUser(new Utilisateur({Password:this.CurrentPassword, Pseudo:this.session.get("User").Pseudo}), this.session.get("TK")).subscribe(result =>{
+    this.utilisateurService.CheckUser(new Utilisateur({Password:this.CurrentPassword, Pseudo:this.accessService.data["Info"].Pseudo}), this.accessService.data["User"]).subscribe(result =>{
       Check1$.next(true);
     }, error => {
       this.alertCurrentPassword = 'Votre mot de passe est erroné.'
     })
   }
 
+  //Vérification du nouveau mot de passe : longueur. A ajouter plus tard : Majuscule et caractère spéciaux.
   public CheckPassword()
   {
     this.alertPassword="";
@@ -60,6 +60,7 @@ export class ChangerPasswordComponent implements OnInit {
     else Check2$.next(true);
   }
   
+  //Vérification confirmation de password identique au précédent.
   public CheckPasswordVerif()
   {
     this.alertPasswordVerif="";
@@ -68,6 +69,7 @@ export class ChangerPasswordComponent implements OnInit {
     else Check3$.next(true);
   }
 
+  //Validation du nouveau password
   ChangePassword()
   {
     this.CheckCurrentPassword();
@@ -75,17 +77,19 @@ export class ChangerPasswordComponent implements OnInit {
     this.CheckPasswordVerif(); 
     this.MessageOK='';
     this.MessageNOK='';
+    //Si les 3 checks sont ok
     zip(Check1$, Check2$, Check3$).subscribe(() => {
       if (Check1$ && Check2$ && Check3$)
       {
-        this.utilisateurService.changePassword(this.session.get("User").Id,this.NewPassword, this.session.get("TK")).subscribe(result => {
-          this.session.get("User").password = this.NewPassword;
+        this.utilisateurService.changePassword(this.accessService.data["Info"].Id,this.NewPassword, this.accessService.data["User"]).subscribe(result => {
+          //Si changement ok via API, reset des variables et display message réussi.
           this.NewPassword ='';
           this.NewPasswordVerif='';
           this.CurrentPassword='';
           this.MessageOK='Votre password a bien été modifié.'
           setTimeout(() => this.MessageOK='',5000);
         }, error => {
+          //Si erreur lors de l'envoi à l'API.
           this.MessageNOK="Oops, un problème sauvage est survenue, contactez l'administrateur du site via la page de contact."
           setTimeout(() => this.MessageNOK='',5000);
         })

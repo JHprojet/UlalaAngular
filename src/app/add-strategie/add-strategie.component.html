@@ -7,7 +7,8 @@
 <div class="form-group row">
     &nbsp;&nbsp;<h2>Ajouter une stratégie</h2>&nbsp;&nbsp;&nbsp;&nbsp;
     <button (click)="ShowHelp()" type="button" class="btn btn-light dropdown-toggle">
-        {{TexteButtonHelp}}
+        <ng-container *ngIf="Show">Fermer l'aide</ng-container>
+        <ng-container *ngIf="!Show">Afficher l'aide</ng-container>
         </button>
 </div>
 <hr/>
@@ -97,8 +98,8 @@
             <option *ngFor="let classe of selectClasse" value={{classe.Id}}>{{classe.NomFR}}</option>
         </select>
     </div>
-    <ng-container *ngIf="messageClasse != ''">
-        <div class="alert alert-danger" role="alert"> {{messageClasse}}</div>
+    <ng-container *ngIf="DisplayMessageClasse">
+        <div class="alert alert-danger" role="alert">Veuillez sélectionner les 4 classes.</div>
     </ng-container>
 
 </ng-container>
@@ -115,6 +116,6 @@
     <div class="alert alert-danger" role="alert"> {{errorImage}}</div>
 </ng-container>
     <br/>
-    <button *ngIf=" ((messageClasse == '' && messageBossZone == '' && AffButtonWithDetail == 'Aff') || messageIndication == '') && errorImage == '' && Loading != 'Load'" class="btn btn-primary" type="submit" (click)="upload()">Envoyer</button>
+    <button *ngIf="((messageBossZone == '' && !DisplayMessageClasse && DisplayBoutonSansTeam) || messageIndication == '') && errorImage == '' && !Loading" class="btn btn-primary" type="submit" (click)="upload()">Envoyer</button>
 
 

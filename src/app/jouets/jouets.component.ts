@@ -1,6 +1,5 @@
 import { Component, OnInit, Inject } from '@angular/core';
-import { Router } from '@angular/router';
-import { SESSION_STORAGE, WebStorageService } from 'angular-webstorage-service';
+import { AccessComponent } from '../helpeur/access-component';
 
 @Component({
   selector: 'app-jouets',
@@ -9,13 +8,10 @@ import { SESSION_STORAGE, WebStorageService } from 'angular-webstorage-service';
 })
 export class JouetsComponent implements OnInit {
 
-  constructor(@Inject(SESSION_STORAGE) private session: WebStorageService, private routerService:Router) { }
+  constructor(private accessService:AccessComponent) { }
 
   ngOnInit(): void {
-    if(!this.session.get("TKA"))
-    {
-      this.routerService.navigateByUrl("/")
-    }
+    this.accessService.getAnonymeKey();
   }
 
 }

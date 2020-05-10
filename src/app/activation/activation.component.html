@@ -6,14 +6,14 @@
 <input type="text" [(ngModel)]="token" name="token">
 <button type="button" class="btn btn-btn" (click)="envoiToken()">Envoyer mon code d'activation</button>
 <br/><br/>
-<ng-container *ngIf="MessageOK !='' || MessageNOK !=''">
-    <div *ngIf="MessageOK !=''" class="alert alert-success">{{MessageOK}}</div>
-    <div *ngIf="MessageNOK !=''" class="alert alert-danger">{{MessageNOK}}</div>
+<ng-container *ngIf="DisplayValidationOk || DisplayValidationErreur">
+    <div *ngIf="DisplayValidationOk" class="alert alert-success">Merci, votre compte à bien été activé, vous allez être rediriger dans un instant. Bonne navigation!</div>
+    <div *ngIf="DisplayValidationErreur" class="alert alert-danger">Clef d'activation erronée, merci de réessayer. En cas de problème, veuillez contacter l'administrateur du site via la page de contact.</div>
 </ng-container>
 
 <p>Vous n'avez pas reçu votre clef d'activation par mail? <a class="link" (click)='RenvoiToken()'>Cliquez ici!</a></p>
 
-<ng-container *ngIf="MessageRenvoiOK !='' || MessageRenvoiNOK !=''">
-    <div *ngIf="MessageRenvoiOK !=''" class="alert alert-success">{{MessageRenvoiOK}}</div>
-    <div *ngIf="MessageRenvoiNOK !=''" class="alert alert-danger">{{MessageRenvoiNOK}}</div>
+<ng-container *ngIf="DisplayRenvoiTokenOk || DisplayRenvoiTokenErreur">
+    <div *ngIf="DisplayRenvoiTokenOk" class="alert alert-success">Mail renvoyé, regardez dans votre boite mail ! (Et n'oubliez pas les spams!)</div>
+    <div *ngIf="DisplayRenvoiTokenErreur" class="alert alert-danger">Oops, une erreur sauvage semble être survenue, veuillez contacter l'administrateur du site via la page contact rubrique 'Activation de mon compte'</div>
 </ng-container>

@@ -23,6 +23,9 @@ import { RetrievePasswordComponent } from './retrieve-password/retrieve-password
 import { AdminUsersComponent } from './admin-users/admin-users.component';
 import { AdminStratComponent } from './admin-strat/admin-strat.component';
 import { ModalModule } from 'ngx-bootstrap/modal/ngx-bootstrap-modal';
+import { AccessComponent } from './helpeur/access-component';
+import { TestComponent } from './test/test.component';
+import { ReactiveFormsModule } from '@angular/forms';
 
 @NgModule({
   declarations: [
@@ -43,7 +46,8 @@ import { ModalModule } from 'ngx-bootstrap/modal/ngx-bootstrap-modal';
     ActivationComponent,
     RetrievePasswordComponent,
     AdminUsersComponent,
-    AdminStratComponent
+    AdminStratComponent,
+    TestComponent
   ],
   imports: [
     HttpClientModule,
@@ -51,9 +55,10 @@ import { ModalModule } from 'ngx-bootstrap/modal/ngx-bootstrap-modal';
     StorageServiceModule,
     AppRoutingModule,
     FormsModule,
-    ModalModule.forRoot()
+    ModalModule.forRoot(),
+    ReactiveFormsModule
   ],
-  providers: [],
+  providers: [AccessComponent],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

@@ -16,7 +16,7 @@
     Si vous souhaitez chercher des stratégies sur un Boss particulier :<br/>
     1 - Sélectionnez un continent + une zone + un boss.<br/>
     2 - Sélectionner si vous le souhaitez une ou plusieurs classes
-    <ng-container *ngIf="currentUser.Id != 0">
+    <ng-container *ngIf="accessUser">
         <br/><br/>
         Vous pouvez également , si vous avez enregistré une team perso dans Mes infos>Mes teams persos :<br/>
         1 - Selectionnez votre team.<br/>
@@ -26,7 +26,7 @@
     <hr/>
 </div>
 <br/>
-<div *ngIf="currentUser.Id != 0" class="form-group row">
+<div *ngIf="accessUser" class="form-group row">
     <ng-container *ngIf="selectMesTeams.length != 0">
         <label class="form-check-label col-sm-2">Choisir sa team</label>
         <select class="form-control col-sm-2" NgModel (change)="choixMaTeam(MaTeam)" #MaTeam>
@@ -104,8 +104,8 @@
         </div>
         <div class="row">
             <div class="col-sm-4"><b>Posteur :</b> {{Enregistrement.Utilisateur.Pseudo}}
-                <img height="25px" src="http://192.168.1.2:8081/Follow1.png" (click)="Follow(Enregistrement.Utilisateur.Id)" *ngIf="currentUser.Id != Enregistrement.Utilisateur.Id && currentUser.Id != 0">
-                <img height="25px" src="http://192.168.1.2:8081/Unfollow.png" (click)="Unfollow(Enregistrement.Utilisateur.Id)" *ngIf="currentUser.Id != Enregistrement.Utilisateur.Id && currentUser.Id != 0">
+                <img height="25px" src="http://127.0.0.1:8081/Follow1.png" (click)="Follow(Enregistrement.Utilisateur.Id)" *ngIf="currentUser.Id != Enregistrement.Utilisateur.Id && currentUser.Id != 0">
+                <img height="25px" src="http://127.0.0.1:8081/Unfollow.png" (click)="Unfollow(Enregistrement.Utilisateur.Id)" *ngIf="currentUser.Id != Enregistrement.Utilisateur.Id && currentUser.Id != 0">
             </div>
             <div class="col-sm-7"><b>Team :</b> {{Enregistrement.Team.Classe1.NomFR}} - {{Enregistrement.Team.Classe2.NomFR}} - {{Enregistrement.Team.Classe3.NomFR}} - {{Enregistrement.Team.Classe4.NomFR}}</div>
             
@@ -117,12 +117,12 @@
             <img [src]="Enregistrement.ImagePath4" height="390px">
         </div>
         <div class="row">
-             <ng-container *ngIf="currentUser.Id != 0">
-                <img *ngIf="VerifFavori(Enregistrement.Id)" src="http://192.168.1.2:8081/fav.png" height="30px" (click)="retraitFavori(Enregistrement.Id)">
-                <img *ngIf="!VerifFavori(Enregistrement.Id)" src="http://192.168.1.2:8081/nofav.png" height="30px" (click)="mettreFavori(Enregistrement.Id)" >
-                <img *ngIf="VerifVote(Enregistrement.Id) != 1 " src="http://192.168.1.2:8081/plus.png" height="30px" (click)="VotePlus(Enregistrement.Id)">
-                <img *ngIf="VerifVote(Enregistrement.Id) != 0" src="http://192.168.1.2:8081/croix.png" height="30px" (click)="DeleteVote(Enregistrement.Id)">
-                <img *ngIf="VerifVote(Enregistrement.Id) != -1" src="http://192.168.1.2:8081/moins.png" height="30px" (click)="VoteMoins(Enregistrement.Id)">
+             <ng-container *ngIf="accessUser">
+                <img *ngIf="VerifFavori(Enregistrement.Id)" src="http://127.0.0.1:8081/fav.png" height="30px" (click)="retraitFavori(Enregistrement.Id)">
+                <img *ngIf="!VerifFavori(Enregistrement.Id)" src="http://127.0.0.1:8081/nofav.png" height="30px" (click)="mettreFavori(Enregistrement.Id)" >
+                <img *ngIf="VerifVote(Enregistrement.Id) != 1 " src="http://127.0.0.1:8081/plus.png" height="30px" (click)="VotePlus(Enregistrement.Id)">
+                <img *ngIf="VerifVote(Enregistrement.Id) != 0" src="http://127.0.0.1:8081/croix.png" height="30px" (click)="DeleteVote(Enregistrement.Id)">
+                <img *ngIf="VerifVote(Enregistrement.Id) != -1" src="http://127.0.0.1:8081/moins.png" height="30px" (click)="VoteMoins(Enregistrement.Id)">
              </ng-container>
             <div class="col-sm-2"><b>Note :</b> {{Enregistrement.Note}}</div>
         </div>

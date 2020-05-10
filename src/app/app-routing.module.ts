@@ -17,6 +17,7 @@ import { ActivationComponent } from './activation/activation.component';
 import { RetrievePasswordComponent } from './retrieve-password/retrieve-password.component';
 import { AdminUsersComponent } from './admin-users/admin-users.component';
 import { AdminStratComponent } from './admin-strat/admin-strat.component';
+import { TestComponent } from './test/test.component';
 
 
 const routes: Routes = [];
@@ -41,7 +42,8 @@ const routes: Routes = [];
     {path : 'activation', component: ActivationComponent},
     {path : 'RetrievePassword', component: RetrievePasswordComponent},
     {path : 'admusers', component: AdminUsersComponent},
-    {path : 'admstrats', component: AdminStratComponent}
+    {path : 'admstrats', component: AdminStratComponent},
+    {path : 'test', component: TestComponent}
   ])],
   exports: [RouterModule]
 })

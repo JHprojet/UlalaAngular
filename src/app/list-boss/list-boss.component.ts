@@ -1,8 +1,7 @@
-import { Component, OnInit, Inject } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { BosszoneDAL } from '../service/bosszone-dal';
 import { BossZone } from '../models/boss-zone';
-import { Router } from '@angular/router';
-import { SESSION_STORAGE, WebStorageService } from 'angular-webstorage-service';
+import { AccessComponent } from '../helpeur/access-component';
 
 
 @Component({
@@ -12,16 +11,14 @@ import { SESSION_STORAGE, WebStorageService } from 'angular-webstorage-service';
 })
 export class ListBossComponent implements OnInit {
 
-  constructor(@Inject(SESSION_STORAGE) private session: WebStorageService,private routerService:Router,private serviceBossZone:BosszoneDAL) { }
+  constructor(private accessService:AccessComponent,private serviceBossZone:BosszoneDAL) { }
   BossZone:BossZone[];
 
+  //Simple récupération d'une liste d'objet via API + display sous forme de tableau.
   ngOnInit(): void {
-    if(!this.session.get("TKA"))
-    {
-      this.routerService.navigateByUrl("/")
-    }
+    this.accessService.getAnonymeKey();
     this.BossZone = new Array<BossZone>();
-    this.serviceBossZone.getBossZones(this.session.get("TK")??this.session.get("TKA")).subscribe(result =>{
+    this.serviceBossZone.getBossZones(this.accessService.data["User"]??this.accessService.data["Anonyme"]).subscribe(result =>{
       this.BossZone = result;
     })
   }

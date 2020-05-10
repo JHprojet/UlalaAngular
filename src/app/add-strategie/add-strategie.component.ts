@@ -1,4 +1,4 @@
-import { Component, OnInit, setTestabilityGetter, Inject, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { Classe } from '../models/classe';
 import { ClasseDAL } from '../service/classe-dal';
 import { ZoneDAL } from '../service/zone-dal';
@@ -14,173 +14,180 @@ import { TeamDal } from '../service/team-dal';
 import { BossZone } from '../models/boss-zone';
 import { Team } from '../models/team';
 import { Utilisateur } from '../models/utilisateur';
-import { Router } from '@angular/router';
-import { Subject, zip } from 'rxjs';
+import { ReplaySubject, zip, Subject } from 'rxjs';
 import { MesTeams } from '../models/mes-teams';
 import { MesTeamsDAL } from '../service/mesteams-dal';
-import { SESSION_STORAGE, WebStorageService } from 'angular-webstorage-service';
-
-const scan1$ = new Subject<boolean>();
-const scan2$ = new Subject<boolean>();
-const scan3$ = new Subject<boolean>();
-const scan4$ = new Subject<boolean>();
-const OkImage$ = new Subject<boolean>();
-const calc1$ = new Subject<boolean>();
-const calc2$ = new Subject<boolean>();
-const calc3$ = new Subject<boolean>();
+import { AccessComponent } from '../helpeur/access-component';
 
 @Component({
   selector: 'app-add-strategie',
   templateUrl: './add-strategie.component.html',
   styleUrls: ['./add-strategie.component.css']
 })
-export class AddStrategieComponent implements OnInit {
 
+export class AddStrategieComponent implements OnInit {
+  //Variables utilisées pour utilisation de zip.
+  OkImage$:ReplaySubject<boolean>; 
+  scan1$:ReplaySubject<boolean>; scan2$:ReplaySubject<boolean>; scan3$:ReplaySubject<boolean>; scan4$:ReplaySubject<boolean>; 
+  calc1$:ReplaySubject<boolean>; calc2$:ReplaySubject<boolean>; calc3$:ReplaySubject<boolean>; 
+  //Tableaux de remplissage des listes déroulantes.
   selectClasse: Classe[];
   selectContinent: Zone[];
-  Loading: string;
   selectZone: Zone[];
   selectBoss: Boss[];
+  selectMesTeams: MesTeams[];
+  //Variables de gestion de l'enregistrement à envoyer en DB
+  Enregistrement:Enregistrement;
+  currentUser:Utilisateur;
+  MaTeam:MesTeams;
   Idclasse1: number;
   Idclasse2: number;
   Idclasse3: number;
   Idclasse4: number;
-  messageClasse: string;
-  IdBZ: string;
-  messageBossZone:string;
   zoneId: number = 0;
-  errorImage: string;
+  IdBZ: string;
+  //Variables de gestion Images uploadées
   Images = new Array<any>();
-  Enregistrement:Enregistrement;
-  messageIndication:string;
   FileNames:string[];
+  Loading: boolean;
+  //Variables de display/hide messages error/success
+  messageBossZone:string;
+  DisplayBoutonSansTeam:boolean;
+  DisplayMessageClasse: boolean;
+  messageIndication:string;
+  errorImage: string;
   UploadOK:string;
   UploadFail:string;
+  //Variables de gestion de l'aide (Display/Hide)
   Show:boolean;
-  TexteButtonHelp:string;
-  selectMesTeams: MesTeams[];
-  currentUser:Utilisateur;
-  MaTeam:MesTeams;
-  AffButtonWithDetail:string;
-  
 
-  constructor(private cd:ChangeDetectorRef,@Inject(SESSION_STORAGE) private session: WebStorageService,private mesTeamsService:MesTeamsDAL,private routerService:Router, private enregistrementService:EnregistrementDAL,private imageService:ImageDAL, private classeService:ClasseDAL, private zoneService:ZoneDAL, private bossZoneService:BosszoneDAL, private bossService:BossDAL, private teamService:TeamDal) { }
+  constructor(private accessService:AccessComponent, private cd:ChangeDetectorRef,private mesTeamsService:MesTeamsDAL, private enregistrementService:EnregistrementDAL,private imageService:ImageDAL, private classeService:ClasseDAL, private zoneService:ZoneDAL, private bossZoneService:BosszoneDAL, private bossService:BossDAL, private teamService:TeamDal) { }
 
+  // /!\ Note Globale /!\ : 
+  // - Le component doit être simplifié en passant par un FormBuilder
+  // - Supprimer la récupération des teams perso via API >> Maintenant disponible via Session Storage dès la connexion.
+
+  //#region | ngOnInit |
   ngOnInit(): void {
-    if(!this.session.get("TKA"))
-    {
-      this.routerService.navigateByUrl("/")
-    }
+    this.accessService.getAnonymeKey();
     this.messageIndication="Si vous le souhaitez, vous pouvez choisir directement votre team perso et le boss. Sinon, ne remplir que les lignes suivantes.";
-    this.Loading = "";
-    this.AffButtonWithDetail = "Aff";
+    this.Loading = false;
+    this.DisplayBoutonSansTeam = true;
     this.Show = false;
-    this.TexteButtonHelp = "Afficher l'aide";
     this.MaTeam = new MesTeams({Id:0});
     this.selectClasse = new Array<Classe>();
     this.selectContinent = new Array<Zone>();
     this.selectMesTeams = new Array<MesTeams>();
     this.currentUser = new Utilisateur({});
-    if(this.session.get("User")) 
+    if(this.accessService.data["Info"]) 
     {
-      this.currentUser = this.session.get("User");
-    }
-    else this.currentUser.Id = 0;
-    
-    if (this.currentUser.Id != 0)
-    {
-      this.mesTeamsService.getMeTeamsByUserId(this.currentUser.Id, this.session.get("TK")).subscribe(result => {
+      this.currentUser = this.accessService.data["Info"];
+      this.mesTeamsService.getMeTeamsByUserId(this.currentUser.Id, this.accessService.data["User"]).subscribe(result => {
         this.selectMesTeams = result;
       })
     }
-
-    this.classeService.getClasses(this.session.get("TK")??this.session.get("TKA")).subscribe(result =>{
+    else this.currentUser.Id = 0;
+    
+    this.classeService.getClasses(this.accessService.data["User"]??this.accessService.data["Anonyme"]).subscribe(result =>{
       this.selectClasse = result;
-    })
-    this.zoneService.getZones(this.session.get("TK")??this.session.get("TKA")).subscribe(response => {
+    });
+    this.zoneService.getZones(this.accessService.data["User"]??this.accessService.data["Anonyme"]).subscribe(response => {
       response.forEach(item => {
         if (this.selectContinent.findIndex(sc => sc.ContinentFR == item.ContinentFR) == -1) {
           this.selectContinent.push(item);
-          }
-        });
+        }
       });
+    });
     this.Idclasse1 = 0;
     this.Idclasse2 = 0; 
     this.Idclasse3 = 0; 
     this.Idclasse4 = 0;
     this.selectZone = new Array<Zone>();
     this.selectBoss = new Array<Boss>();
-    this.messageClasse = "Veuillez sélectionner les 4 classes.";
+    this.DisplayMessageClasse = true;
     this.IdBZ = "0";
     this.messageBossZone = "Veuillez sélectionner un Continent.";
     this.zoneId = 0;
     this.errorImage = "Veuillez sélectionner les 4 images de votre stratégie.";
     this.Images = new Array<any>();
-    this.Enregistrement = new Enregistrement( {
-      Utilisateur: new Utilisateur({Id:1})
-      })
+    this.Enregistrement = new Enregistrement( { Utilisateur: new Utilisateur({Id:1}) })
     this.FileNames = new Array<string>();
     this.UploadOK="";
     this.UploadFail="";
-    }
-    public changeContinent(Continent)
-    {
-      this.selectZone = [];
-      this.selectBoss = [];
-      this.IdBZ = "";
-      if (Continent.value == 0) this.messageBossZone = "Veuillez sélectionner un Continent.";
-      else {
+  }
+  //#endregion
+
+  //#region | changeContinent | Action lors du changement du continent en liste déroulante
+  public changeContinent(Continent)
+  {
+    //Réinitialisation de la liste déroulante de zone et boss et de L'IdBossZone
+    this.selectZone = [];
+    this.selectBoss = [];
+    this.IdBZ = "";
+    //Si valeur vide sélectionnée => Message d'erreur
+    if (Continent.value == 0) this.messageBossZone = "Veuillez sélectionner un Continent.";
+    //Sinon => Récupération de la liste des zones correspondante au continent sélectionné pour remplir liste déroulante zones
+    else {
       this.messageBossZone = "Veuillez sélectionner une Zone."
-      this.zoneService.getZones(this.session.get("TK")??this.session.get("TKA")).subscribe(response => {     
+      this.zoneService.getZones(this.accessService.data["User"]??this.accessService.data["Anonyme"]).subscribe(response => {     
         response.forEach(item => {
           if (item.ContinentFR == Continent.value) {
             this.selectZone.push(item);
-            }
-          })
+          }
         });
-      }
+      });
     }
-    public changeZone(Zone)
-    {
-      this.selectBoss = [];
-      this.IdBZ = "0";
-      if (Zone.value == 0) this.messageBossZone = "Veuillez sélectionner une Zone.";
-      else {
-      this.bossZoneService.getBossZones(this.session.get("TK")??this.session.get("TKA")).subscribe(response => {
+  }
+  //#endregion
+
+  //#region | changeZone | Action lors du changement de la zone en liste déroulante
+  public changeZone(Zone)
+  {
+    //Réinitialisation de la liste déroulante de boss et de L'IdBossZone
+    this.selectBoss = [];
+    this.IdBZ = "0";
+    //Si valeur vide sélectionnée => Message d'erreur
+    if (Zone.value == 0) this.messageBossZone = "Veuillez sélectionner une Zone.";
+    //Sinon => Récupération de la liste de boss correspondante à la zone sélectionné pour remplir liste déroulante boss
+    else {
+      this.bossZoneService.getBossZones(this.accessService.data["User"]??this.accessService.data["Anonyme"]).subscribe(response => {
         this.messageBossZone = "Veuillez sélectionner un Boss."
         response.forEach(item => {
           if (item.Zone.Id == Zone.value) {
             this.zoneId = item.Zone.Id;
-            this.bossService.getBoss(item.Boss.Id, this.session.get("TK")??this.session.get("TKA")).subscribe(response => {
+            this.bossService.getBoss(item.Boss.Id, this.accessService.data["User"]??this.accessService.data["Anonyme"]).subscribe(response => {
               this.selectBoss.push(response);
-              })
-            }
-          })
+            });
+          }
         });
-      }
+      });
     }
-  
-    public changeBoss(Boss)
+  }
+  //#endregion
+
+  //#region | changeBoss | Action lors du changement du boss en liste déroulante
+  public changeBoss(Boss)
+  {
+    //Si valeur vide sélectionnée => Message d'erreur
+    if (Boss.value == 0) 
     {
-      if (Boss.value == 0) 
-      {
-        this.messageBossZone = "Veuillez sélectionner un Boss.";
-        this.messageIndication = "Veuillez sélectionner un Boss.";
-      }
-      else {
-        if (this.AffButtonWithDetail == "") this.messageIndication = "";
-        this.messageBossZone = "";
-        this.bossZoneService.getBossZones(this.session.get("TK")??this.session.get("TKA")).subscribe(response => {
-          response.forEach(item => {
-            if (Boss.value == item.Boss.Id && this.zoneId == item.Zone.Id) 
-            {
-              this.Enregistrement.BossZone = new BossZone({});
-              this.Enregistrement.BossZone.Id = item.Id;
-            }
-          });
-        });
-      }
+      this.messageBossZone = "Veuillez sélectionner un Boss.";
+      this.messageIndication = "Veuillez sélectionner un Boss.";
     }
+    //Sinon => Récupération de l'Id BossZone
+    else {
+      if (!this.DisplayBoutonSansTeam) this.messageIndication = "";
+      this.messageBossZone = "";
+      this.bossZoneService.getBossZones(this.accessService.data["User"]??this.accessService.data["Anonyme"]).subscribe(response => {
+        response.forEach(item => {
+          if (Boss.value == item.Boss.Id && this.zoneId == item.Zone.Id) { this.Enregistrement.BossZone = new BossZone({Id:item.Id}) }
+        });
+      });
+    }
+  }
+  //#endregion
+
+  //#region | uploadFile | Upload des 4 images une fois ces dernières validées
   public uploadFile(file)
   {
     let IMG = new Image; //Création nouvelle Image.
@@ -193,17 +200,17 @@ export class AddStrategieComponent implements OnInit {
     let reader = new FileReader();
     reader.onload = () => {
       IMG.fileAsBase64 = reader.result.toString(); // Store base64 encoded representation of file
-      this.imageService.uploadImage(IMG, this.session.get("TK")??this.session.get("TKA")) // POST to server
-        .subscribe(resp => { });
+      this.imageService.uploadImage(IMG, this.accessService.data["User"]??this.accessService.data["Anonyme"]) // POST to server
+        .subscribe(resp => { }); //Process avec message à rajouter si erreur.
     }  
     reader.readAsDataURL(file); // Read the file
   }
   
   public upload()
   {
-    if(this.session.get("User"))
+    if(this.accessService.data["Info"])
     {
-      this.Enregistrement.Utilisateur.Id = this.session.get("User").Id
+      this.Enregistrement.Utilisateur.Id = this.accessService.data["Info"].Id
     }
     for (let item of this.Images)
     {
@@ -213,7 +220,7 @@ export class AddStrategieComponent implements OnInit {
     this.Enregistrement.ImagePath2 = "http://192.168.1.2:8081/"+this.FileNames[1];
     this.Enregistrement.ImagePath3 = "http://192.168.1.2:8081/"+this.FileNames[2];
     this.Enregistrement.ImagePath4 = "http://192.168.1.2:8081/"+this.FileNames[3];
-    this.enregistrementService.postEnregistrement(this.Enregistrement, this.session.get("TK")??this.session.get("TKA")).subscribe(result => { 
+    this.enregistrementService.postEnregistrement(this.Enregistrement, this.accessService.data["User"]??this.accessService.data["Anonyme"]).subscribe(result => { 
       this.ngOnInit();
       let ToClean = document.getElementById("inputImages") as HTMLInputElement;
       ToClean.value = "";
@@ -224,97 +231,112 @@ export class AddStrategieComponent implements OnInit {
       setTimeout(() => this.UploadFail="",3000)
     })
   }
-  
+  //#endregion
+ 
+  //#region | changeClasse | Méthodes (x4) de changement des variables et messages d'erreur lors de la sélection d'une classe
+  //A améliorer plus tard en transformant les 4 variables en un tableau de variable (permettant une seule méthode)
   public changeClasse1(classe)
   {
-    this.messageClasse = "";
-    this.Idclasse1 = classe.value;
-    if(this.Idclasse1 == 0 || this.Idclasse2 == 0 || this.Idclasse3 == 0 || this.Idclasse4 == 0) this.messageClasse = "Veuillez sélectionner les 4 classes.";
-    else{
-      this.EcritureIdClasse()
-    }
+    this.DisplayMessageClasse = false;  //Cache le message d'erreur
+    this.Idclasse1 = classe.value;      //Ajout de la valeur de la classe choisi dans la variable associée
+    //Si Toutes les classes n'ont pas été sélectionnées => Display message erreur
+    if( this.Idclasse1 == 0 || this.Idclasse2 == 0 || this.Idclasse3 == 0 || this.Idclasse4 == 0) this.DisplayMessageClasse = true;
+    //Sinon lancement méthode de récupération de l'Id de la team correspondante
+    else{ this.EcritureIdClasse() }
   }
-
   public changeClasse2(classe)
   {
-    this.messageClasse = "";
+    this.DisplayMessageClasse = false;
     this.Idclasse2 = classe.value;
-    if(this.Idclasse1 == 0 || this.Idclasse2 == 0 || this.Idclasse3 == 0 || this.Idclasse4 == 0) this.messageClasse = "Veuillez sélectionner les 4 classes.";
+    if(this.Idclasse1 == 0 || this.Idclasse2 == 0 || this.Idclasse3 == 0 || this.Idclasse4 == 0) this.DisplayMessageClasse = true;
     else{
       this.EcritureIdClasse()
     }
   }
-
   public changeClasse3(classe)
   {
-    this.messageClasse = "";
+    this.DisplayMessageClasse = false;
     this.Idclasse3 = classe.value;
-    if(this.Idclasse1 == 0 || this.Idclasse2 == 0 || this.Idclasse3 == 0 || this.Idclasse4 == 0) this.messageClasse = "Veuillez sélectionner les 4 classes.";
+    if(this.Idclasse1 == 0 || this.Idclasse2 == 0 || this.Idclasse3 == 0 || this.Idclasse4 == 0) this.DisplayMessageClasse = true;
     else {
       this.EcritureIdClasse()
     }
   }
-
   public changeClasse4(classe)
   {
-    this.messageClasse = "";
+    this.DisplayMessageClasse = false;
     this.Idclasse4 = classe.value;
-    if(this.Idclasse1 == 0 || this.Idclasse2 == 0 || this.Idclasse3 == 0 || this.Idclasse4 == 0) this.messageClasse = "Veuillez sélectionner les 4 classes.";
+    if(this.Idclasse1 == 0 || this.Idclasse2 == 0 || this.Idclasse3 == 0 || this.Idclasse4 == 0) this.DisplayMessageClasse = true;
     else {
       this.EcritureIdClasse()
     }
   }
-  
+  //#endregion
+
+  //#region | checkImages | Méthode de vérification des image pixel par pixel
   public checkImages(T)
   {
-    this.Images = []; //Vide la liste des 4 images
-    for (let file of T.files)
-    {
-      this.Images.push(file); //Ajout de l'image à la liste des 4 images
-    }
+    this.Images = []; //Initialisation de la liste des 4 images
     this.errorImage = ""; //Vide le message d'erreur
-    
+    for (let file of T.files) //Ajout des 4 images à la liste
+    {
+      this.Images.push(file); 
+    }
     if(T.files.length != 4) this.errorImage = "Vous devez sélectionner 4 images."; //Message erreur si nombre de fichier différent de 4.
     else 
     {
       let test: boolean = true;
       for (let file of T.files)
-        { //Vérifie que les fichiers sont uniquement des fichiers image de type png, jpeg, jpg.
-          if(this.getExtension(file.name) != "png" && this.getExtension(file.name) != "jpeg" && this.getExtension(file.name) != "jpg") test = false;
-        }
+      { //Vérifie que les fichiers sont uniquement des fichiers image de type png, jpeg, jpg.
+        if(this.getExtension(file.name) != "png" && this.getExtension(file.name) != "jpeg" && this.getExtension(file.name) != "jpg") test = false;
+      }
       if (!test) this.errorImage = "Vos fichiers doivent être uniquement au format JPG, JPEG ou PNG"; //Message erreur si pas image du bon format.
       //Vérifications que les 4 fichiers ont le même format.
       else if(!(this.getExtension(T.files[0].name) == this.getExtension(T.files[1].name) && this.getExtension(T.files[1].name) == this.getExtension(T.files[2].name) 
               && this.getExtension(T.files[2].name) == this.getExtension(T.files[3].name))) 
-              this.errorImage = "Vos 4 fichiers doivent être du même format (JPG, JPEG, PNG)"; 
+              this.errorImage = "Vos 4 fichiers doivent être du même format (JPG, JPEG, PNG)"; //Display de l'erreur si pas le même format.
       else
       {
         this.errorImage = "Processing, please wait..."
-        this.CheckPixels(this.Images);
-        zip(OkImage$).subscribe(([OkImage]) => {
-          if(OkImage == true) {
-            this.Loading="";
+        //Réinitialisation des variables d'attente
+        this.OkImage$ = new ReplaySubject<boolean>();
+        this.scan1$ = new ReplaySubject<boolean>();
+        this.scan2$ = new ReplaySubject<boolean>();
+        this.scan3$ = new ReplaySubject<boolean>();
+        this.scan4$ = new ReplaySubject<boolean>();
+        this.calc1$ = new ReplaySubject<boolean>();
+        this.calc2$ = new ReplaySubject<boolean>();
+        this.calc3$ = new ReplaySubject<boolean>();
+        this.CheckPixels(this.Images); //Méthode de check pixel par pixel
+        //Lorsque la méthode CheckPixel se termine
+        zip(this.OkImage$).subscribe(([OkImage]) => {
+          if(OkImage) { //Si le test pixel par pixel est OK
+            this.Loading = false;
             this.errorImage = "";
+            //Force la MAJ des données du component (suite bug Firefox)
             this.cd.detectChanges();
             this.cd.markForCheck();
           }
-          else if (OkImage == false){
-            this.Loading="";
+          else if (!OkImage) { //Si le test pixel par pixel est KO
+            this.Loading = false;
             this.errorImage = "Vos 4 images doivent être comme spécifié dans l'aide (voir l'aide plus haut)."
           }
         });
       }
     }
   }
+  //#endregion
   
+  //#region | getExtension | Récupération de l'extension du fichier
   public getExtension(path) {
-    var basename = path.split(/[\\/]/).pop();  // extract file name from full path ... (supports `\\` and `/` separators)
-    let pos = basename.lastIndexOf('.');       // get last position of `.`
-    if (basename === '' || pos < 1) return ""; // if file name is empty or ... `.` not found (-1) or comes first (0)
-    return basename.slice(pos + 1);            // extract extension ignoring `.`
+    var basename = path.split(/[\\/]/).pop();  // Extrait le nom du fichier (supporte les séparateurs '\\' et '/')
+    let pos = basename.lastIndexOf('.');       // Cherche la position du '.'
+    if (basename === '' || pos < 1) return ""; // Si le nom est vide ou le '.' est introuvale (-1) ou arrive en premier (0)
+    return basename.slice(pos + 1);            // Extrait l'extension sans le '.'
   }
+  //#endregion
 
-  //Création chaîne de caractère GUID (enfin presque)
+  //#region | newGuid | Création chaîne de caractère GUID (enfin presque)
   public newGuid() {
     return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
       var r = Math.random() * 16 | 0,
@@ -322,92 +344,100 @@ export class AddStrategieComponent implements OnInit {
       return v.toString(16);
     });
   }
+  //#endregion
 
-  //Récupération de l'id de chaque classe
+  //#region | EcritureIdClasse | Récupération de l'id de la team correspondante à l'Id des 4 classes
   public EcritureIdClasse()
   {
-  this.teamService.getTeamByClasses(this.Idclasse1,this.Idclasse2,this.Idclasse3,this.Idclasse4, this.session.get("TK")??this.session.get("TKA")).subscribe(result => {
-    this.Enregistrement.Team = new Team({});
-    this.Enregistrement.Team.Id = result.Id;
+    this.teamService.getTeamByClasses(this.Idclasse1,this.Idclasse2,this.Idclasse3,this.Idclasse4, this.accessService.data["User"]??this.accessService.data["Anonyme"]).subscribe(result => {
+      this.Enregistrement.Team = new Team({Id : result.Id});
     });
   }
+  //#endregion
 
-  public ShowHelp(){
-    this.Show = !this.Show;
-    if (this.TexteButtonHelp == "Afficher l'aide") this.TexteButtonHelp = "Cacher l'aide";
-    else if (this.TexteButtonHelp == "Cacher l'aide") this.TexteButtonHelp = "Afficher l'aide";
-  }
+  //#region | ShowHelp | Gestion du booléen qui affiche et cache l'aide
+  public ShowHelp() { this.Show = !this.Show; }
+  //#endregion
 
+  //#region | CheckPixels | Méthode qui vérifie le nombre de pixel identique pour vérifier que les images sont du format attendu
+  //Forte probabilité d'amélioration possible.
   public CheckPixels(Images:any[])
   {
+    //Création d'un tableau de pixel par image
     let tab1 = [];
     let tab2 = [];
     let tab3 = [];
     let tab4 = [];
+    //Création des 4 readers (A noter : trouver une solution pour n'avoir qu'un reader)
     let reader = new FileReader();
     let reader1 = new FileReader();
     let reader2 = new FileReader();
     let reader3 = new FileReader();
-    this.Loading = "Load";
+    //Passage Loading a true pour activer le message et le logo de Loading
+    this.Loading = true;
+    //Import de Jimp
     var Jimp = require('jimp');
-    //image0
+    //A noter : Solution à trouver pour éviter la répétition sur les 4 prochaines méthodes
+    //Remplissage tableau de pixel image 1
     reader.onload = () => {
-       
       Jimp.read(reader.result.toString()).then(image => {
-        
         image.resize(100,220);
         image.scan(0, 0, image.bitmap.width, image.bitmap.height, function(x, y, idx) {
-         tab1.push(image.getPixelColor(x, y));
+          tab1.push(image.getPixelColor(x, y));
         })
-        scan1$.next(true);
+        this.scan1$.next(true);
       })
     }
     reader.readAsDataURL(Images[0]);
-    //image1
+    //Remplissage tableau de pixel image 2
     reader2.onload = () => {
       Jimp.read(reader2.result.toString()).then(image => {
         image.resize(100,220);
         image.scan(0, 0, image.bitmap.width, image.bitmap.height, function(x, y, idx) {
-         tab2.push(image.getPixelColor(x, y));
+          tab2.push(image.getPixelColor(x, y));
         })
-        scan2$.next(true);
+        this.scan2$.next(true);
       })
     }
     reader2.readAsDataURL(Images[1]);
-   //image2
+    //Remplissage tableau de pixel image 3
     reader3.onload = () => {
       Jimp.read(reader3.result.toString()).then(image => {
         image.resize(100,220);
         image.scan(0, 0, image.bitmap.width, image.bitmap.height, function(x, y, idx) {
-         tab3.push(image.getPixelColor(x, y));
+          tab3.push(image.getPixelColor(x, y));
         });
-        scan3$.next(true);
+        this.scan3$.next(true);
       })
     }
     reader3.readAsDataURL(Images[2]);
-    //image3
+    //Remplissage tableau de pixel image 4
     reader1.onload = () => {
        Jimp.read(reader1.result.toString()).then(image => {
         image.resize(100,220);
         image.scan(0, 0, image.bitmap.width, image.bitmap.height, function(x, y, idx) {
-         tab4.push(image.getPixelColor(x, y));
+          tab4.push(image.getPixelColor(x, y));
         })
-        scan4$.next(true);
+        this.scan4$.next(true);
       })
     }
     reader1.readAsDataURL(Images[3]);
-
-    zip(scan1$, scan2$, scan3$, scan4$).subscribe(() => {
-      this.CalcPourcentSimil(tab1, tab2, calc1$);
-      this.CalcPourcentSimil(tab2, tab3, calc2$);
-      this.CalcPourcentSimil(tab3, tab4, calc3$);
+    //Une fois les 4 tableaux de pixel remplis
+    zip(this.scan1$, this.scan2$, this.scan3$, this.scan4$).subscribe(() => {
+      //Vérification du nombre de pixel identique entre les tableaux
+      this.CalcPourcentSimil(tab1, tab2, this.calc1$);
+      this.CalcPourcentSimil(tab2, tab3, this.calc2$);
+      this.CalcPourcentSimil(tab3, tab4, this.calc3$);
     });
-    zip(calc1$, calc2$, calc3$).subscribe(([calc1, calc2, calc3]) => {
-      if (calc1 && calc2 && calc3 ) OkImage$.next(true);
-      else OkImage$.next(false);
+    //Une fois les 3 vérifications effectuées
+    zip(this.calc1$, this.calc2$, this.calc3$).subscribe(([calc1, calc2, calc3]) => {
+      if (calc1 && calc2 && calc3 ) this.OkImage$.next(true); // Si les 3 vérifications sont à true renvoi le Subject à true;
+      else this.OkImage$.next(false); //Sinon false
     });
   }
+  //#endregion
 
+  //#region | CalcPourcentSimil | Méthode qui vérifie le nombre de pixel entre 2 tableaux de pixel. Retourne true ou false.
   public CalcPourcentSimil(IMG1:any[], IMG2:any[], C$)
   {
     let NumTot:number = 0;
@@ -415,48 +445,51 @@ export class AddStrategieComponent implements OnInit {
     let Percent:number = 0;
     for (let element of IMG1)
     {
-      if(element == IMG2[NumTot])
-      {
-        NumIdentique += 1;
-      }
-      NumTot += 1;
+      if(element == IMG2[NumTot]) { NumIdentique++; }
+      NumTot++;
     }
     Percent = NumIdentique / NumTot * 100;
-    if(Percent > 25) C$.next(true);
-    else C$.next(false);
+    if(Percent > 25) C$.next(true); //Si + de 25% identique OK
+    else C$.next(false); //sinon KO
   }
+  //#endregion
 
+  //#region | choixMaTeam | Action si sélection d'une team perso
   public choixMaTeam(T)
   {
+    //Si choix vide
     if (T.value == 0)
     {
-      this.messageIndication = this.messageIndication="Si vous le souhaitez, vous pouvez choisir directement votre team perso et le boss. Sinon, ne remplir que les lignes suivantes.";
-      this.MaTeam = new MesTeams({Id:0});
-      this.AffButtonWithDetail = "Aff";
-    }
-    else{
-      
-      this.mesTeamsService.getMaTeam(T.value, this.session.get("TK")).subscribe(result => {
-      this.MaTeam = result;
-      this.Enregistrement.Team = new Team({});
-      this.Enregistrement.Team.Id = result.Team.Id;
-      this.AffButtonWithDetail = "";
-    })
-    this.bossZoneService.getBossZones(this.session.get("TK")??this.session.get("TKA")).subscribe(response => {
+      //Reset de la liste déroulante Boss + Reset message indicatif + Reset de l'Id de la team + Display bouton possible sans utilisation de la team perso
       this.selectBoss = [];
-      this.IdBZ = "0";
-      this.messageIndication = "Veuillez sélectionner un Boss."
-      response.forEach(item => {
-        if (item.Zone.Id == this.MaTeam.Zone.Id) {
-          this.zoneId = item.Zone.Id;
-          this.bossService.getBoss(item.Boss.Id, this.session.get("TK")??this.session.get("TKA")).subscribe(response => {
-            this.selectBoss.push(response);
-            })
+      this.messageIndication= "Si vous le souhaitez, vous pouvez choisir directement votre team perso et le boss. Sinon, ne remplir que les lignes suivantes.";
+      this.MaTeam = new MesTeams({Id:0});
+      this.DisplayBoutonSansTeam = true;
+    }
+    else {
+      //Récupération + écriture de l'Id de la team correspondante aux 4 classes + Suppression du display du bouton via détail
+      this.mesTeamsService.getMaTeam(T.value, this.accessService.data["User"]).subscribe(result => {
+        this.MaTeam = result;
+        this.Enregistrement.Team = new Team({Id : result.Team.Id});
+        this.DisplayBoutonSansTeam = false;
+      });
+      //Réinitialisation des variables de gestion + Récupération de la liste des bosses correspondant à la zone de la team perso de l'utilisateur
+      this.bossZoneService.getBossZones(this.accessService.data["User"]??this.accessService.data["Anonyme"]).subscribe(response => {
+        this.selectBoss = [];
+        this.IdBZ = "0";
+        this.messageIndication = "Veuillez sélectionner un Boss."
+        response.forEach(item => {
+          if (item.Zone.Id == this.MaTeam.Zone.Id) {
+            this.zoneId = item.Zone.Id;
+            this.bossService.getBoss(item.Boss.Id, this.accessService.data["User"]??this.accessService.data["Anonyme"]).subscribe(response => {
+              this.selectBoss.push(response);
+            });
           }
         })
       });
     }
   }
+  //#endregion
 }
 
 

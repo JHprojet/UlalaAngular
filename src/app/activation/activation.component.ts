@@ -1,7 +1,7 @@
-import { Component, OnInit, Inject } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { UtilisateurDAL } from '../service/utilisateur-dal';
 import { Router } from '@angular/router';
-import { SESSION_STORAGE, WebStorageService } from 'angular-webstorage-service';
+import { AccessComponent } from '../helpeur/access-component';
 
 @Component({
   selector: 'app-activation',
@@ -10,56 +10,64 @@ import { SESSION_STORAGE, WebStorageService } from 'angular-webstorage-service';
 })
 export class ActivationComponent implements OnInit {
 
-  constructor(@Inject(SESSION_STORAGE) private session: WebStorageService,private routerService:Router,private utilisateurService:UtilisateurDAL) { }
-  Pseudo:string;
-  Id:number;
-  token:string;
-  MessageOK:string;
-  MessageNOK:string;
-  MessageRenvoiOK:string;
-  MessageRenvoiNOK:string;
+  constructor(private accessService:AccessComponent, private routerService:Router, private utilisateurService:UtilisateurDAL) { }
+  
+  Pseudo:string; //Pseudo de l'utilisateur pour affichage sur la page
+  token:string; //Token renseigné par l'utilisateur
+  DisplayValidationOk:boolean; //Display message si validation OK
+  DisplayValidationErreur:boolean; //Display message si validation Erreur
+  DisplayRenvoiTokenOk:boolean; //Display message si renvoi du token par mail OK
+  DisplayRenvoiTokenErreur:boolean; //Display message si renvoi du token par mail Erreur
 
   ngOnInit(): void {
-    if(!this.session.get("TKA"))
-    {
-      this.routerService.navigateByUrl("/")
-    }
-    this.Pseudo = this.session.get("PseudoU");
-    this.Id = this.session.get("IdU");
+    this.accessService.CheckAccess("Activation");
+    this.Pseudo = this.accessService.data["Pseudo"];
     this.token = '';
-    this.MessageOK = '';
-    this.MessageNOK = '';
-    this.MessageRenvoiOK = '';
-    this.MessageRenvoiNOK = '';
+    this.DisplayValidationOk = false;
+    this.DisplayValidationErreur = false;
+    this.DisplayRenvoiTokenOk = false;
+    this.DisplayRenvoiTokenErreur = false;
   }
 
+  // Une fois le token renseigné et appuie sur bouton "Envoyer"
+  // 1 - Cache les messages d'erreur si affichés.
+  // 2 - Affiche un message "Token invalide" si Check dans la DB = Pas de match.
+  // 3 - Si Token valide, connecte l'utilisateur et affiche un message de validation (Suppression du token en DB = compte activé).
+  // 3a - Supprime les variables préalablement utilisées de la session et du tableau de session local.
+  // 3b - Attend 3 secondes et redirige l'utilisateur vers la page d'accueil.
   public envoiToken()
   {
-    this.MessageNOK = '';
-    this.MessageOK = '';
-    console.log(this.session.get("TKA"));
-    this.utilisateurService.UpdateToken(this.Id, this.token, this.session.get("TKA")).subscribe(result => {
-      this.utilisateurService.getUtilisateur(this.Id, this.session.get("TKA")).subscribe(result => {
-        this.session.set("User",result);
-        this.MessageOK = "Merci, votre compte à bien été activé, vous allez être rediriger dans un instant. Bonne navigation!";
-        setTimeout(() => this.MessageOK='',3000);
-        this.routerService.navigateByUrl('');
-      })
-    }, error => {
-      this.MessageNOK = "Clef d'activation erronée, merci de réessayer. En cas de problème, veuillez contacter l'administrateur du site via la page de contact."
-    })
+    this.DisplayValidationOk = false;
+    this.DisplayValidationErreur = false;
+    this.utilisateurService.UpdateToken(this.accessService.data["Id"], this.token, this.accessService.data["Anonyme"]).subscribe(() => {
+      this.utilisateurService.getUtilisateur(this.accessService.data["Id"], this.accessService.data["User"]).subscribe(result => {
+        this.accessService.data["Info"] = result;
+        this.accessService.setSession("Info", result);
+        this.accessService.deleteSession("Pseudo");
+        this.accessService.deleteSession("Id");
+        this.DisplayValidationOk = true;
+        setTimeout(() => {
+          this.DisplayValidationOk = false;
+          this.routerService.navigateByUrl('');
+        },3000);
+      });
+    }, error => { this.DisplayValidationErreur = true; })
   }
 
+  // Si l'utilisateur clique sur le bouton "Renvoyer token"
+  // 1 - Cache les messages d'erreur si affichés.
+  // 2 - Affiche un message "Mail renvoyé" si retour success de l'API (s'efface au bout de 5s).
+  // 3 - Affiche un message d'erreur si retour échec de la DB (s'efface au bout de 10s).
   public RenvoiToken()
   {
-    this.MessageRenvoiOK = '';
-    this.MessageRenvoiNOK = '';
-    this.utilisateurService.RenvoiToken(this.session.get("IdU"), this.session.get("TKA")).subscribe(result =>{
-      this.MessageRenvoiOK= "Mail renvoyé, regardez dans votre boite mail ! (Et n'oubliez pas les spams!)";
-      setTimeout(() => this.MessageRenvoiOK='',5000);
+    this.DisplayRenvoiTokenOk = false;
+    this.DisplayRenvoiTokenErreur = false;
+    this.utilisateurService.RenvoiToken(this.accessService.data["Id"], this.accessService.data["Anonyme"]).subscribe(() =>{
+      this.DisplayRenvoiTokenOk = true;
+      setTimeout(() => { this.DisplayRenvoiTokenOk = false; },5000);
     }, error => {
-      this.MessageRenvoiNOK = "Oops, une erreur sauvage semble être survenue, veuillez contacter l'administrateur du site via la page contact rubrique 'Activation de mon compte'";
-      setTimeout(() => this.MessageRenvoiNOK='',10000);
+      this.DisplayRenvoiTokenErreur = true;
+      setTimeout(() => { this.DisplayRenvoiTokenErreur = false; },10000);
     })
   }
 }

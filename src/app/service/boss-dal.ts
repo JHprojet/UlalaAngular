@@ -1,7 +1,6 @@
 import {Injectable} from "@angular/core";
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
-import { retry, catchError } from 'rxjs/operators';
 import { Boss } from "../models/boss";
 
 const EndPoint = "http://localhost:44312/api/";

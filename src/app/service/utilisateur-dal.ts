@@ -14,20 +14,20 @@ export class UtilisateurDAL {
       return this.http.get(EndPoint+'Login', this.GetHeader())
     }
     SetRoleAndActif(Id:number, Role:string, Actif:number, Token:string){
-      return this.http.post(EndPoint+'Post API/Utilisateur/'+Id+'/?Role='+Role+'&Actif='+Actif ,this.GetHeader(Token))
+      return this.http.post(EndPoint+'Post API/Utilisateur/'+Id+'/?Role='+Role+'&Actif='+Actif , null, this.GetHeader(Token))
     }
-    
     RetrouverPseudo(Mail:string, Token:string) {
-      return this.http.post(EndPoint+'Login/?MailforPseudo='+Mail, this.GetHeader(Token))
+      return this.http.post(EndPoint+'Login/?MailforPseudo='+Mail, null, this.GetHeader(Token))
     }
     GenererNouveauPassword(Mail:string, Token:string) {
-      return this.http.post(EndPoint+'Login/?Mail='+Mail, this.GetHeader(Token))
+      return this.http.post(EndPoint+'Login/?Mail='+Mail, null, this.GetHeader(Token))
     }
     changePassword(Id:number,NewPassword:string, Token:string) {
       return this.http.post(EndPoint+'Login/?IdUtilisateur='+Id, JSON.stringify(NewPassword), this.GetHeader(Token))
     }
     RenvoiToken(Id:number, Token:string) {
-      return this.http.post(EndPoint+'Login/?IdU='+Id, this.GetHeader(Token))
+      console.log(Token);
+      return this.http.post(EndPoint+'Login/?IdU='+Id, null, this.GetHeader(Token))
     }
     UpdateToken(Id:number, TokenAct:string, Token:string) {
       return this.http.post(EndPoint+'Login/'+Id, JSON.stringify(TokenAct), this.GetHeader(Token))
@@ -48,6 +48,7 @@ export class UtilisateurDAL {
         return this.http.get<Utilisateur>(EndPoint+'Utilisateur/?mail='+mail, this.GetHeader(Token));
     }
     postUtilisateur(monObjet: Utilisateur, Token:string): Observable<Utilisateur> {
+        console.log("Passage postUtilisateur");
         return this.http.post<Utilisateur>(EndPoint+'Utilisateur', monObjet, this.GetHeader(Token))
     }
     putUtilisateur(monObjet: Utilisateur, id: number, Token:string): Observable<Utilisateur> {

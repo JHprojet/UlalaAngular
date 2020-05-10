@@ -5,6 +5,8 @@ import { Skill } from '../models/skill';
 import { Classe } from '../models/classe';
 import { ClasseDAL } from '../service/classe-dal';
 import { SESSION_STORAGE, WebStorageService } from 'angular-webstorage-service';
+import { AccessComponent } from '../helpeur/access-component';
+import { zip } from 'rxjs';
 
 @Component({
   selector: 'app-skills',
@@ -13,27 +15,27 @@ import { SESSION_STORAGE, WebStorageService } from 'angular-webstorage-service';
 })
 export class SkillsComponent implements OnInit {
 
-  constructor(@Inject(SESSION_STORAGE) private session: WebStorageService,private classeService:ClasseDAL,private skillService:SkillDAL,private routerService:Router) { }
+  constructor(private accessService:AccessComponent,@Inject(SESSION_STORAGE) private session: WebStorageService,private classeService:ClasseDAL,private skillService:SkillDAL,private routerService:Router) { }
   Skills:Skill[];
   SkillsBase:Skill[];
   selectClasse:Classe[];
 
   ngOnInit(): void {
-    if(this.session.get("TKA") == null)
-    {
-      this.routerService.navigateByUrl("/")
-    }
+    this.accessService.getAnonymeKey();
     this.Skills = new Array<Skill>();
-    this.skillService.getSkills(this.session.get("TK")??this.session.get("TKA")).subscribe(result =>
-     {
-       this.SkillsBase = result;
-     });
-     this.classeService.getClasses(this.session.get("TK")??this.session.get("TKA")).subscribe(response => {
-      this.selectClasse = response;
+    zip(this.accessService.CheckAno$).subscribe(() => {
+      this.skillService.getSkills(this.accessService.getSession("User")??this.accessService.getSession("Anonyme")).subscribe(result =>
+      {
+        this.SkillsBase = result;
+      });
+      this.classeService.getClasses(this.accessService.getSession("User")??this.accessService.getSession("Anonyme")).subscribe(response => {
+        this.selectClasse = response;
+        this.accessService.CheckAno$.closed;
+      });
     });
-      
   }
 
+  //Filtre la liste de skill en fonction de la liste déroulante onChange
   public changeClasse(classe)
   {
     if (classe.value == 0) this.Skills = this.SkillsBase;

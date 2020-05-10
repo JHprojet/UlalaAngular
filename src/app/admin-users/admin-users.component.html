@@ -73,12 +73,12 @@
         </thead>
         <tbody>
             <tr *ngFor="let elem of Users">
-                <td>{{elem.Id}}</td>
-                <td>{{elem.Pseudo}}</td>
-                <td>{{elem.Mail}}</td>
-                <td>{{elem.Role}} </td>
-                <td>{{elem.Actif}}</td>
-                <td><button class="btn btn-primary" type="button" (click)="Edit(elem.Id)">Editer</button></td>
+                <td class="align-middle">{{elem.Id}}</td>
+                <td class="align-middle">{{elem.Pseudo}}</td>
+                <td class="align-middle">{{elem.Mail}}</td>
+                <td class="align-middle">{{elem.Role}} </td>
+                <td class="align-middle">{{elem.Actif}}</td>
+                <td class="align-middle"><button class="btn btn-primary" type="button" (click)="Edit(elem.Id)">Editer</button></td>
             </tr>
         </tbody>  
     </table>

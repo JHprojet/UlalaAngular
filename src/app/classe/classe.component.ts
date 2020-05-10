@@ -1,8 +1,7 @@
-import { Component, OnInit, Inject } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { ClasseDAL } from '../service/classe-dal';
 import { Classe } from '../models/Classe';
-import { Router } from '@angular/router';
-import { SESSION_STORAGE, WebStorageService } from 'angular-webstorage-service';
+import { AccessComponent } from '../helpeur/access-component';
 
 @Component({
   selector: 'app-classe',
@@ -13,23 +12,24 @@ export class ClasseComponent implements OnInit {
   selectClasse: Classe[];
   ClasseActive: Classe;
 
-  constructor(@Inject(SESSION_STORAGE) private session: WebStorageService,private classeService:ClasseDAL, private routerService:Router) { }
+  constructor(private accessService:AccessComponent,private classeService:ClasseDAL) { }
+
+  //Note globale : Contenu à prévoir.
 
   ngOnInit(): void {
-    if(!this.session.get("TKA"))
-    {
-      this.routerService.navigateByUrl("/")
-    }
+    this.accessService.getAnonymeKey();
     this.ClasseActive = new Classe({});
     this.selectClasse = new Array<Classe>();
-    this.classeService.getClasses(this.session.get("TK")??this.session.get("TKA")).subscribe(response => {
+    //Remplissage liste déroulante avec classes
+    this.classeService.getClasses(this.accessService.data["User"]??this.accessService.data["Anonyme"]).subscribe(response => {
       this.selectClasse = response;
     });
   }
 
+  //Display de la classe choisie uniquement.
   changeClasse(Classe)
   {
-    this.classeService.getClasse(Classe.value, this.session.get("TK")??this.session.get("TKA")).subscribe(response => {
+    this.classeService.getClasse(Classe.value, this.accessService.data["User"]??this.accessService.data["Anonyme"]).subscribe(response => {
       this.ClasseActive = response;
     });
   }

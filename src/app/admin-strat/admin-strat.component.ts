@@ -1,10 +1,8 @@
-import { Component, OnInit, Inject,TemplateRef  } from '@angular/core';
+import { Component, OnInit, TemplateRef } from '@angular/core';
 import { EnregistrementDAL } from '../service/enregistrement-dal';
-import { SESSION_STORAGE, WebStorageService } from 'angular-webstorage-service';
-import { Router } from '@angular/router';
-import { UtilisateurDAL } from '../service/utilisateur-dal';
 import { Enregistrement } from '../models/enregistrement';
 import { BsModalService, BsModalRef } from 'ngx-bootstrap/modal';
+import { AccessComponent } from '../helpeur/access-component';
 
 @Component({
   selector: 'app-admin-strat',
@@ -13,9 +11,11 @@ import { BsModalService, BsModalRef } from 'ngx-bootstrap/modal';
 })
 export class AdminStratComponent implements OnInit {
 
-  constructor(private modalService: BsModalService,@Inject(SESSION_STORAGE) private session: WebStorageService,private routerService:Router, private enregistrementService:EnregistrementDAL) { 
-    
-  }
+  constructor(private AccessService:AccessComponent,private modalService: BsModalService, private enregistrementService:EnregistrementDAL) { }
+  
+  // Note sur component :
+  // Ajouter une pagination !!!
+
   BaseStrats:Enregistrement[];
   Strats:Enregistrement[];
   SearchId:string;
@@ -26,15 +26,13 @@ export class AdminStratComponent implements OnInit {
   ColTri:string;
 
   ngOnInit(): void {
-    if(!this.session.get("TKA") || !this.session.get("TK") || !this.session.get("User") || this.session.get("User").Role != "Admin")
-    {
-      this.routerService.navigateByUrl("/")
-    }
+    this.AccessService.CheckAccess("Admin");
     this.BaseStrats = new Array<Enregistrement>();
     this.Strats = new Array<Enregistrement>();
-    this.enregistrementService.getEnregistrements(this.session.get("TK")).subscribe(result => {
+    //Récupération de tous les enregistrements.
+    this.enregistrementService.getEnregistrements(this.AccessService.data["User"]).subscribe(result => {
       this.BaseStrats = result;
-    })
+    });
     this.SearchId= "";
     this.SearchPseudo= "";
     this.SupprId = 0;
@@ -42,47 +40,52 @@ export class AdminStratComponent implements OnInit {
     this.ColTri = "Id";
   }
 
+  //Recherche des enregistrement en fonction des données indiqué via liste déroulante sur le filtre et le tri.
   Search()
   {
-    this.enregistrementService.getEnregistrements(this.session.get("TK")).subscribe(result => {
-      this.BaseStrats = result;
+    this.enregistrementService.getEnregistrements(this.AccessService.data["User"]).subscribe(result => {
+      this.BaseStrats = result; //Toutes les strats sont stocké dans this.BaseStrats - this.Strats sera pour le display uniquement.
       this.Strats = this.BaseStrats.filter(result => result.Id.toString().includes(this.SearchId) && result.Utilisateur.Pseudo.includes(this.SearchPseudo));
-      console.log(this.Ordre);
-      if(this.Ordre == 0 && this.ColTri == "Id") this.Strats = this.Strats.sort(this.TriIdAsc);
-      else if (this.Ordre == 1 && this.ColTri == "Id") this.Strats = this.Strats.sort(this.TriIdDsc);
-      else if(this.Ordre == 0 && this.ColTri == "Note") this.Strats = this.Strats.sort(this.TriNoteAsc);
-      else if(this.Ordre == 1 && this.ColTri == "Note") this.Strats = this.Strats.sort(this.TriNoteDsc);
-    })
-    
-  }
+        //Permet le tri de la liste en fonction des choix via liste déroulante après filtrage. Solution à trouver pour simplifier l'écriture.
+        if(this.Ordre == 0 && this.ColTri == "Id") this.Strats = this.Strats.sort(this.TriIdAsc);
+        else if (this.Ordre == 1 && this.ColTri == "Id") this.Strats = this.Strats.sort(this.TriIdDsc);
+        else if(this.Ordre == 0 && this.ColTri == "Note") this.Strats = this.Strats.sort(this.TriNoteAsc);
+        else if(this.Ordre == 1 && this.ColTri == "Note") this.Strats = this.Strats.sort(this.TriNoteDsc);
+      });
+    }
 
+  //Fonctions de tri en fonction des possibilités
+  //Solution à trouver pour faire une seule méthode
+  //Test non concluant de l'ajout de paramètres ou de l'utilisation de variables du component pour changer l'action dans une seule méthode
   TriIdAsc(a:Enregistrement, b:Enregistrement)
   { if(a.Id > b.Id) return 1; if(b.Id > a.Id) return -1; return 0;  }
   TriIdDsc(a:Enregistrement, b:Enregistrement)
   { if(a.Id < b.Id) return 1; if(b.Id < a.Id) return -1; return 0; }
-
   TriNoteAsc(a:Enregistrement, b:Enregistrement)
   { if(a.Note > b.Note) return 1; if(b.Note > a.Note) return -1; return 0; }
   TriNoteDsc(a:Enregistrement, b:Enregistrement)
   { if(a.Note < b.Note) return 1; if(b.Note < a.Note) return -1; return 0; }
 
+  //Assignation nouvelle valeur pour le tri lorsque changement sur liste déroulante.
   ChangeTri(Tri) { this.ColTri = Tri.value; }
-  ChangeOrdre(Ordre) { this.Ordre = Ordre.value;
-  }
+  ChangeOrdre(Ordre) { this.Ordre = Ordre.value; }
 
+  //Gestion du modal pour vérification de suppression de l'enregistrement.
   openModal(template: TemplateRef<any>, Id:number) {
     this.SupprId = Id;
     this.modalRef = this.modalService.show(template, {class: 'modal-sm'});
   }
 
+  //Si confirmation sur le modal
   confirm(): void {
-    this.enregistrementService.deleteEnregistrement(this.SupprId, this.session.get("TK")).subscribe(() => { })
-    this.Search();
+    //Si confirmer, suppression de l'enregistrement + mise à jour de la liste
+    this.enregistrementService.deleteEnregistrement(this.SupprId, this.AccessService.data["User"]).subscribe(() => { })
+    this.Search(); //A remplacer plus tard par une suppression en paralèlle dans le tableau local plutôt que rapeler la fonction Search qui passe pas l'API.
     this.modalRef.hide();
   }
  
+  //Si refus sur le modal - Do nothing
   decline(): void {
     this.modalRef.hide();
   }
-
 }

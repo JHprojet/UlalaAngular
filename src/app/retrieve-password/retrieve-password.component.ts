@@ -1,8 +1,7 @@
-import { Component, OnInit, Inject } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { UtilisateurDAL } from '../service/utilisateur-dal';
 import { zip, Subject } from 'rxjs';
-import { Router } from '@angular/router';
-import { SESSION_STORAGE, WebStorageService } from 'angular-webstorage-service';
+import { AccessComponent } from '../helpeur/access-component';
 
 const CheckMail$ = new Subject<boolean>();
 
@@ -16,35 +15,34 @@ export class RetrievePasswordComponent implements OnInit {
   MessageMail:string="";
   MessageOK:string="";
   MessageNOK:string="";
-  constructor(@Inject(SESSION_STORAGE) private session: WebStorageService,private routerService:Router,private utilisateurService:UtilisateurDAL) { }
+  constructor(private accessService:AccessComponent,private utilisateurService:UtilisateurDAL) { }
 
   ngOnInit(): void {
-    if(!this.session.get("TKA"))
-    {
-      this.routerService.navigateByUrl("/")
-    }
+    this.accessService.getAnonymeKey();
   }
 
+  //Check du mail renseigné sur le champ correspondant (Format + Correct ou non)
   public VerifMail()
   {
     let re = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
     this.MessageMail = "";
     if (this.Mail == "") this.MessageMail = "Champ obligatoire.";
     else if (!re.test(this.Mail)) this.MessageMail = "Merci de saisir un E-mail au bon format."
-    else this.utilisateurService.getUtilisateurByMail(this.Mail, this.session.get("TKA")).subscribe(response => {
+    else this.utilisateurService.getUtilisateurByMail(this.Mail, this.accessService.data["Anonyme"]).subscribe(response => {
               CheckMail$.next(true);
             }, error =>{
               this.MessageMail = "Aucun compte n'est lié à cet E-mail.";
             });
   }
 
+  //Méthode appelant API vers procédure stockée d'envoi d'un mail avec nouveau password généré.
   public GenererPassword()
   {
     this.VerifMail();
     zip(CheckMail$).subscribe(() => {
       if(this.MessageMail == '')
       {
-        this.utilisateurService.GenererNouveauPassword(this.Mail, this.session.get("TK")).subscribe(result => {
+        this.utilisateurService.GenererNouveauPassword(this.Mail, this.accessService.data["Anonyme"]).subscribe(result => {
           this.MessageOK = "Votre nouveau mot de passe a été envoyé par E-mail. Pensez à vérifier vos spams!"
           setTimeout(()=> this.MessageOK ='', 5000);
           this.Mail = '';
@@ -56,13 +54,14 @@ export class RetrievePasswordComponent implements OnInit {
     });
   }
 
+  //Méthode appelant API vers procédure stockée d'envoi d'un mail avec pseudo actuel.
   public RetrouverPseudo()
   {
     this.VerifMail();
     zip(CheckMail$).subscribe(() => {
       if(this.MessageMail == '')
       {
-        this.utilisateurService.RetrouverPseudo(this.Mail, this.session.get("TK")).subscribe(result => {
+        this.utilisateurService.RetrouverPseudo(this.Mail, this.accessService.data["Anonyme"]).subscribe(result => {
           this.MessageOK = "Votre pseudo a été envoyé par E-mail. Pensez à vérifier vos spams!"
           setTimeout(()=> this.MessageOK ='', 5000);
           this.Mail = '';

@@ -1,10 +1,8 @@
-import { Component, OnInit, Inject } from '@angular/core';
-import { Router } from '@angular/router';
+import { Component, OnInit } from '@angular/core';
 import { UtilisateurDAL } from '../service/utilisateur-dal';
 import { Utilisateur } from '../models/utilisateur';
 import { zip, Subject } from 'rxjs';
-import { SESSION_STORAGE, WebStorageService } from 'angular-webstorage-service';
-import { SpawnSyncOptionsWithBufferEncoding } from 'child_process';
+import { AccessComponent } from '../helpeur/access-component';
 
 const Users$ = new Subject<boolean>();
 const CheckMail$ = new Subject<boolean>();
@@ -17,7 +15,7 @@ const CheckPseudo$ = new Subject<boolean>();
 })
 export class AdminUsersComponent implements OnInit {
 
-  constructor(@Inject(SESSION_STORAGE) private session: WebStorageService,private routerService:Router, private utilisateurService:UtilisateurDAL) { }
+  constructor(private accessService:AccessComponent, private utilisateurService:UtilisateurDAL) { }
   Users:Utilisateur[];
   SearchMail:string;
   SearchPseudo:string;
@@ -35,10 +33,7 @@ export class AdminUsersComponent implements OnInit {
   messageEchec:string;
 
   ngOnInit(): void {
-    if(!this.session.get("TKA") || !this.session.get("TK") || !this.session.get("User") || this.session.get("User").Role != "Admin")
-    {
-      this.routerService.navigateByUrl("/")
-    }
+    this.accessService.CheckAccess("Admin");
     this.edit = false;
     this.Users = new Array<Utilisateur>();
     this.SelectRole = ["User", "Admin"];
@@ -58,31 +53,27 @@ export class AdminUsersComponent implements OnInit {
   search()
   {
     this.message = "";
-    this.utilisateurService.getUtilisateurs(this.session.get("TK")).subscribe(result => {
+    this.utilisateurService.getUtilisateurs(this.accessService.data["User"]).subscribe(result => {
       this.Users = result;
       Users$.next(true);
     })
     zip(Users$).subscribe(() => {
+      //filter utilisé pour filtrer la liste en fonction du choix via liste déroulante (Valeur par défaut mise en place)
       this.Users = this.Users.filter(result => result.Role.includes(this.SearchRole) && result.Mail.includes(this.SearchMail) && result.Pseudo.includes(this.SearchPseudo))
       if (this.Users.length == 0) this.message = "Aucun Utilisateur trouvé.";
     });
   }
 
-  changeRole(Role)
-  {
-    this.SearchRole = Role.value;
-  }
+  //Assignation valeur du Role, sélection via liste déroulante (Valeur par défaut = User) pour la recherche
+  changeRole(Role) { this.SearchRole = Role.value; }
 
-  changeEditRole(Role)
-  {
-    this.EditRole = Role.value;
-  }
+  //Assignation valeur du Role lors d'une édition d'un utilisateur existant, sélection via liste déroulante
+  changeEditRole(Role) { this.EditRole = Role.value; }
 
-  changeEditActif(Actif)
-  {
-    this.EditActif = Actif.value;
-  }
+  //Assignation valeur "Actif" lors d'une édition d'un utilisateur existant, sélection via liste déroulante
+  changeEditActif(Actif) { this.EditActif = Actif.value; }
 
+  //Remplissage auto des champs lors de sélection d'édition.
   Edit(id)
   {
     this.edit = true;
@@ -90,7 +81,10 @@ export class AdminUsersComponent implements OnInit {
     this.EditPseudo = this.Users.find(result => result.Id == id).Pseudo;
     this.EditActif = this.Users.find(result => result.Id == id).Actif;
     this.EditRole = this.Users.find(result => result.Id == id).Role;
+    //Utilisation du timeout pour laisser le temps de remplir les variables ci-avant.
+    //Solution à trouvé avec un zip.
     setTimeout(() => {
+    //bis repatita, c'est moche mais ça marche. Solution à trouver pour améliorer.
     let myRoleSelect = (document.getElementById("R") as HTMLSelectElement);
       for(var i, j = 0; i = myRoleSelect.options[j]; j++) {
         if(i.value == this.EditRole) {
@@ -115,6 +109,7 @@ export class AdminUsersComponent implements OnInit {
     })
   }
 
+  //Envoi des modifications suite à édition via API.
   Modifier()
   {
     this.EditUtil.Mail = this.EditMail;
@@ -129,37 +124,33 @@ export class AdminUsersComponent implements OnInit {
       else {
         this.messageError = "";
         this.edit = false;
-        this.utilisateurService.putUtilisateur(this.EditUtil, this.EditUtil.Id, this.session.get("TK")).subscribe(() => {
+        this.utilisateurService.putUtilisateur(this.EditUtil, this.EditUtil.Id, this.accessService.data["User"]).subscribe(() => {
           this.messageValidation = "Le changement a été effectué avec succès.";
           this.search();
-          setTimeout(() => {
-            this.messageValidation="";
-          },4000)
+          setTimeout(() => { this.messageValidation=""; },4000)
         }, error => {
           this.messageEchec = "La mise à jour n'a pas fonctionnée. Tu es nul en tant qu'admin.";
-          setTimeout(() => {
-            this.messageEchec="";
-          },4000)
+          setTimeout(() => { this.messageEchec=""; },4000)
         });
-      }
-        
+      } 
     });
-    
-    
   }
 
+  //Vérification si pseudo existe déjà lors de l'édition.
   public CheckPseudo(Pseudo:string, Id:number)
   {
-    this.utilisateurService.getUtilisateurByPseudo(Pseudo, this.session.get("TK")).subscribe(result => {
+    this.utilisateurService.getUtilisateurByPseudo(Pseudo, this.accessService.data["User"]).subscribe(result => {
       if(result.Id == Id) CheckPseudo$.next(true);
       else CheckPseudo$.next(false);
     }, error => {
       CheckPseudo$.next(true);
     })
   }
+
+  //Vérification si mail existe déjà lors de l'édition.
   public CheckMail(Mail:string, Id:number)
   {
-    this.utilisateurService.getUtilisateurByMail(Mail, this.session.get("TK")).subscribe(result => {
+    this.utilisateurService.getUtilisateurByMail(Mail, this.accessService.data["User"]).subscribe(result => {
       if(result.Id == Id) CheckMail$.next(true);
       else CheckMail$.next(false);
     }, error => {

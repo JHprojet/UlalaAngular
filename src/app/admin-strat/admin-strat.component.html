@@ -3,7 +3,7 @@
 <br/>
 
 <div class="col-sm-12 form-group row">
-    <label class="col-sm-1 col-form-label">L'Id est :</label>
+    <label class="col-sm-2 col-form-label">L'Id contient :</label>
     <div class="col-sm-1">
         <input type="text" value="{{SearchId}}" class="form-control" [(ngModel)]="SearchId" name="SearchId">
     </div>
@@ -11,11 +11,13 @@
     <div class="col-sm-2">
         <input type="text" value="{{SearchPseudo}}" class="form-control" [(ngModel)]="SearchPseudo" name="SearchPseudo">
     </div>
-    <label class="col-sm-1 col-form-label">Tri : </label>
+    <label class="col-sm-1 col-form-label"></label>
+    <label class="col-sm-1 col-form-label">Tri par : </label>
     <select class="form-control col-sm-1" NgModel (change)="ChangeTri(Tri)" #Tri>
         <option value="Id">Id</option>
         <option value="Note">Note</option>
     </select>
+    <label class="col-sm-1 col-form-label">Ordre :</label>
     <select class="form-control col-sm-1" NgModel (change)="ChangeOrdre(Ordre)" #Ordre>
         <option value="0">Asc</option>
         <option value="1">Dsc</option>
@@ -34,7 +36,7 @@
       <button type="button" class="btn btn-primary" (click)="decline()">Non</button>
     </div>
   </ng-template>
-
+  <hr/>
 <table class="table table-striped">
     <thead class="thead-dark">
         <tr>
@@ -44,27 +46,27 @@
             <th>Zone</th>
             <th>Boss</th>
             <th>Classes</th>
-            <th>Images</th>
+            <th style="width:10%;">Images</th>
             <th>Note</th>
             <th>X</th>
         </tr>
     </thead>
     <tbody>
         <tr *ngFor="let elem of Strats">
-            <td>{{elem.Id}}</td>
-            <td>{{elem.Utilisateur.Pseudo}}</td>
-            <td>{{elem.BossZone.Zone.ContinentFR}}</td>
-            <td>{{elem.BossZone.Zone.ZoneFR}}</td>
-            <td>{{elem.BossZone.Boss.NomFR}} </td>
-            <td>{{elem.Team.Classe1.NomFR}} - {{elem.Team.Classe2.NomFR}} <br/> {{elem.Team.Classe3.NomFR}} - {{elem.Team.Classe4.NomFR}}</td>
-            <td>
+            <td class="align-middle">{{elem.Id}}</td>
+            <td class="align-middle">{{elem.Utilisateur.Pseudo}}</td>
+            <td class="align-middle">{{elem.BossZone.Zone.ContinentFR}}</td>
+            <td class="align-middle">{{elem.BossZone.Zone.ZoneFR}}</td>
+            <td class="align-middle">{{elem.BossZone.Boss.NomFR}} </td>
+            <td class="align-middle">{{elem.Team.Classe1.NomFR}} - {{elem.Team.Classe2.NomFR}} <br/> {{elem.Team.Classe3.NomFR}} - {{elem.Team.Classe4.NomFR}}</td>
+            <td class="align-middle" style="width:15%;">
                 <img src={{elem.ImagePath1}} width="30px">
                 <img src={{elem.ImagePath2}} width="30px">
                 <img src={{elem.ImagePath3}} width="30px">
                 <img src={{elem.ImagePath4}} width="30px">
             </td>
-            <td>{{elem.Note}}</td>
-            <td><button class="btn btn-primary" type="button" (click)="openModal(template, elem.Id)">X</button></td>
+            <td class="align-middle">{{elem.Note}}</td>
+            <td class="align-middle"><button class="btn btn-primary" type="button" (click)="openModal(template, elem.Id)">X</button></td>
         </tr>
     </tbody>  
 </table>
