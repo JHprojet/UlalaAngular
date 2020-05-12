@@ -16,7 +16,6 @@ export class ListBossComponent implements OnInit {
 
   //Simple récupération d'une liste d'objet via API + display sous forme de tableau.
   ngOnInit(): void {
-    this.accessService.getAnonymeKey();
     this.BossZone = new Array<BossZone>();
     this.serviceBossZone.getBossZones(this.accessService.data["User"]??this.accessService.data["Anonyme"]).subscribe(result =>{
       this.BossZone = result;

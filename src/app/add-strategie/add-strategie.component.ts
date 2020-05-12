@@ -69,7 +69,6 @@ export class AddStrategieComponent implements OnInit {
 
   //#region | ngOnInit |
   ngOnInit(): void {
-    this.accessService.getAnonymeKey();
     this.messageIndication="Si vous le souhaitez, vous pouvez choisir directement votre team perso et le boss. Sinon, ne remplir que les lignes suivantes.";
     this.Loading = false;
     this.DisplayBoutonSansTeam = true;

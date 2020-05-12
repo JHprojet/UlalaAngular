@@ -17,7 +17,6 @@ export class ClasseComponent implements OnInit {
   //Note globale : Contenu à prévoir.
 
   ngOnInit(): void {
-    this.accessService.getAnonymeKey();
     this.ClasseActive = new Classe({});
     this.selectClasse = new Array<Classe>();
     //Remplissage liste déroulante avec classes

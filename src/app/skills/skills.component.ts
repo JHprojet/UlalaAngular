@@ -21,7 +21,6 @@ export class SkillsComponent implements OnInit {
   selectClasse:Classe[];
 
   ngOnInit(): void {
-    this.accessService.getAnonymeKey();
     this.Skills = new Array<Skill>();
     zip(this.accessService.CheckAno$).subscribe(() => {
       this.skillService.getSkills(this.accessService.getSession("User")??this.accessService.getSession("Anonyme")).subscribe(result =>

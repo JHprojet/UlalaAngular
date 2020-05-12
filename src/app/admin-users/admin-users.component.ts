@@ -33,7 +33,6 @@ export class AdminUsersComponent implements OnInit {
   messageEchec:string;
 
   ngOnInit(): void {
-    this.accessService.CheckAccess("Admin");
     this.edit = false;
     this.Users = new Array<Utilisateur>();
     this.SelectRole = ["User", "Admin"];

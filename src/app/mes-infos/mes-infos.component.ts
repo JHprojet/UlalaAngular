@@ -14,7 +14,6 @@ export class MesInfosComponent implements OnInit {
   
   //Ajout de contenu prévu plus tard.
   ngOnInit(): void {
-    this.accessService.getAnonymeKey();
     this.User = this.accessService.getSession("Info");
   }
 

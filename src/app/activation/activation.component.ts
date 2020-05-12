@@ -13,16 +13,15 @@ export class ActivationComponent implements OnInit {
   constructor(private accessService:AccessComponent, private routerService:Router, private utilisateurService:UtilisateurDAL) { }
   
   Pseudo:string; //Pseudo de l'utilisateur pour affichage sur la page
-  token:string; //Token renseigné par l'utilisateur
+  Token:string; //Token renseigné par l'utilisateur
   DisplayValidationOk:boolean; //Display message si validation OK
   DisplayValidationErreur:boolean; //Display message si validation Erreur
   DisplayRenvoiTokenOk:boolean; //Display message si renvoi du token par mail OK
   DisplayRenvoiTokenErreur:boolean; //Display message si renvoi du token par mail Erreur
 
   ngOnInit(): void {
-    this.accessService.CheckAccess("Activation");
     this.Pseudo = this.accessService.data["Pseudo"];
-    this.token = '';
+    this.Token = '';
     this.DisplayValidationOk = false;
     this.DisplayValidationErreur = false;
     this.DisplayRenvoiTokenOk = false;
@@ -39,7 +38,7 @@ export class ActivationComponent implements OnInit {
   {
     this.DisplayValidationOk = false;
     this.DisplayValidationErreur = false;
-    this.utilisateurService.UpdateToken(this.accessService.data["Id"], this.token, this.accessService.data["Anonyme"]).subscribe(() => {
+    this.utilisateurService.UpdateToken(this.accessService.data["Id"], this.Token, this.accessService.data["Anonyme"]).subscribe(() => {
       this.utilisateurService.getUtilisateur(this.accessService.data["Id"], this.accessService.data["User"]).subscribe(result => {
         this.accessService.data["Info"] = result;
         this.accessService.setSession("Info", result);

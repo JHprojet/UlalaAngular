@@ -80,7 +80,6 @@ export class SearchStrategieComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.accessService.getAnonymeKey();
     this.accessUser = false;
     this.currentUser = new Utilisateur({});
     this.Enregistrements = new Array<Enregistrement>();

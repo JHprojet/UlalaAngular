@@ -18,7 +18,6 @@ export class RetrievePasswordComponent implements OnInit {
   constructor(private accessService:AccessComponent,private utilisateurService:UtilisateurDAL) { }
 
   ngOnInit(): void {
-    this.accessService.getAnonymeKey();
   }
 
   //Check du mail renseigné sur le champ correspondant (Format + Correct ou non)

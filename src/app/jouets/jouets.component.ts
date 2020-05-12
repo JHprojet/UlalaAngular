@@ -11,7 +11,6 @@ export class JouetsComponent implements OnInit {
   constructor(private accessService:AccessComponent) { }
 
   ngOnInit(): void {
-    this.accessService.getAnonymeKey();
   }
 
 }

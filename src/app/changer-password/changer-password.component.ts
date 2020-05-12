@@ -28,7 +28,6 @@ export class ChangerPasswordComponent implements OnInit {
   // /!\ A transformer en FormBuilder pour simplifier le component
 
   ngOnInit(): void {
-    this.accessService.CheckAccess("User");
     this.MessageNOK ='';
     this.MessageOK ='';
     this.alertPassword ='';

@@ -26,6 +26,10 @@ import { ModalModule } from 'ngx-bootstrap/modal/ngx-bootstrap-modal';
 import { AccessComponent } from './helpeur/access-component';
 import { TestComponent } from './test/test.component';
 import { ReactiveFormsModule } from '@angular/forms';
+import { IsAdmin } from './helpeur/is-admin';
+import { IsUser } from './helpeur/is-user';
+import { IsToActivate } from './helpeur/is-to-activate';
+import { IsAnonyme } from './helpeur/is-anonyme';
 
 @NgModule({
   declarations: [
@@ -58,7 +62,7 @@ import { ReactiveFormsModule } from '@angular/forms';
     ModalModule.forRoot(),
     ReactiveFormsModule
   ],
-  providers: [AccessComponent],
+  providers: [IsAnonyme,IsToActivate,IsUser,IsAdmin,AccessComponent],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

@@ -53,7 +53,6 @@ export class MesPreferencesComponent implements OnInit {
   //A tranformer via FormBuilder pour substantiellement siimplifier le component
 
   ngOnInit(): void {
-    this.accessService.CheckAccess("User");
     this.teamId = 0;
     this.MateamId = 0;
     this.edit = false;

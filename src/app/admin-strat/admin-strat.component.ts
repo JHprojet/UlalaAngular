@@ -26,7 +26,6 @@ export class AdminStratComponent implements OnInit {
   ColTri:string;
 
   ngOnInit(): void {
-    this.AccessService.CheckAccess("Admin");
     this.BaseStrats = new Array<Enregistrement>();
     this.Strats = new Array<Enregistrement>();
     //Récupération de tous les enregistrements.

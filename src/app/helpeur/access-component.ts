@@ -48,6 +48,15 @@ export class AccessComponent {
         else if(role == "Activation" && (!this.getSession("Anonyme") || !this.getSession("Pseudo") || !this.getSession("Id"))) this.routerService.navigateByUrl("/");
     }
 
+    public CheckAccessTest(role):boolean
+    {
+        if(role == "Anonyme" && !this.getSession("Anonyme")) return false;
+        else if(role == "User" && (!this.getSession("Anonyme") || !this.getSession("User"))) return false;
+        else if(role == "Admin" && (!this.getSession("Anonyme") || !this.getSession("User") || !this.getSession("Info") || this.getSession("Info").Role != "Admin")) return false;
+        else if(role == "Activation" && (!this.getSession("Anonyme") || !this.getSession("Pseudo") || !this.getSession("Id"))) return false;
+        else return true;
+    }
+
     //Récupération des infos de session (via tableau data[])
     public getSession(Token:string):any
     {

@@ -11,7 +11,6 @@ export class ContactComponent implements OnInit {
   constructor(private accessService:AccessComponent) { }
 
   ngOnInit(): void {
-    this.accessService.getAnonymeKey();
   }
   //Component à faire
 }

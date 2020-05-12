@@ -51,7 +51,6 @@ export class TestComponent implements OnInit {
   selectMesTeams:MesTeams[] = new Array<MesTeams>();
 
   ngOnInit(): void {
-    this.accessService.getAnonymeKey();
     this.SearchFormWithTeam.get('Boss').disable();
     this.SearchForm.get('Boss').disable();
     this.SearchForm.get('Zone').disable();
@@ -73,14 +72,16 @@ export class TestComponent implements OnInit {
   }
 
   onSubmit() {
-    console.log("coucou")
-    let User ="", BossZoneId="", C1="", C2="", C3="", C4="";
+    let User ="", BossZoneId="", C1="", C2="", C3="", C4="", ZoneIdOfTheSelectedTeam;
     //Faire if route = alors User =
+    
     if(this.SearchFormWithTeam.value.Boss != '') {
       this.AllBossZone.forEach(item => {
-        if(item.Zone.Id == this.SearchFormWithTeam.value.Team 
-            && item.Boss.NomFR == this.SearchForm.value.Boss)
-        BossZoneId = item.Id.toString();
+        if(item.Zone.Id == this.selectMesTeams.find(team => team.Id == this.SearchFormWithTeam.value.Team).Zone.Id
+            && item.Boss.NomFR == this.SearchFormWithTeam.value.Boss) {
+              console.log(item.Boss.NomFR);
+              BossZoneId = item.Id.toString();
+            }
       });
      this.accessService.data["Teams"].forEach(item => {
        if(item.Id == this.SearchFormWithTeam.value.Team) {

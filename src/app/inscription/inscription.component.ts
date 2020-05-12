@@ -33,7 +33,6 @@ export class InscriptionComponent implements OnInit {
   constructor(private accessService:AccessComponent,private utilisateurService:UtilisateurDAL, private fb:FormBuilder, private cv:CustomValidators) { }
 
   ngOnInit(): void { 
-    this.accessService.getAnonymeKey();
   }
   
   //Action à l'envoi du formulaire
