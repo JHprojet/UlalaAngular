@@ -31,9 +31,7 @@ export class AppComponent {
   Vote$:Subject<boolean>;
   Teams$:Subject<boolean>;
 
-  constructor(private teamService:MesTeamsDAL,private favService:FavoriDAL,private voteService:VoteDAL,private accessService:AccessComponent,private router:Router, private UtilisateurService:UtilisateurDAL) { 
-    this.accessService.getSession("Info");
-    this.accessService.getAnonymeKey();
+  constructor(private teamService:MesTeamsDAL,private favService:FavoriDAL,private voteService:VoteDAL,private accessService:AccessComponent,private router:Router, private UtilisateurService:UtilisateurDAL) {
     this.data = this.accessService.data;
   }
 
@@ -76,7 +74,7 @@ export class AppComponent {
             this.accessService.setSession("Votes",new Array<Vote>());
             this.Vote$.next(true);
           });
-          this.teamService.getMeTeamsByUserId(this.data["Info"].Id).subscribe(result => {
+          this.teamService.getMesTeamsByUserId(this.data["Info"].Id).subscribe(result => {
             this.accessService.setSession("Teams",result);
             this.Teams$.next(true);
           }, error => {

@@ -81,7 +81,7 @@ export class AddStrategieComponent implements OnInit {
     if(this.accessService.getSession("Info")) 
     {
       this.currentUser = this.accessService.getSession("Info");
-      this.mesTeamsService.getMeTeamsByUserId(this.currentUser.Id).subscribe(result => {
+      this.mesTeamsService.getMesTeamsByUserId(this.currentUser.Id).subscribe(result => {
         this.selectMesTeams = result;
       })
     }

@@ -83,9 +83,9 @@ export class SearchStrategieComponent implements OnInit {
     this.accessUser = false;
     this.currentUser = new Utilisateur({});
     this.Enregistrements = new Array<Enregistrement>();
-    if(this.accessService.data["Info"]) 
+    if(this.accessService.getSession("Info")) 
     {
-      this.currentUser = this.accessService.data["Info"];
+      this.currentUser = this.accessService.getSession("Info");
       this.accessUser = true;
       if (this.route == 'mystrat') this.U = this.currentUser.Id.toString();
     }
@@ -115,7 +115,7 @@ export class SearchStrategieComponent implements OnInit {
         this.route = params[0].path;
       })
       if (this.currentUser.Id != 0) {
-        this.mesTeamsService.getMeTeamsByUserId(this.currentUser.Id).subscribe(result => {
+        this.mesTeamsService.getMesTeamsByUserId(this.currentUser.Id).subscribe(result => {
           this.selectMesTeams = result;
         });
         this.favorisService.getFavorisByUtilisateurId(this.currentUser.Id).subscribe(result => {
@@ -174,7 +174,7 @@ export class SearchStrategieComponent implements OnInit {
   //Non fonctionnel ATM
   public Follow(Id:Number)
   {
-    if(this.accessService.data["Info"].Id != Id) 
+    if(this.accessService.getSession("Info").Id != Id) 
     {
       let follow:Follow = new Follow({Id:0,Follower:new Utilisateur({Id:this.accessService.getSession("Info").Id}), Followed:new Utilisateur({Id:Id})})
 

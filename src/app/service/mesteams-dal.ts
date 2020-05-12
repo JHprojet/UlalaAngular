@@ -21,7 +21,7 @@ export class MesTeamsDAL {
   getMaTeam(id:number): Observable<MesTeams> {
     return this.http.get<MesTeams>(EndPoint+'MesTeams/'+id, this.httpOptions)
   }
-  getMeTeamsByUserId(id:number): Observable<MesTeams[]> {
+  getMesTeamsByUserId(id:number): Observable<MesTeams[]> {
     return this.http.get<MesTeams[]>(EndPoint+'MesTeams/?UtilisateurId='+id, this.httpOptions)
   }
   postMaTeam(monObjet: MesTeams): Observable<MesTeams> {

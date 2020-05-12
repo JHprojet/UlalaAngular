@@ -84,7 +84,7 @@ export class MesPreferencesComponent implements OnInit {
     this.zoneId = 0;
     this.utilisateur = new Utilisateur({})
     this.utilisateur = this.accessService.getSession("Info");
-    this.mesteamsService.getMeTeamsByUserId(this.utilisateur.Id).subscribe(result =>{
+    this.mesteamsService.getMesTeamsByUserId(this.utilisateur.Id).subscribe(result =>{
       this.mesTeams = result;
     },error =>{
       this.mesTeams = new Array<MesTeams>();
@@ -192,7 +192,7 @@ export class MesPreferencesComponent implements OnInit {
     this.teamAdd.NomTeam = this.nomTeam;
     //Ajout de la team + récupération de la liste complète mise à jour
     this.mesteamsService.postMaTeam(this.teamAdd).subscribe(result => {
-      this.mesteamsService.getMeTeamsByUserId(this.utilisateur.Id).subscribe(result =>{
+      this.mesteamsService.getMesTeamsByUserId(this.utilisateur.Id).subscribe(result =>{
         this.mesTeams = result;
       })
     }, error => {
@@ -294,7 +294,7 @@ export class MesPreferencesComponent implements OnInit {
     this.teamAdd.NomTeam = this.nomTeam;
     if(!this.teamAdd.Team) this.teamAdd.Team = new Team({Id:this.teamId});
     this.mesteamsService.putMaTeam(this.teamAdd, this.MateamId).subscribe(() => {
-      this.mesteamsService.getMeTeamsByUserId(this.utilisateur.Id).subscribe(result =>{
+      this.mesteamsService.getMesTeamsByUserId(this.utilisateur.Id).subscribe(result =>{
         this.mesTeams = result;
       });
     }, error => {
