@@ -12,7 +12,7 @@ export class ClasseComponent implements OnInit {
   selectClasse: Classe[];
   ClasseActive: Classe;
 
-  constructor(private accessService:AccessComponent,private classeService:ClasseDAL) { }
+  constructor(private classeService:ClasseDAL) { }
 
   //Note globale : Contenu à prévoir.
 
@@ -20,7 +20,7 @@ export class ClasseComponent implements OnInit {
     this.ClasseActive = new Classe({});
     this.selectClasse = new Array<Classe>();
     //Remplissage liste déroulante avec classes
-    this.classeService.getClasses(this.accessService.data["User"]??this.accessService.data["Anonyme"]).subscribe(response => {
+    this.classeService.getClasses().subscribe(response => {
       this.selectClasse = response;
     });
   }
@@ -28,7 +28,7 @@ export class ClasseComponent implements OnInit {
   //Display de la classe choisie uniquement.
   changeClasse(Classe)
   {
-    this.classeService.getClasse(Classe.value, this.accessService.data["User"]??this.accessService.data["Anonyme"]).subscribe(response => {
+    this.classeService.getClasse(Classe.value).subscribe(response => {
       this.ClasseActive = response;
     });
   }

@@ -8,7 +8,7 @@ import { AccessComponent } from '../helpeur/access-component';
 })
 export class HomeComponent implements OnInit {
 
-  constructor(private accessService:AccessComponent) { }
+  constructor() { }
 
   ngOnInit(): void {
   }

@@ -37,14 +37,14 @@ export class CustomValidators {
 
     //Check si Pseudo déjà utilisé via API - Async
     public CheckPseudo: AsyncValidatorFn = (control: AbstractControl): Observable<ValidationErrors | null> => {
-        return this.utilisateurService.getUtilisateurByPseudo(control.value, this.accessService.data["Anonyme"]).pipe(
+        return this.utilisateurService.getUtilisateurByPseudo(control.value).pipe(
             map(() => { return {'PseudoExist': true}}),catchError(() => of(null))
         );
     };
 
     //Check si Mail déjà utilisé via API - Async
     public CheckEmail: AsyncValidatorFn = (control: AbstractControl): Observable<ValidationErrors | null> => {
-        return this.utilisateurService.getUtilisateurByMail(control.value, this.accessService.data["Anonyme"]).pipe(
+        return this.utilisateurService.getUtilisateurByMail(control.value).pipe(
             map(() => { return {'MailExist': true}}),catchError(() => of(null))
         );
     };

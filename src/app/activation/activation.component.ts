@@ -38,9 +38,8 @@ export class ActivationComponent implements OnInit {
   {
     this.DisplayValidationOk = false;
     this.DisplayValidationErreur = false;
-    this.utilisateurService.UpdateToken(this.accessService.data["Id"], this.Token, this.accessService.data["Anonyme"]).subscribe(() => {
-      this.utilisateurService.getUtilisateur(this.accessService.data["Id"], this.accessService.data["User"]).subscribe(result => {
-        this.accessService.data["Info"] = result;
+    this.utilisateurService.UpdateToken(this.accessService.data["Id"], this.Token).subscribe(() => {
+      this.utilisateurService.getUtilisateur(this.accessService.data["Id"]).subscribe(result => {
         this.accessService.setSession("Info", result);
         this.accessService.deleteSession("Pseudo");
         this.accessService.deleteSession("Id");
@@ -61,7 +60,7 @@ export class ActivationComponent implements OnInit {
   {
     this.DisplayRenvoiTokenOk = false;
     this.DisplayRenvoiTokenErreur = false;
-    this.utilisateurService.RenvoiToken(this.accessService.data["Id"], this.accessService.data["Anonyme"]).subscribe(() =>{
+    this.utilisateurService.RenvoiToken(this.accessService.getSession("Id")).subscribe(() =>{
       this.DisplayRenvoiTokenOk = true;
       setTimeout(() => { this.DisplayRenvoiTokenOk = false; },5000);
     }, error => {

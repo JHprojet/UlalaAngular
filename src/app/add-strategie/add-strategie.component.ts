@@ -14,7 +14,7 @@ import { TeamDal } from '../service/team-dal';
 import { BossZone } from '../models/boss-zone';
 import { Team } from '../models/team';
 import { Utilisateur } from '../models/utilisateur';
-import { ReplaySubject, zip, Subject } from 'rxjs';
+import { ReplaySubject, zip } from 'rxjs';
 import { MesTeams } from '../models/mes-teams';
 import { MesTeamsDAL } from '../service/mesteams-dal';
 import { AccessComponent } from '../helpeur/access-component';
@@ -78,19 +78,19 @@ export class AddStrategieComponent implements OnInit {
     this.selectContinent = new Array<Zone>();
     this.selectMesTeams = new Array<MesTeams>();
     this.currentUser = new Utilisateur({});
-    if(this.accessService.data["Info"]) 
+    if(this.accessService.getSession("Info")) 
     {
-      this.currentUser = this.accessService.data["Info"];
-      this.mesTeamsService.getMeTeamsByUserId(this.currentUser.Id, this.accessService.data["User"]).subscribe(result => {
+      this.currentUser = this.accessService.getSession("Info");
+      this.mesTeamsService.getMeTeamsByUserId(this.currentUser.Id).subscribe(result => {
         this.selectMesTeams = result;
       })
     }
     else this.currentUser.Id = 0;
     
-    this.classeService.getClasses(this.accessService.data["User"]??this.accessService.data["Anonyme"]).subscribe(result =>{
+    this.classeService.getClasses().subscribe(result =>{
       this.selectClasse = result;
     });
-    this.zoneService.getZones(this.accessService.data["User"]??this.accessService.data["Anonyme"]).subscribe(response => {
+    this.zoneService.getZones().subscribe(response => {
       response.forEach(item => {
         if (this.selectContinent.findIndex(sc => sc.ContinentFR == item.ContinentFR) == -1) {
           this.selectContinent.push(item);
@@ -128,7 +128,7 @@ export class AddStrategieComponent implements OnInit {
     //Sinon => Récupération de la liste des zones correspondante au continent sélectionné pour remplir liste déroulante zones
     else {
       this.messageBossZone = "Veuillez sélectionner une Zone."
-      this.zoneService.getZones(this.accessService.data["User"]??this.accessService.data["Anonyme"]).subscribe(response => {     
+      this.zoneService.getZones().subscribe(response => {     
         response.forEach(item => {
           if (item.ContinentFR == Continent.value) {
             this.selectZone.push(item);
@@ -149,12 +149,12 @@ export class AddStrategieComponent implements OnInit {
     if (Zone.value == 0) this.messageBossZone = "Veuillez sélectionner une Zone.";
     //Sinon => Récupération de la liste de boss correspondante à la zone sélectionné pour remplir liste déroulante boss
     else {
-      this.bossZoneService.getBossZones(this.accessService.data["User"]??this.accessService.data["Anonyme"]).subscribe(response => {
+      this.bossZoneService.getBossZones().subscribe(response => {
         this.messageBossZone = "Veuillez sélectionner un Boss."
         response.forEach(item => {
           if (item.Zone.Id == Zone.value) {
             this.zoneId = item.Zone.Id;
-            this.bossService.getBoss(item.Boss.Id, this.accessService.data["User"]??this.accessService.data["Anonyme"]).subscribe(response => {
+            this.bossService.getBoss(item.Boss.Id).subscribe(response => {
               this.selectBoss.push(response);
             });
           }
@@ -177,7 +177,7 @@ export class AddStrategieComponent implements OnInit {
     else {
       if (!this.DisplayBoutonSansTeam) this.messageIndication = "";
       this.messageBossZone = "";
-      this.bossZoneService.getBossZones(this.accessService.data["User"]??this.accessService.data["Anonyme"]).subscribe(response => {
+      this.bossZoneService.getBossZones().subscribe(response => {
         response.forEach(item => {
           if (Boss.value == item.Boss.Id && this.zoneId == item.Zone.Id) { this.Enregistrement.BossZone = new BossZone({Id:item.Id}) }
         });
@@ -199,7 +199,7 @@ export class AddStrategieComponent implements OnInit {
     let reader = new FileReader();
     reader.onload = () => {
       IMG.fileAsBase64 = reader.result.toString(); // Store base64 encoded representation of file
-      this.imageService.uploadImage(IMG, this.accessService.data["User"]??this.accessService.data["Anonyme"]) // POST to server
+      this.imageService.uploadImage(IMG) // POST to server
         .subscribe(resp => { }); //Process avec message à rajouter si erreur.
     }  
     reader.readAsDataURL(file); // Read the file
@@ -207,9 +207,9 @@ export class AddStrategieComponent implements OnInit {
   
   public upload()
   {
-    if(this.accessService.data["Info"])
+    if(this.accessService.getSession("Info"))
     {
-      this.Enregistrement.Utilisateur.Id = this.accessService.data["Info"].Id
+      this.Enregistrement.Utilisateur.Id = this.accessService.getSession("Info").Id
     }
     for (let item of this.Images)
     {
@@ -219,7 +219,7 @@ export class AddStrategieComponent implements OnInit {
     this.Enregistrement.ImagePath2 = "http://192.168.1.2:8081/"+this.FileNames[1];
     this.Enregistrement.ImagePath3 = "http://192.168.1.2:8081/"+this.FileNames[2];
     this.Enregistrement.ImagePath4 = "http://192.168.1.2:8081/"+this.FileNames[3];
-    this.enregistrementService.postEnregistrement(this.Enregistrement, this.accessService.data["User"]??this.accessService.data["Anonyme"]).subscribe(result => { 
+    this.enregistrementService.postEnregistrement(this.Enregistrement).subscribe(result => { 
       this.ngOnInit();
       let ToClean = document.getElementById("inputImages") as HTMLInputElement;
       ToClean.value = "";
@@ -348,7 +348,7 @@ export class AddStrategieComponent implements OnInit {
   //#region | EcritureIdClasse | Récupération de l'id de la team correspondante à l'Id des 4 classes
   public EcritureIdClasse()
   {
-    this.teamService.getTeamByClasses(this.Idclasse1,this.Idclasse2,this.Idclasse3,this.Idclasse4, this.accessService.data["User"]??this.accessService.data["Anonyme"]).subscribe(result => {
+    this.teamService.getTeamByClasses(this.Idclasse1,this.Idclasse2,this.Idclasse3,this.Idclasse4).subscribe(result => {
       this.Enregistrement.Team = new Team({Id : result.Id});
     });
   }
@@ -467,20 +467,20 @@ export class AddStrategieComponent implements OnInit {
     }
     else {
       //Récupération + écriture de l'Id de la team correspondante aux 4 classes + Suppression du display du bouton via détail
-      this.mesTeamsService.getMaTeam(T.value, this.accessService.data["User"]).subscribe(result => {
+      this.mesTeamsService.getMaTeam(T.value).subscribe(result => {
         this.MaTeam = result;
         this.Enregistrement.Team = new Team({Id : result.Team.Id});
         this.DisplayBoutonSansTeam = false;
       });
       //Réinitialisation des variables de gestion + Récupération de la liste des bosses correspondant à la zone de la team perso de l'utilisateur
-      this.bossZoneService.getBossZones(this.accessService.data["User"]??this.accessService.data["Anonyme"]).subscribe(response => {
+      this.bossZoneService.getBossZones().subscribe(response => {
         this.selectBoss = [];
         this.IdBZ = "0";
         this.messageIndication = "Veuillez sélectionner un Boss."
         response.forEach(item => {
           if (item.Zone.Id == this.MaTeam.Zone.Id) {
             this.zoneId = item.Zone.Id;
-            this.bossService.getBoss(item.Boss.Id, this.accessService.data["User"]??this.accessService.data["Anonyme"]).subscribe(response => {
+            this.bossService.getBoss(item.Boss.Id).subscribe(response => {
               this.selectBoss.push(response);
             });
           }

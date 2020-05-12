@@ -45,11 +45,11 @@ export class AppComponent {
     this.MessageRecupPassword="";
     this.ErrorLogin = "";
     this.OkLogin = "";
-    this.UtilisateurService.CheckUser(new Utilisateur({Pseudo:this.login, Password:this.password}), this.data["Anonyme"]).subscribe(result => {
+    this.UtilisateurService.CheckUser(new Utilisateur({Pseudo:this.login, Password:this.password})).subscribe(result => {
       this.accessService.setSession("User",result);
       
       this.data["User"] = this.accessService.getSession("User");
-      this.UtilisateurService.getUtilisateurByPseudo(this.login, this.data["User"]).subscribe(result2 => {
+      this.UtilisateurService.getUtilisateurByPseudo(this.login).subscribe(result2 => {
         if (result2.ActivationToken != '')
         {
           this.accessService.setSession("Id",result2.Id);
@@ -62,21 +62,21 @@ export class AppComponent {
         {
           this.accessService.setSession("Info",result2);
           this.data["Info"] = this.accessService.data["Info"];
-          this.favService.getFavorisByUtilisateurId(this.data["Info"].Id,this.accessService.data["User"]).subscribe(result => {
+          this.favService.getFavorisByUtilisateurId(this.data["Info"].Id).subscribe(result => {
             this.accessService.setSession("Fav",result);
             this.Fav$.next(true);
           }, error => {
             this.accessService.setSession("Fav",new Array<Favori>());
             this.Fav$.next(true);
           });
-          this.voteService.getVotesByUser(this.data["Info"].Id,this.accessService.data["User"]).subscribe(result => {
+          this.voteService.getVotesByUser(this.data["Info"].Id).subscribe(result => {
             this.accessService.setSession("Votes",result);
             this.Vote$.next(true);
           }, error => {
             this.accessService.setSession("Votes",new Array<Vote>());
             this.Vote$.next(true);
           });
-          this.teamService.getMeTeamsByUserId(this.data["Info"].Id,this.accessService.data["User"]).subscribe(result => {
+          this.teamService.getMeTeamsByUserId(this.data["Info"].Id).subscribe(result => {
             this.accessService.setSession("Teams",result);
             this.Teams$.next(true);
           }, error => {

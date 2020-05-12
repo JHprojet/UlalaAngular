@@ -15,7 +15,7 @@ const CheckPseudo$ = new Subject<boolean>();
 })
 export class AdminUsersComponent implements OnInit {
 
-  constructor(private accessService:AccessComponent, private utilisateurService:UtilisateurDAL) { }
+  constructor(private utilisateurService:UtilisateurDAL) { }
   Users:Utilisateur[];
   SearchMail:string;
   SearchPseudo:string;
@@ -52,7 +52,7 @@ export class AdminUsersComponent implements OnInit {
   search()
   {
     this.message = "";
-    this.utilisateurService.getUtilisateurs(this.accessService.data["User"]).subscribe(result => {
+    this.utilisateurService.getUtilisateurs().subscribe(result => {
       this.Users = result;
       Users$.next(true);
     })
@@ -123,7 +123,7 @@ export class AdminUsersComponent implements OnInit {
       else {
         this.messageError = "";
         this.edit = false;
-        this.utilisateurService.putUtilisateur(this.EditUtil, this.EditUtil.Id, this.accessService.data["User"]).subscribe(() => {
+        this.utilisateurService.putUtilisateur(this.EditUtil, this.EditUtil.Id).subscribe(() => {
           this.messageValidation = "Le changement a été effectué avec succès.";
           this.search();
           setTimeout(() => { this.messageValidation=""; },4000)
@@ -138,7 +138,7 @@ export class AdminUsersComponent implements OnInit {
   //Vérification si pseudo existe déjà lors de l'édition.
   public CheckPseudo(Pseudo:string, Id:number)
   {
-    this.utilisateurService.getUtilisateurByPseudo(Pseudo, this.accessService.data["User"]).subscribe(result => {
+    this.utilisateurService.getUtilisateurByPseudo(Pseudo).subscribe(result => {
       if(result.Id == Id) CheckPseudo$.next(true);
       else CheckPseudo$.next(false);
     }, error => {
@@ -149,7 +149,7 @@ export class AdminUsersComponent implements OnInit {
   //Vérification si mail existe déjà lors de l'édition.
   public CheckMail(Mail:string, Id:number)
   {
-    this.utilisateurService.getUtilisateurByMail(Mail, this.accessService.data["User"]).subscribe(result => {
+    this.utilisateurService.getUtilisateurByMail(Mail).subscribe(result => {
       if(result.Id == Id) CheckMail$.next(true);
       else CheckMail$.next(false);
     }, error => {

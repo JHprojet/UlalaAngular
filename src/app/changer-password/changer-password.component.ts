@@ -42,7 +42,7 @@ export class ChangerPasswordComponent implements OnInit {
   public CheckCurrentPassword()
   {
     this.alertCurrentPassword ='';
-    this.utilisateurService.CheckUser(new Utilisateur({Password:this.CurrentPassword, Pseudo:this.accessService.data["Info"].Pseudo}), this.accessService.data["User"]).subscribe(result =>{
+    this.utilisateurService.CheckUser(new Utilisateur({Password:this.CurrentPassword, Pseudo:this.accessService.getSession("Info").Pseudo})).subscribe(result =>{
       Check1$.next(true);
     }, error => {
       this.alertCurrentPassword = 'Votre mot de passe est erroné.'
@@ -80,7 +80,7 @@ export class ChangerPasswordComponent implements OnInit {
     zip(Check1$, Check2$, Check3$).subscribe(() => {
       if (Check1$ && Check2$ && Check3$)
       {
-        this.utilisateurService.changePassword(this.accessService.data["Info"].Id,this.NewPassword, this.accessService.data["User"]).subscribe(result => {
+        this.utilisateurService.changePassword(this.accessService.getSession("Info").Id,this.NewPassword).subscribe(result => {
           //Si changement ok via API, reset des variables et display message réussi.
           this.NewPassword ='';
           this.NewPasswordVerif='';

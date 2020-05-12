@@ -115,25 +115,25 @@ export class SearchStrategieComponent implements OnInit {
         this.route = params[0].path;
       })
       if (this.currentUser.Id != 0) {
-        this.mesTeamsService.getMeTeamsByUserId(this.currentUser.Id, this.accessService.data["User"]).subscribe(result => {
+        this.mesTeamsService.getMeTeamsByUserId(this.currentUser.Id).subscribe(result => {
           this.selectMesTeams = result;
         });
-        this.favorisService.getFavorisByUtilisateurId(this.currentUser.Id, this.accessService.data["User"]).subscribe(result => {
+        this.favorisService.getFavorisByUtilisateurId(this.currentUser.Id).subscribe(result => {
           this.myFavs = result;
         }, error => {
           this.myFavs = new Array<Favori>();
         });
-        this.voteService.getVotesByUser(this.currentUser.Id, this.accessService.data["User"]).subscribe(result => {
+        this.voteService.getVotesByUser(this.currentUser.Id).subscribe(result => {
           this.myVotes = result;
         }, error =>
         {
           this.myVotes = new Array<Vote>();
         });
       }
-      this.classeService.getClasses(this.accessService.data["User"]??this.accessService.data["Anonyme"]).subscribe(response => {
+      this.classeService.getClasses().subscribe(response => {
         this.selectClasse = response;
       });
-      this.zoneService.getZones(this.accessService.data["User"]??this.accessService.data["Anonyme"]).subscribe(response => {
+      this.zoneService.getZones().subscribe(response => {
         response.forEach(item => {
           if (this.selectContinent.findIndex(sc => sc.ContinentFR == item.ContinentFR) == -1) {
             this.selectContinent.push(item);
@@ -152,17 +152,17 @@ export class SearchStrategieComponent implements OnInit {
     }
     //Si une team est sélectionnée
     else {
-    this.mesTeamsService.getMaTeam(Team.value, this.accessService.data["User"]).subscribe(result => {
+    this.mesTeamsService.getMaTeam(Team.value).subscribe(result => {
       this.MaTeam = result; //Récupération de la team sélectionnée via API
     });
-    this.bossZoneService.getBossZones(this.accessService.data["User"]??this.accessService.data["Anonyme"]).subscribe(response => {
+    this.bossZoneService.getBossZones().subscribe(response => {
       this.selectBoss = [];
       this.IdBZ = "0";
       this.messageIndication = "Veuillez sélectionner un Boss."
       response.forEach(item => {
         if (item.Zone.Id == this.MaTeam.Zone.Id) {
           this.zoneId = item.Zone.Id;
-          this.bossService.getBoss(item.Boss.Id, this.accessService.data["User"]??this.accessService.data["Anonyme"]).subscribe(response => {
+          this.bossService.getBoss(item.Boss.Id).subscribe(response => {
             this.selectBoss.push(response); //Récupération de la liste des boss présent dans la team sélectionnée 
             })
           }
@@ -176,9 +176,9 @@ export class SearchStrategieComponent implements OnInit {
   {
     if(this.accessService.data["Info"].Id != Id) 
     {
-      let follow:Follow = new Follow({Id:0,Follower:new Utilisateur({Id:this.accessService.data["Info"].Id}), Followed:new Utilisateur({Id:Id})})
+      let follow:Follow = new Follow({Id:0,Follower:new Utilisateur({Id:this.accessService.getSession("Info").Id}), Followed:new Utilisateur({Id:Id})})
 
-      this.followService.postFollow(follow, this.accessService.data["User"]).subscribe(result => {
+      this.followService.postFollow(follow).subscribe(result => {
         console.log("ok")
       });
     }
@@ -187,8 +187,8 @@ export class SearchStrategieComponent implements OnInit {
   //Non fonctionnel ATM
   public Unfollow(Id:number)
   {
-    this.followService.getFollowbyFollowedFollower(this.accessService.data["Info"].Id, Id, this.accessService.data["User"]).subscribe(result => {
-        this.followService.deleteFollow(result, this.accessService.data["User"]).subscribe(result2 => {
+    this.followService.getFollowbyFollowedFollower(this.accessService.getSession("Info").Id, Id).subscribe(result => {
+        this.followService.deleteFollow(result).subscribe(result2 => {
           console.log("DELETE OK");
         })
       })
@@ -208,7 +208,7 @@ export class SearchStrategieComponent implements OnInit {
     }
     else { //Si un continent a été sélectionné
     this.messageIndication = "Veuillez sélectionner une Zone."
-    this.zoneService.getZones(this.accessService.data["User"]??this.accessService.data["Anonyme"]).subscribe(response => {     
+    this.zoneService.getZones().subscribe(response => {     
       response.forEach(item => {
         if (item.ContinentFR == Continent.value) {
           this.selectZone.push(item); //Remplissage du prochain menu déroulant en fonction de la sélection.
@@ -230,12 +230,12 @@ export class SearchStrategieComponent implements OnInit {
     this.IdBZ = "-1";
     }
     else {
-      this.bossZoneService.getBossZones(this.accessService.data["User"]??this.accessService.data["Anonyme"]).subscribe(response => {
+      this.bossZoneService.getBossZones().subscribe(response => {
         this.messageIndication = "Veuillez sélectionner un Boss."
         response.forEach(item => {
           if (item.Zone.Id == Zone.value) {
             this.zoneId = item.Zone.Id;
-            this.bossService.getBoss(item.Boss.Id, this.accessService.data["User"]??this.accessService.data["Anonyme"]).subscribe(response => {
+            this.bossService.getBoss(item.Boss.Id).subscribe(response => {
               this.selectBoss.push(response);
             });
           }
@@ -251,7 +251,7 @@ export class SearchStrategieComponent implements OnInit {
     if (Boss.value == 0) this.messageIndication = "Veuillez sélectionner un Boss.";
     else {
       this.messageIndication = "";
-      this.bossZoneService.getBossZones(this.accessService.data["User"]??this.accessService.data["Anonyme"]).subscribe(response => {
+      this.bossZoneService.getBossZones().subscribe(response => {
         response.forEach(item => {
           if (Boss.value == item.Boss.Id && this.zoneId == item.Zone.Id) 
           {
@@ -307,7 +307,7 @@ export class SearchStrategieComponent implements OnInit {
       }
       //Lancement de la requête et display et récupération des enregistrement.
       //Si NotFound renvoyé par API, message disant que rien n'a été trouvé et de réessayer avec moins de filtres.
-      this.enregistrementService.getEnregistrementsByInfos(this.U, this.IdBZ, this.Idclasse1, this.Idclasse2, this.Idclasse3, this.Idclasse4, this.accessService.data["User"]??this.accessService.data["Anonyme"])
+      this.enregistrementService.getEnregistrementsByInfos(this.U, this.IdBZ, this.Idclasse1, this.Idclasse2, this.Idclasse3, this.Idclasse4)
       .subscribe(result => {
       this.Enregistrements = result;
       }, error => {
@@ -323,9 +323,9 @@ export class SearchStrategieComponent implements OnInit {
     let Fav = new Favori({});
     Fav.Enregistrement = new Enregistrement({Id:id});
     Fav.Utilisateur = new Utilisateur({Id:this.currentUser.Id})
-    this.favorisService.postFavori(Fav, this.accessService.data["User"]).subscribe(() => { fav$.next(true) });
+    this.favorisService.postFavori(Fav).subscribe(() => { fav$.next(true) });
     zip(fav$).subscribe(() => {
-      this.favorisService.getFavorisByUtilisateurId(this.currentUser.Id, this.accessService.data["User"]).subscribe(result =>{
+      this.favorisService.getFavorisByUtilisateurId(this.currentUser.Id).subscribe(result =>{
         this.myFavs = result; //Remplissage du tableau avec tous les favoris de l'utilisateur une fois le favori envoyé avec succès via API
       });
     });    
@@ -339,7 +339,7 @@ export class SearchStrategieComponent implements OnInit {
       if(elem.Enregistrement.Id == id) //Si favori trouvé dans la liste (en fonction Id envoyé via la page) 
       {
         //Suppression favoris via API + suppression dans le tableau local si delete OK.
-        this.favorisService.deleteFavori(elem.Id, this.accessService.data["User"]).subscribe(() => {});
+        this.favorisService.deleteFavori(elem.Id).subscribe(() => {});
         this.myFavs = this.myFavs.filter(r => r.Id != elem.Id);
       }
     }
@@ -387,15 +387,15 @@ export class SearchStrategieComponent implements OnInit {
     {
       if (Vote.Enregistrement.Id == Id) //Si vote trouvé : suppression du vote + suppression dans le tableau local
       {
-        this.voteService.deleteVote(Vote.Id, this.accessService.data["User"]).subscribe(() => {});
+        this.voteService.deleteVote(Vote.Id).subscribe(() => {});
         this.Enregistrements[this.Enregistrements.findIndex(r => r.Id == Vote.Enregistrement.Id)].Note--;
       }
     }
     //Ajout du nouveau vote + ajout dans le tableau local
-    this.voteService.postVote(V, this.accessService.data["User"]).subscribe(() => { vote$.next(true) });
+    this.voteService.postVote(V).subscribe(() => { vote$.next(true) });
     this.Enregistrements[this.Enregistrements.findIndex(r => r.Id == Id)].Note--;
     zip(vote$).subscribe(() => {
-      this.voteService.getVotesByUser(this.currentUser.Id, this.accessService.data["User"]).subscribe(result =>{
+      this.voteService.getVotesByUser(this.currentUser.Id).subscribe(result =>{
         this.myVotes = result; //Mise à jour du tableau de vote
       })
     })
@@ -413,14 +413,14 @@ export class SearchStrategieComponent implements OnInit {
     {
       if (Vote.Enregistrement.Id == Id) 
       {
-        this.voteService.deleteVote(Vote.Id, this.accessService.data["User"]).subscribe(() => {});
+        this.voteService.deleteVote(Vote.Id).subscribe(() => {});
         this.Enregistrements[this.Enregistrements.findIndex(r => r.Id == Vote.Enregistrement.Id)].Note++;
       }
     }
-    this.voteService.postVote(V, this.accessService.data["User"]).subscribe(() => { vote$.next(true) });
+    this.voteService.postVote(V).subscribe(() => { vote$.next(true) });
     this.Enregistrements[this.Enregistrements.findIndex(r => r.Id == Id)].Note++;
     zip(vote$).subscribe(() => {
-      this.voteService.getVotesByUser(this.currentUser.Id, this.accessService.data["User"]).subscribe(result =>{
+      this.voteService.getVotesByUser(this.currentUser.Id).subscribe(result =>{
         this.myVotes = result;
       });
     });
@@ -433,7 +433,7 @@ export class SearchStrategieComponent implements OnInit {
     {
       if (Vote.Enregistrement.Id == Id) 
       {
-        this.voteService.deleteVote(Vote.Id, this.accessService.data["User"]).subscribe(() => {});
+        this.voteService.deleteVote(Vote.Id).subscribe(() => {});
         if (Vote.Vote == 1) this.Enregistrements[this.Enregistrements.findIndex(r => r.Id == Vote.Enregistrement.Id)].Note--;
         if (Vote.Vote == -1) this.Enregistrements[this.Enregistrements.findIndex(r => r.Id == Vote.Enregistrement.Id)].Note++;
         this.myVotes = this.myVotes.filter(r => r.Id != Vote.Id);

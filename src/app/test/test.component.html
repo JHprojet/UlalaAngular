@@ -38,13 +38,16 @@
             <option value=""></option>
             <option *ngFor="let boss of selectBoss" value={{boss}}>{{boss}}</option>
         </select>
-        <button type="submit" style="margin-left:30px;width:100px;" class=" btn btn-secondary btn-sm">Valider</button>
+        <button type="submit" style="margin-left:30px;width:100px;" [disabled]="!SearchFormWithTeam.valid" class=" btn btn-secondary btn-sm">Valider</button>
     </ng-container>
     <ng-container *ngIf="selectMesTeams.length == 0">
         <p>Vous n'avez pas encore de team favorite. Si vous souhaitez en créer afin de simplifier la recherche de stratégie : <a routerLink='/prefs'>C'est par ici!</a></p>
     </ng-container>
 </form>
+
+
 <form [formGroup]="SearchForm" (ngSubmit)="onSubmit()" *ngIf="SearchFormWithTeam.value.Team == ''">
+<hr/>
     <div class="form-group row">
         <!-- Select Continent -->
         <label class="col-sm-2 col-form-label">Continent : </label>
@@ -184,7 +187,9 @@
          Bouton de Validation -->
         
 
-
+<div class="alert alert-danger" *ngIf="ShowAucunEnregistrement">
+    Oops, aucun enregistrement n'a été trouvé. Essayez peut-être avec moins de filtres!
+</div>
 <ng-container class="centered" *ngFor="let Enregistrement of Enregistrements">
     <div class="mx-auto col-sm-8" >
         <div class="row">

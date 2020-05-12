@@ -62,10 +62,10 @@ export class MesPreferencesComponent implements OnInit {
     this.teamAdd = new MesTeams({});
     this.selectClasse = new Array<Classe>();
     this.selectContinent = new Array<Zone>();
-    this.classeService.getClasses(this.accessService.data["User"]).subscribe(result =>{
+    this.classeService.getClasses().subscribe(result =>{
       this.selectClasse = result;
     })
-    this.zoneService.getZones(this.accessService.data["User"]).subscribe(response => {
+    this.zoneService.getZones().subscribe(response => {
       response.forEach(item => {
         if (this.selectContinent.findIndex(sc => sc.ContinentFR == item.ContinentFR) == -1) {
           this.selectContinent.push(item);
@@ -84,7 +84,7 @@ export class MesPreferencesComponent implements OnInit {
     this.zoneId = 0;
     this.utilisateur = new Utilisateur({})
     this.utilisateur = this.accessService.getSession("Info");
-    this.mesteamsService.getMeTeamsByUserId(this.utilisateur.Id, this.accessService.data["User"]).subscribe(result =>{
+    this.mesteamsService.getMeTeamsByUserId(this.utilisateur.Id).subscribe(result =>{
       this.mesTeams = result;
     },error =>{
       this.mesTeams = new Array<MesTeams>();
@@ -100,7 +100,7 @@ export class MesPreferencesComponent implements OnInit {
     if (Continent.value == 0) this.messageBossZone = "Veuillez sélectionner un Continent.";
     else {
       this.messageBossZone = "Veuillez sélectionner une Zone."
-      this.zoneService.getZones(this.accessService.data["User"]).subscribe(response => { 
+      this.zoneService.getZones().subscribe(response => { 
         response.forEach(item => {
           if (item.ContinentFR == Continent.value) this.selectZone.push(item);
           //Si en mode édition de la team, changement d'état du ReplaySubject pour remplissage en cascade.
@@ -122,7 +122,7 @@ export class MesPreferencesComponent implements OnInit {
     if (Z.value == 0) this.messageBossZone = "Veuillez sélectionner une Zone.";
     else {
     this.messageBossZone = "";
-    this.bossZoneService.getBossZones(this.accessService.data["User"]).subscribe(response => {
+    this.bossZoneService.getBossZones().subscribe(response => {
       response.forEach(item => {
         if (item.Zone.Id == Z.value) this.teamAdd.Zone = new Zone({Id:item.Zone.Id});
         if (item.Zone.Id == Z && this.edit) 
@@ -180,7 +180,7 @@ export class MesPreferencesComponent implements OnInit {
   //Update de la team correspondante a chaque changement de classe si toutes les classes ont été sélectionnées
   public EcritureIdClasse()
   {
-  this.teamService.getTeamByClasses(this.Idclasse1,this.Idclasse2,this.Idclasse3,this.Idclasse4, this.accessService.data["User"]).subscribe(result => {
+  this.teamService.getTeamByClasses(this.Idclasse1,this.Idclasse2,this.Idclasse3,this.Idclasse4).subscribe(result => {
     this.teamAdd.Team = new Team({Id:result.Id});
     });
   }
@@ -188,11 +188,11 @@ export class MesPreferencesComponent implements OnInit {
   //upload de la nouvelle team
   public upload()
   {
-    this.teamAdd.Utilisateur = new Utilisateur({Id:this.accessService.data["Info"].Id});
+    this.teamAdd.Utilisateur = new Utilisateur({Id:this.accessService.getSession("Info").Id});
     this.teamAdd.NomTeam = this.nomTeam;
     //Ajout de la team + récupération de la liste complète mise à jour
-    this.mesteamsService.postMaTeam(this.teamAdd, this.accessService.data["User"]).subscribe(result => {
-      this.mesteamsService.getMeTeamsByUserId(this.utilisateur.Id, this.accessService.data["User"]).subscribe(result =>{
+    this.mesteamsService.postMaTeam(this.teamAdd).subscribe(result => {
+      this.mesteamsService.getMeTeamsByUserId(this.utilisateur.Id).subscribe(result =>{
         this.mesTeams = result;
       })
     }, error => {
@@ -212,7 +212,7 @@ export class MesPreferencesComponent implements OnInit {
   //Suppression d'une team.
   public DeleteTeam(id)
   {
-    this.mesteamsService.deleteMaTeam(id, this.accessService.data["User"]).subscribe(result => {
+    this.mesteamsService.deleteMaTeam(id).subscribe(result => {
       this.ngOnInit();
     });
   }
@@ -223,7 +223,7 @@ export class MesPreferencesComponent implements OnInit {
     this.messageClasse = "";
     this.edit = true;
     //Récupération de la team
-    this.mesteamsService.getMaTeam(id, this.accessService.data["User"]).subscribe(result => {
+    this.mesteamsService.getMaTeam(id).subscribe(result => {
       this.nomTeam = result.NomTeam;
       this.MateamId = result.Id;
       this.teamId = result.Team.Id;
@@ -290,11 +290,11 @@ export class MesPreferencesComponent implements OnInit {
   public update()
   {
     //Envoi de la nouvelle team pour update via API puis récupération de la liste.
-    this.teamAdd.Utilisateur = new Utilisateur({Id:this.accessService.data["Info"].Id});
+    this.teamAdd.Utilisateur = new Utilisateur({Id:this.accessService.getSession("Info").Id});
     this.teamAdd.NomTeam = this.nomTeam;
     if(!this.teamAdd.Team) this.teamAdd.Team = new Team({Id:this.teamId});
-    this.mesteamsService.putMaTeam(this.teamAdd, this.MateamId, this.accessService.data["User"]).subscribe(() => {
-      this.mesteamsService.getMeTeamsByUserId(this.utilisateur.Id, this.accessService.data["User"]).subscribe(result =>{
+    this.mesteamsService.putMaTeam(this.teamAdd, this.MateamId).subscribe(() => {
+      this.mesteamsService.getMeTeamsByUserId(this.utilisateur.Id).subscribe(result =>{
         this.mesTeams = result;
       });
     }, error => {

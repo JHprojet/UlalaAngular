@@ -30,7 +30,7 @@ export class InscriptionComponent implements OnInit {
     updateOn: 'blur', validators: [this.cv.EmailMatch, this.cv.PasswordMatch] });
   Success:boolean;
 
-  constructor(private accessService:AccessComponent,private utilisateurService:UtilisateurDAL, private fb:FormBuilder, private cv:CustomValidators) { }
+  constructor(private utilisateurService:UtilisateurDAL, private fb:FormBuilder, private cv:CustomValidators) { }
 
   ngOnInit(): void { 
   }
@@ -44,7 +44,7 @@ export class InscriptionComponent implements OnInit {
       Password:this.inscriptionForm.controls.password.value
     });
     //Envoi API
-    this.utilisateurService.postUtilisateur(Inscription, this.accessService.data["Anonyme"]).subscribe(result => { 
+    this.utilisateurService.postUtilisateur(Inscription).subscribe(result => { 
       //Si succès
       this.Success = true;
       this.inscriptionForm.reset();
