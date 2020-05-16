@@ -84,11 +84,8 @@ export class MesPreferencesComponent implements OnInit {
     this.zoneId = 0;
     this.utilisateur = new Utilisateur({})
     this.utilisateur = this.accessService.getSession("Info");
-    this.mesteamsService.getMesTeamsByUserId(this.utilisateur.Id).subscribe(result =>{
-      this.mesTeams = result;
-    },error =>{
-      this.mesTeams = new Array<MesTeams>();
-    })
+    if(this.accessService.getSession("Teams")) this.mesTeams = this.accessService.getSession("Teams");
+    else this.mesTeams = new Array<MesTeams>();
   }
 
   //Voir SearchComponent : méthode similaire
@@ -191,14 +188,14 @@ export class MesPreferencesComponent implements OnInit {
     this.teamAdd.Utilisateur = new Utilisateur({Id:this.accessService.getSession("Info").Id});
     this.teamAdd.NomTeam = this.nomTeam;
     //Ajout de la team + récupération de la liste complète mise à jour
-    this.mesteamsService.postMaTeam(this.teamAdd).subscribe(result => {
-      this.mesteamsService.getMesTeamsByUserId(this.utilisateur.Id).subscribe(result =>{
+    this.mesteamsService.postMyTeam(this.teamAdd).subscribe(result => {
+      this.mesteamsService.getMyTeamsByUserId(this.utilisateur.Id).subscribe(result =>{
         this.mesTeams = result;
+        this.accessService.setSession("Teams",result);
       })
     }, error => {
       this.errorUpload = "Un problème est survenue, merci de réessayer."
     })
-    this.ngOnInit();
   }
 
   //Vérification du nom renseigné pour la team
@@ -212,8 +209,9 @@ export class MesPreferencesComponent implements OnInit {
   //Suppression d'une team.
   public DeleteTeam(id)
   {
-    this.mesteamsService.deleteMaTeam(id).subscribe(result => {
-      this.ngOnInit();
+    this.mesteamsService.deleteMyTeamById(id).subscribe(() => {
+      this.mesTeams.splice(this.mesTeams.findIndex(team => team.Id == id),1);
+      this.accessService.setSession("Teams",this.mesTeams);
     });
   }
 
@@ -223,7 +221,7 @@ export class MesPreferencesComponent implements OnInit {
     this.messageClasse = "";
     this.edit = true;
     //Récupération de la team
-    this.mesteamsService.getMaTeam(id).subscribe(result => {
+    this.mesteamsService.getMyTeam(id).subscribe(result => {
       this.nomTeam = result.NomTeam;
       this.MateamId = result.Id;
       this.teamId = result.Team.Id;
@@ -293,14 +291,14 @@ export class MesPreferencesComponent implements OnInit {
     this.teamAdd.Utilisateur = new Utilisateur({Id:this.accessService.getSession("Info").Id});
     this.teamAdd.NomTeam = this.nomTeam;
     if(!this.teamAdd.Team) this.teamAdd.Team = new Team({Id:this.teamId});
-    this.mesteamsService.putMaTeam(this.teamAdd, this.MateamId).subscribe(() => {
-      this.mesteamsService.getMesTeamsByUserId(this.utilisateur.Id).subscribe(result =>{
+    this.mesteamsService.putMyTeamById(this.teamAdd, this.MateamId).subscribe(() => {
+      this.mesteamsService.getMyTeamsByUserId(this.utilisateur.Id).subscribe(result =>{
         this.mesTeams = result;
+        this.accessService.setSession("Teams",this.mesTeams)
       });
     }, error => {
       this.errorUpload = "Un problème est survenue, merci de réessayer."
     })
-    this.ngOnInit();
   }
   
 }

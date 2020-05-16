@@ -1,7 +1,7 @@
-import { Validators } from './validators';
+import { CustomValidators } from './validators';
 
 describe('Validators', () => {
   it('should create an instance', () => {
-    expect(new Validators()).toBeTruthy();
+    expect(new CustomValidators()).toBeTruthy();
   });
 });

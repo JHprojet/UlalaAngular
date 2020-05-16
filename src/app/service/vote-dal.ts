@@ -19,7 +19,7 @@ export class VoteDAL {
   getVotes(): Observable<Vote[]> {
     return this.http.get<Vote[]>(EndPoint+'Vote', this.httpOptions)
   }
-  getVote(id:number): Observable<Vote> {
+  getVoteById(id:number): Observable<Vote> {
     return this.http.get<Vote>(EndPoint+'Vote/'+id, this.httpOptions)
   }
   getVotesByUser(id:number): Observable<Vote[]> {
@@ -28,10 +28,10 @@ export class VoteDAL {
   postVote(monObjet: Vote): Observable<Vote> {
     return this.http.post<Vote>(EndPoint+'Vote', monObjet, this.httpOptions)
   }
-  putVote(monObjet: Vote, id: number): Observable<Vote> {
+  putVoteById(monObjet: Vote, id: number): Observable<Vote> {
     return this.http.put<Vote>(EndPoint+'Vote/'+id, monObjet, this.httpOptions)
   }
-  deleteVote(id: number): Observable<Vote> {
+  deleteVoteById(id: number): Observable<Vote> {
     return this.http.delete<Vote>(EndPoint+'Vote/'+id, this.httpOptions)
   }
   handleError(error) {

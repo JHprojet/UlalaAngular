@@ -1,12 +1,11 @@
 <br/>
 <hr/>
 <div class="form-group row">
-
     &nbsp;&nbsp;<h3>Selections de tri : </h3>&nbsp;&nbsp;&nbsp;&nbsp; 
-
-        <button (click)="ShowHelp()" type="button" class="btn btn-light dropdown-toggle">
-        {{TexteButtonHelp}}
-        </button>
+    <button (click)="ShowHelp()" type="button" class="btn btn-light dropdown-toggle">
+        <ng-container *ngIf="!Show">Afficher l'aide</ng-container>
+        <ng-container *ngIf="Show">Fermer l'aide</ng-container>
+    </button>
 </div>
 <hr/>
 <div class="help" *ngIf="Show">
@@ -25,78 +24,100 @@
     </ng-container>
     <hr/>
 </div>
-<br/>
-<div *ngIf="accessUser" class="form-group row">
+
+
+<form [formGroup]="SearchFormWithTeam" (ngSubmit)="onSubmit()" *ngIf="accessUser" class="form-group row">
     <ng-container *ngIf="selectMesTeams.length != 0">
-        <label class="form-check-label col-sm-2">Choisir sa team</label>
-        <select class="form-control col-sm-2" NgModel (change)="choixMaTeam(MaTeam)" #MaTeam>
-            <option value="0"></option>
+        <label class="col-form-label col-sm-2">Choisir sa team</label>
+        <select id="Team" class="form-control col-sm-2" (change)="GetBossViaTeam(C)" #C formControlName="Team">
+            <option value=""></option>
             <option *ngFor="let MaTeam of selectMesTeams" value={{MaTeam.Id}}>{{MaTeam.NomTeam}}</option>
         </select>
         <label class="col-sm-1 col-form-label">Boss</label>
-        <select class="form-control col-sm-3" NgModel (change)="changeBoss(Boss)" #Boss>
-            <option value="0"></option>
-            <option *ngFor="let boss of selectBoss" value={{boss.Id}}>{{boss.NomFR}}</option>
+        <select class="form-control col-sm-3" formControlName="Boss">
+            <option value=""></option>
+            <option *ngFor="let boss of selectBoss" value={{boss}}>{{boss}}</option>
         </select>
+        <button type="submit" style="margin-left:30px;width:100px;" [disabled]="!SearchFormWithTeam.valid" class=" btn btn-danger btn-sm">Valider</button>
     </ng-container>
     <ng-container *ngIf="selectMesTeams.length == 0">
         <p>Vous n'avez pas encore de team favorite. Si vous souhaitez en créer afin de simplifier la recherche de stratégie : <a routerLink='/prefs'>C'est par ici!</a></p>
     </ng-container>
+</form>
+<div *ngIf="SearchFormWithTeam.errors?.BossIsNeeded && (SearchFormWithTeam.touched || SearchFormWithTeam.dirty)" class="cross-validation-error-message alert alert-danger">
+    Le boss doit être sélectionné.
 </div>
-<div *ngIf="MaTeam.Id == 0" class="form-group row">
-    <label class="col-sm-1 col-form-label">Continent</label>
-    <select class="form-control col-sm-2" NgModel (change)="changeContinent(Continent)" #Continent>
-        <option value="0"></option>
-        <option *ngFor="let zone of selectContinent">{{zone.ContinentFR}}</option>
-    </select>
-    <label class="col-sm-1 col-form-label">Zone</label>
-    <select class="form-control col-sm-3" NgModel (change)="changeZone(Zone)" #Zone>
-        <option value="0"></option>
-        <option *ngFor="let zone of selectZone" value={{zone.Id}}>{{zone.ZoneFR}}</option>
-    </select>
-    <label class="col-sm-1 col-form-label">Boss</label>
-    <select class="form-control col-sm-3" NgModel (change)="changeBoss(Boss)" #Boss>
-        <option value="0"></option>
-        <option *ngFor="let boss of selectBoss" value={{boss.Id}}>{{boss.NomFR}}</option>
-    </select>
-</div>
-<div *ngIf="MaTeam.Id == 0" class="form-group row">
-    <label class="col-sm-1 col-form-label">Classe 1</label>
-    <select class="form-control col-sm-2" NgModel (change)="changeClasse1(Classe1)" #Classe1>
-        <option value="0"></option>
-        <option *ngFor="let classe of selectClasse" value={{classe.Id}}>{{classe.NomFR}}</option>
-    </select>
 
-    <label class="col-sm-1 col-form-label">Classe 2</label>
-    <select class="form-control col-sm-2" NgModel (change)="changeClasse2(Classe2)" #Classe2>
-        <option value="0"></option>
-        <option *ngFor="let classe of selectClasse" value={{classe.Id}}>{{classe.NomFR}}</option>
-    </select>
 
-    <label class="col-sm-1 col-form-label">Classe 3</label>
-    <select class="form-control col-sm-2" NgModel (change)="changeClasse3(Classe3)" #Classe3>
-        <option value="0"></option>
-        <option *ngFor="let classe of selectClasse" value={{classe.Id}}>{{classe.NomFR}}</option>
-    </select>
-
-    <label class="col-sm-1 col-form-label">Classe 4</label>
-    <select class="form-control col-sm-2" NgModel (change)="changeClasse4(Classe4)" #Classe4>
-        <option value="0"></option>
-        <option *ngFor="let classe of selectClasse" value={{classe.Id}}>{{classe.NomFR}}</option>
-    </select>
-</div>
-<button type="button" class="btn btn-primary" (click)="chercherEnregistrements()">Chercher</button>
-
-<br/>
+<form [formGroup]="SearchForm" (ngSubmit)="onSubmit()" *ngIf="SearchFormWithTeam.value.Team == ''">
 <hr/>
-<h3>Affichage des Enregistrements :</h3>
-<hr/>
-<br/>
+    <div class="form-group row">
+        <!-- Select Continent -->
+        <label class="col-sm-2 col-form-label">Continent : </label>
+        <select id="Continent" class="form-control col-sm-2" (change)="GetZones(C)" #C formControlName="Continent">
+            <option value=""></option>
+            <option *ngFor="let elem of selectContinent" value="{{elem}}">{{elem}}</option>
+        </select>
+        <!-- Select Zone -->
+        <label class="col-sm-1 col-form-label">Zone : </label>
+        <select id="Zone" class="form-control col-sm-3" (change)="GetBoss(C,Z)" #Z formControlName="Zone">
+            <option value=""></option>
+            <option *ngFor="let elem of selectZone" value="{{elem}}">{{elem}}</option>
+        </select>
+        <!-- Select Boss -->
+        <label class="col-sm-1 col-form-label">Boss : </label>
+        <select id="Boss" class="form-control col-sm-3"  formControlName="Boss">
+            <option value=""></option>
+            <option *ngFor="let elem of selectBoss" value="{{elem}}">{{elem}}</option>
+        </select>
+    </div>
+    <div *ngIf="SearchForm.errors?.ZoneIsNeeded && (SearchForm.touched || SearchForm.dirty)" class="cross-validation-error-message alert alert-danger">
+        La zone doit être sélectionnée.
+    </div>
+    <div *ngIf="SearchForm.errors?.BossIsNeeded && (SearchForm.touched || SearchForm.dirty)" class="cross-validation-error-message alert alert-danger">
+        Le boss doit être sélectionné.
+    </div>
+    <div class="form-group row">
+        <!-- Select Classe 1 -->
+        <div class="col-sm-5 row">
+            <label class="col-sm col-form-label">Classe 1 : </label>
+            <select id="Classe1" class="form-control col-sm" formControlName="Classe1">
+                <option value=""></option>
+                <option *ngFor="let elem of selectClasse" value="{{elem.Id}}">{{elem.NomFR}}</option>
+            </select>
+        <!-- Select Classe 2 -->
+            <label class="col-sm col-form-label">Classe 2 : </label>
+            <select id="Classe2" class="form-control col-sm"  formControlName="Classe2">
+                <option value=""></option>
+                <option *ngFor="let elem of selectClasse" value="{{elem.Id}}">{{elem.NomFR}}</option>
+            </select>
+        </div>
+        <!-- Select Classe 3 -->
+        <div class="col-sm-5 row">
+            <label class="col-sm col-form-label">Classe 3 : </label>
+            <select id="Classe3" class="form-control col-sm"  formControlName="Classe3">
+                <option value=""></option>
+                <option *ngFor="let elem of selectClasse" value="{{elem.Id}}">{{elem.NomFR}}</option>
+            </select>
+        <!-- Select Classe 4 -->
+            <label class="col-sm col-form-label">Classe 4 : </label>
+            <select id="Classe4" class="form-control col-sm"  formControlName="Classe4">
+                <option value=""></option>
+                <option *ngFor="let elem of selectClasse" value="{{elem.Id}}">{{elem.NomFR}}</option>
+            </select>
+        </div>
+        <div class="col-sm-2 row">
+            <button type="submit"  style="margin-left:30px;width:100px;" class=" btn btn-danger btn-sm" [disabled]="!SearchForm.valid">Valider</button>
+        </div>
+    </div>
+</form>   
+<hr/> 
 
-<ng-container *ngIf="!Enregistrements.length"><div *ngIf="messageIndication !=''" class="alert alert-danger" role="alert">{{messageIndication}}</div></ng-container>
-
+<div class="alert alert-danger" *ngIf="(!Enregistrements || Enregistrements.length < 1) && DisplayNoEnregistrementMessage">
+    Oops, aucun enregistrement n'a été trouvé. Essayez peut-être avec moins de filtres!
+</div>
 <ng-container class="centered" *ngFor="let Enregistrement of Enregistrements">
-    <div class="mx-auto col-sm-8" >
+    <div class="mx-auto col-sm-8">
         <div class="row">
             <div class="col-sm-3"><b>Continent :</b> {{Enregistrement.BossZone.Zone.ContinentFR}}</div>
             <div class="col-sm-5"><b>Zone :</b> {{Enregistrement.BossZone.Zone.ZoneFR}}</div>
@@ -104,8 +125,6 @@
         </div>
         <div class="row">
             <div class="col-sm-4"><b>Posteur :</b> {{Enregistrement.Utilisateur.Pseudo}}
-                <img height="25px" src="http://127.0.0.1:8081/Follow1.png" (click)="Follow(Enregistrement.Utilisateur.Id)" *ngIf="currentUser.Id != Enregistrement.Utilisateur.Id && currentUser.Id != 0">
-                <img height="25px" src="http://127.0.0.1:8081/Unfollow.png" (click)="Unfollow(Enregistrement.Utilisateur.Id)" *ngIf="currentUser.Id != Enregistrement.Utilisateur.Id && currentUser.Id != 0">
             </div>
             <div class="col-sm-7"><b>Team :</b> {{Enregistrement.Team.Classe1.NomFR}} - {{Enregistrement.Team.Classe2.NomFR}} - {{Enregistrement.Team.Classe3.NomFR}} - {{Enregistrement.Team.Classe4.NomFR}}</div>
             
@@ -117,16 +136,15 @@
             <img [src]="Enregistrement.ImagePath4" height="390px">
         </div>
         <div class="row">
-             <ng-container *ngIf="accessUser">
-                <img *ngIf="VerifFavori(Enregistrement.Id)" src="http://127.0.0.1:8081/fav.png" height="30px" (click)="retraitFavori(Enregistrement.Id)">
-                <img *ngIf="!VerifFavori(Enregistrement.Id)" src="http://127.0.0.1:8081/nofav.png" height="30px" (click)="mettreFavori(Enregistrement.Id)" >
-                <img *ngIf="VerifVote(Enregistrement.Id) != 1 " src="http://127.0.0.1:8081/plus.png" height="30px" (click)="VotePlus(Enregistrement.Id)">
-                <img *ngIf="VerifVote(Enregistrement.Id) != 0" src="http://127.0.0.1:8081/croix.png" height="30px" (click)="DeleteVote(Enregistrement.Id)">
-                <img *ngIf="VerifVote(Enregistrement.Id) != -1" src="http://127.0.0.1:8081/moins.png" height="30px" (click)="VoteMoins(Enregistrement.Id)">
-             </ng-container>
-            <div class="col-sm-2"><b>Note :</b> {{Enregistrement.Note}}</div>
-        </div>
+            <ng-container *ngIf="accessUser">
+            <img *ngIf="DisplayFavori(Enregistrement.Id)" src="../assets/images/fav.png" height="30px" (click)="retraitFavori(Enregistrement.Id)">
+            <img *ngIf="!DisplayFavori(Enregistrement.Id)" src="../assets/images/nofav.png" height="30px" (click)="mettreFavori(Enregistrement.Id)" >
+            <img *ngIf="DisplayVote(Enregistrement.Id) != 1 " src="../assets/images/plus.png" height="30px" (click)="VotePlus(Enregistrement.Id)">
+            <img *ngIf="DisplayVote(Enregistrement.Id) != 0" src="../assets/images/croix.png" height="30px" (click)="DeleteVote(Enregistrement.Id)">
+            <img *ngIf="DisplayVote(Enregistrement.Id) != -1" src="../assets/images/moins.png" height="30px" (click)="VoteMoins(Enregistrement.Id)">
+            </ng-container>
+        <div class="col-sm-2"><b>Note :</b> {{Enregistrement.Note}}</div>
     </div>
-        <hr/>
+    </div>
+    <hr/>
 </ng-container>
-<br/><br/><br/><br/>

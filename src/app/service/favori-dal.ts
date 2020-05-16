@@ -15,22 +15,22 @@ export class FavoriDAL {
       'Authorization' : this.accessService.getSession("User")??this.accessService.getSession("Anonyme")??""
     })
   };
-  getFavoris(): Observable<Favori[]> {
+  getFavorites(): Observable<Favori[]> {
     return this.http.get<Favori[]>(EndPoint+'Favoris', this.httpOptions)
   }
-  getFavori(id:number): Observable<Favori> {
+  getFavorite(id:number): Observable<Favori> {
     return this.http.get<Favori>(EndPoint+'Favoris/'+id, this.httpOptions)
   }
-  getFavorisByUtilisateurId(id:number): Observable<Favori[]> {
+  getFavoritesByUserId(id:number): Observable<Favori[]> {
     return this.http.get<Favori[]>(EndPoint+'Favoris/?UtilisateurId='+id, this.httpOptions)
   }
-  postFavori(monObjet: Favori): Observable<Favori> {
+  postFavorite(monObjet: Favori): Observable<Favori> {
     return this.http.post<Favori>(EndPoint+'Favoris', monObjet, this.httpOptions)
   }
-  putFavori(monObjet: Favori, id: number): Observable<Favori> {
+  putFavoriteById(monObjet: Favori, id: number): Observable<Favori> {
     return this.http.put<Favori>(EndPoint+'Favoris/'+id, monObjet, this.httpOptions)
   }
-  deleteFavori(id: number): Observable<Favori> {
+  deleteFavoriteById(id: number): Observable<Favori> {
     return this.http.delete<Favori>(EndPoint+'Favoris/'+id, this.httpOptions)
   }
   handleError(error) {

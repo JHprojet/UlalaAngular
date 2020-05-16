@@ -16,19 +16,19 @@ export class JouetDAL {
       'Authorization' : this.accessService.getSession("User")??this.accessService.getSession("Anonyme")??""
     })
   };
-  getJouets(): Observable<Jouet[]> {
+  getToys(): Observable<Jouet[]> {
     return this.http.get<Jouet[]>(EndPoint+'Jouet', this.httpOptions).pipe(catchError(this.handleError))
   }
-  getJouet(id:number): Observable<Jouet> {
+  getToyById(id:number): Observable<Jouet> {
     return this.http.get<Jouet>(EndPoint+'Jouet/'+id, this.httpOptions).pipe(catchError(this.handleError))
   }
-  postJouet(monObjet: Jouet): Observable<Jouet> {
+  postToy(monObjet: Jouet): Observable<Jouet> {
     return this.http.post<Jouet>(EndPoint+'Jouet', monObjet, this.httpOptions).pipe(catchError(this.handleError))
   }
-  putJouet(monObjet: Jouet, id: number): Observable<Jouet> {
+  putToyById(monObjet: Jouet, id: number): Observable<Jouet> {
     return this.http.put<Jouet>(EndPoint+'Jouet/'+id, monObjet, this.httpOptions).pipe(catchError(this.handleError))
   }
-  deleteJouet(id: number): Observable<Jouet> {
+  deleteToyById(id: number): Observable<Jouet> {
     return this.http.delete<Jouet>(EndPoint+'Jouet/'+id, this.httpOptions).pipe(catchError(this.handleError))
   }
   handleError(error) {

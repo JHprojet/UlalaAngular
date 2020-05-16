@@ -74,6 +74,24 @@ export class AccessComponent {
         return result;
     }
 
+    public pushToSession(Token:string, Data:any):void
+    {
+        switch(Token) {
+            case Fav : { 
+                this.data[Fav].push(Data);
+                this.session.set("Fav", this.data[Fav]);
+                break;}
+            case Votes : { 
+                this.data[Votes].push(Data);
+                this.session.set("Votes", this.data[Votes]);
+                break;}
+            case Teams : { 
+                this.data[Teams].push(Data);
+                this.session.set("Teams", this.data[Teams]);
+                break;}
+        }
+    }
+
     //Ecriture valeur en session + copie dans tableau data[]
     public setSession(Token:string, Data:any):void
     {

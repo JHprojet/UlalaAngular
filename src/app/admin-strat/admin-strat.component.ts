@@ -29,7 +29,7 @@ export class AdminStratComponent implements OnInit {
     this.BaseStrats = new Array<Enregistrement>();
     this.Strats = new Array<Enregistrement>();
     //Récupération de tous les enregistrements.
-    this.enregistrementService.getEnregistrements().subscribe(result => {
+    this.enregistrementService.getStrategies().subscribe(result => {
       this.BaseStrats = result;
     });
     this.SearchId= "";
@@ -42,7 +42,7 @@ export class AdminStratComponent implements OnInit {
   //Recherche des enregistrement en fonction des données indiqué via liste déroulante sur le filtre et le tri.
   Search()
   {
-    this.enregistrementService.getEnregistrements().subscribe(result => {
+    this.enregistrementService.getStrategies().subscribe(result => {
       this.BaseStrats = result; //Toutes les strats sont stocké dans this.BaseStrats - this.Strats sera pour le display uniquement.
       this.Strats = this.BaseStrats.filter(result => result.Id.toString().includes(this.SearchId) && result.Utilisateur.Pseudo.includes(this.SearchPseudo));
         //Permet le tri de la liste en fonction des choix via liste déroulante après filtrage. Solution à trouver pour simplifier l'écriture.
@@ -78,7 +78,7 @@ export class AdminStratComponent implements OnInit {
   //Si confirmation sur le modal
   confirm(): void {
     //Si confirmer, suppression de l'enregistrement + mise à jour de la liste
-    this.enregistrementService.deleteEnregistrement(this.SupprId).subscribe(() => { })
+    this.enregistrementService.deleteStrategyById(this.SupprId).subscribe(() => { })
     this.Search(); //A remplacer plus tard par une suppression en paralèlle dans le tableau local plutôt que rapeler la fonction Search qui passe pas l'API.
     this.modalRef.hide();
   }

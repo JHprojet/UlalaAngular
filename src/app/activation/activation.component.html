@@ -1,19 +1,19 @@
 <br/>
 <h2>Activation</h2>
 <br/>
-<p>Bonjour {{Pseudo}}, veuillez entrer votre clef d'activation reçu par mail.</p>
+<p>Bonjour {{Username}}, veuillez entrer votre clef d'activation reçu par mail.</p>
 
 <input type="text" [(ngModel)]="Token" name="Token">
-<button type="button" class="btn btn-btn" (click)="envoiToken()">Envoyer mon code d'activation</button>
+<button type="button" class="btn btn-btn" (click)="sendToken()">Envoyer mon code d'activation</button>
 <br/><br/>
-<ng-container *ngIf="DisplayValidationOk || DisplayValidationErreur">
+<ng-container *ngIf="DisplayValidationOk || DisplayValidationError">
     <div *ngIf="DisplayValidationOk" class="alert alert-success">Merci, votre compte à bien été activé, vous allez être rediriger dans un instant. Bonne navigation!</div>
-    <div *ngIf="DisplayValidationErreur" class="alert alert-danger">Clef d'activation erronée, merci de réessayer. En cas de problème, veuillez contacter l'administrateur du site via la page de contact.</div>
+    <div *ngIf="DisplayValidationError" class="alert alert-danger">Clef d'activation erronée, merci de réessayer. En cas de problème, veuillez contacter l'administrateur du site via la page de contact.</div>
 </ng-container>
 
-<p>Vous n'avez pas reçu votre clef d'activation par mail? <a class="link" (click)='RenvoiToken()'>Cliquez ici!</a></p>
+<p>Vous n'avez pas reçu votre clef d'activation par mail? <a class="link" (click)='ResendTokenByEmail()'>Cliquez ici!</a></p>
 
-<ng-container *ngIf="DisplayRenvoiTokenOk || DisplayRenvoiTokenErreur">
-    <div *ngIf="DisplayRenvoiTokenOk" class="alert alert-success">Mail renvoyé, regardez dans votre boite mail ! (Et n'oubliez pas les spams!)</div>
-    <div *ngIf="DisplayRenvoiTokenErreur" class="alert alert-danger">Oops, une erreur sauvage semble être survenue, veuillez contacter l'administrateur du site via la page contact rubrique 'Activation de mon compte'</div>
+<ng-container *ngIf="DisplayResendTokenOk || DisplayResendTokenError">
+    <div *ngIf="DisplayResendTokenOk" class="alert alert-success">Mail renvoyé, regardez dans votre boite mail ! (Et n'oubliez pas les spams!)</div>
+    <div *ngIf="DisplayResendTokenError" class="alert alert-danger">Oops, une erreur sauvage semble être survenue, veuillez contacter l'administrateur du site via la page contact rubrique 'Activation de mon compte'</div>
 </ng-container>

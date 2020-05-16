@@ -16,7 +16,7 @@ export class InscriptionComponent implements OnInit {
   inscriptionForm = this.fb.group({
     pseudo: ['', {
       validators: [Validators.required, Validators.maxLength(20), Validators.minLength(3)], 
-      asyncValidators : [this.cv.CheckPseudo]}],
+      asyncValidators : [this.cv.CheckUsername]}],
     email: ['', {
       validators: [Validators.required, this.cv.EmailValidator()],
       asyncValidators : [this.cv.CheckEmail]}],
@@ -44,7 +44,7 @@ export class InscriptionComponent implements OnInit {
       Password:this.inscriptionForm.controls.password.value
     });
     //Envoi API
-    this.utilisateurService.postUtilisateur(Inscription).subscribe(result => { 
+    this.utilisateurService.postUser(Inscription).subscribe(result => { 
       //Si succès
       this.Success = true;
       this.inscriptionForm.reset();

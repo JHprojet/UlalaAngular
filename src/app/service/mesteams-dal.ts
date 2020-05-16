@@ -15,22 +15,22 @@ export class MesTeamsDAL {
       'Authorization' : this.accessService.getSession("User")??this.accessService.getSession("Anonyme")??""
     })
   };
-  getMesTeams(): Observable<MesTeams[]> {
+  getMyTeams(): Observable<MesTeams[]> {
     return this.http.get<MesTeams[]>(EndPoint+'MesTeams', this.httpOptions)
   }
-  getMaTeam(id:number): Observable<MesTeams> {
+  getMyTeam(id:number): Observable<MesTeams> {
     return this.http.get<MesTeams>(EndPoint+'MesTeams/'+id, this.httpOptions)
   }
-  getMesTeamsByUserId(id:number): Observable<MesTeams[]> {
+  getMyTeamsByUserId(id:number): Observable<MesTeams[]> {
     return this.http.get<MesTeams[]>(EndPoint+'MesTeams/?UtilisateurId='+id, this.httpOptions)
   }
-  postMaTeam(monObjet: MesTeams): Observable<MesTeams> {
+  postMyTeam(monObjet: MesTeams): Observable<MesTeams> {
     return this.http.post<MesTeams>(EndPoint+'MesTeams', monObjet, this.httpOptions)
   }
-  putMaTeam(monObjet: MesTeams, id: number): Observable<MesTeams> {
+  putMyTeamById(monObjet: MesTeams, id: number): Observable<MesTeams> {
     return this.http.put<MesTeams>(EndPoint+'MesTeams/'+id, monObjet, this.httpOptions)
   }
-  deleteMaTeam(id: number): Observable<MesTeams> {
+  deleteMyTeamById(id: number): Observable<MesTeams> {
     return this.http.delete<MesTeams>(EndPoint+'MesTeams/'+id, this.httpOptions)
   }
   handleError(error) {

@@ -81,7 +81,7 @@ export class AddStrategieComponent implements OnInit {
     if(this.accessService.getSession("Info")) 
     {
       this.currentUser = this.accessService.getSession("Info");
-      this.mesTeamsService.getMesTeamsByUserId(this.currentUser.Id).subscribe(result => {
+      this.mesTeamsService.getMyTeamsByUserId(this.currentUser.Id).subscribe(result => {
         this.selectMesTeams = result;
       })
     }
@@ -219,7 +219,7 @@ export class AddStrategieComponent implements OnInit {
     this.Enregistrement.ImagePath2 = "http://192.168.1.2:8081/"+this.FileNames[1];
     this.Enregistrement.ImagePath3 = "http://192.168.1.2:8081/"+this.FileNames[2];
     this.Enregistrement.ImagePath4 = "http://192.168.1.2:8081/"+this.FileNames[3];
-    this.enregistrementService.postEnregistrement(this.Enregistrement).subscribe(result => { 
+    this.enregistrementService.postStrategy(this.Enregistrement).subscribe(result => { 
       this.ngOnInit();
       let ToClean = document.getElementById("inputImages") as HTMLInputElement;
       ToClean.value = "";
@@ -467,7 +467,7 @@ export class AddStrategieComponent implements OnInit {
     }
     else {
       //Récupération + écriture de l'Id de la team correspondante aux 4 classes + Suppression du display du bouton via détail
-      this.mesTeamsService.getMaTeam(T.value).subscribe(result => {
+      this.mesTeamsService.getMyTeam(T.value).subscribe(result => {
         this.MaTeam = result;
         this.Enregistrement.Team = new Team({Id : result.Team.Id});
         this.DisplayBoutonSansTeam = false;

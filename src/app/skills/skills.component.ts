@@ -22,15 +22,10 @@ export class SkillsComponent implements OnInit {
 
   ngOnInit(): void {
     this.Skills = new Array<Skill>();
-    zip(this.accessService.CheckAno$).subscribe(() => {
-      this.skillService.getSkills().subscribe(result =>
-      {
-        this.SkillsBase = result;
-      });
-      this.classeService.getClasses().subscribe(response => {
-        this.selectClasse = response;
-        this.accessService.CheckAno$.closed;
-      });
+    this.skillService.getSkills().subscribe(result => { this.SkillsBase = result; });
+    this.classeService.getClasses().subscribe(response => {
+      this.selectClasse = response;
+      this.accessService.CheckAno$.closed;
     });
   }
 

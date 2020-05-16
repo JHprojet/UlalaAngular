@@ -1,33 +1,37 @@
 <br/>
+<ng-container *ngIf="!UploadOK || !UploadFail">
+    <div *ngIf="UploadOK" class="alert alert-success" role="alert">Stratégie bien importée, merci pour votre partage!</div>
+    <div *ngIf="UploadFail" class="alert alert-danger" role="alert">Oops, il semblerait qu'un problème soit survenue (quel développeur de merde quand même). Veuillez réessayer.</div>
+</ng-container>
 <hr/>
 <div class="form-group row">
-    &nbsp;&nbsp;<h3>Selections de tri : </h3>&nbsp;&nbsp;&nbsp;&nbsp; 
+    &nbsp;&nbsp;<h2>Ajouter une stratégie</h2>&nbsp;&nbsp;&nbsp;&nbsp;
     <button (click)="ShowHelp()" type="button" class="btn btn-light dropdown-toggle">
-        <ng-container *ngIf="!Show">Afficher l'aide</ng-container>
         <ng-container *ngIf="Show">Fermer l'aide</ng-container>
+        <ng-container *ngIf="!Show">Afficher l'aide</ng-container>
     </button>
+   
 </div>
 <hr/>
 <div class="help" *ngIf="Show">
-    <strong>Utilisation de la recherche :</strong>
+    <strong>Information sur l'ajout d'une stratégie :</strong>
     <br/><br/>
-    Si vous cliquez directement sur "Chercher" Vous aurez la liste complète de tous les enregistrements.<br/>
-    Si vous souhaitez chercher des stratégies sur un Boss particulier :<br/>
-    1 - Sélectionnez un continent + une zone + un boss.<br/>
-    2 - Sélectionner si vous le souhaitez une ou plusieurs classes
-    <ng-container *ngIf="accessUser">
-        <br/><br/>
-        Vous pouvez également , si vous avez enregistré une team perso dans Mes infos>Mes teams persos :<br/>
-        1 - Selectionnez votre team.<br/>
-        2 - Selectionnez le boss.<br/>
-        La recherche s'effectuera automatiquement sur la zone et les classes sélectionnées dans votre team.
-    </ng-container>
+   1 - Sélectionnez tous les champs : Continent, Zone, Boss, et les 4 classes de votre team.<br/>
+   2 - Uploadez les 4 images de votre stratégie : Les 4 images doivent avoir le même format et être en jpg ou en png.<br/><br/>
+
+   Type des images attendu : <p class="helpss">(Aucune autre image, ne sera acceptée)</p>
+   <br/>
+   <img src="http://192.168.1.2:8081/exemple.jpg" width="150px">
     <hr/>
 </div>
-<br/>
 
-<form [formGroup]="SearchFormWithTeam" (ngSubmit)="onSubmit()" *ngIf="accessUser" class="form-group row">
-    <ng-container *ngIf="selectMesTeams.length != 0">
+<button type="submit" class="mx-auto btn btn-info" (click)="switchForm()">
+    <ng-container *ngIf="AddWithTeam">Je veux utiliser la recherche personnalisée</ng-container>
+    <ng-container *ngIf="!AddWithTeam">Je veux utiliser la recherche via une de mes teams</ng-container>
+</button>
+<br/><br/>
+<form [formGroup]="AddFormWithTeam" (ngSubmit)="onSubmitWithTeam()" *ngIf="AddWithTeam" class="form-group">
+    <div *ngIf="selectMesTeams.length != 0" class="form-group row">
         <label class="col-form-label col-sm-2">Choisir sa team</label>
         <select id="Team" class="form-control col-sm-2" (change)="GetBossViaTeam(C)" #C formControlName="Team">
             <option value=""></option>
@@ -38,16 +42,29 @@
             <option value=""></option>
             <option *ngFor="let boss of selectBoss" value={{boss}}>{{boss}}</option>
         </select>
-        <button type="submit" style="margin-left:30px;width:100px;" [disabled]="!SearchFormWithTeam.valid" class=" btn btn-secondary btn-sm">Valider</button>
-    </ng-container>
+    </div>
+    <div class="form-group row">
+        <label class="col-sm-1 col-form-label">Images</label>
+        <input type="file" class="form-control-file col-sm-4"  id="inputImages" multiple (change)="checkImages(input)" #input>
+        <div *ngIf="Loading" class="spinner-border text-dark" role="status">
+            <span class="sr-only">Loading...</span>
+        </div>
+        <button type="submit" style="margin-left:30px;width:100px;" id="inputImagesWithTeam" [disabled]="!AddFormWithTeam.valid || !OkImage$" class=" btn btn-danger btn-sm">Valider</button>
+    </div>
     <ng-container *ngIf="selectMesTeams.length == 0">
         <p>Vous n'avez pas encore de team favorite. Si vous souhaitez en créer afin de simplifier la recherche de stratégie : <a routerLink='/prefs'>C'est par ici!</a></p>
+    </ng-container>
+    <div *ngIf="AddFormWithTeam.errors?.BossIsNeeded && (AddFormWithTeam.touched || AddFormWithTeam.dirty)" class="cross-validation-error-message alert alert-danger">
+        Le boss doit être sélectionné.
+    </div>
+    <ng-container *ngIf="errorImage != ''">
+        <div class="alert alert-danger" role="alert"> {{errorImage}}</div>
     </ng-container>
 </form>
 
 
-<form [formGroup]="SearchForm" (ngSubmit)="onSubmit()" *ngIf="SearchFormWithTeam.value.Team == ''">
-<hr/>
+
+<form [formGroup]="AddForm" (ngSubmit)="onSubmit()" *ngIf="!AddWithTeam">
     <div class="form-group row">
         <!-- Select Continent -->
         <label class="col-sm-2 col-form-label">Continent : </label>
@@ -68,144 +85,56 @@
             <option *ngFor="let elem of selectBoss" value="{{elem}}">{{elem}}</option>
         </select>
     </div>
+    <div *ngIf="AddForm.errors?.ZoneIsNeeded && (AddForm.touched || AddForm.dirty)" class="cross-validation-error-message alert alert-danger">
+        La zone doit être sélectionnée.
+    </div>
+    <div *ngIf="AddForm.errors?.BossIsNeeded && (AddForm.touched || AddForm.dirty)" class="cross-validation-error-message alert alert-danger">
+        Le boss doit être sélectionné.
+    </div>
     <div class="form-group row">
-    <!-- Select Classe 1 -->
-    <label class="col-sm-1 col-form-label">Classe 1 : </label>
-    <select id="Classe1" class="form-control col-sm-2"  formControlName="Classe1">
-        <option value=""></option>
-        <option *ngFor="let elem of selectClasse" value="{{elem.Id}}">{{elem.NomFR}}</option>
-    </select>
-    <!-- Select Classe 2 -->
-    <label class="col-sm-1 col-form-label">Classe 2 : </label>
-    <select id="Classe2" class="form-control col-sm-2"  formControlName="Classe2">
-        <option value=""></option>
-        <option *ngFor="let elem of selectClasse" value="{{elem.Id}}">{{elem.NomFR}}</option>
-    </select>
-    <!-- Select Classe 3 -->
-    <label class="col-sm-1 col-form-label">Classe 3 : </label>
-    <select id="Classe3" class="form-control col-sm-2"  formControlName="Classe3">
-        <option value=""></option>
-        <option *ngFor="let elem of selectClasse" value="{{elem.Id}}">{{elem.NomFR}}</option>
-    </select>
-    <!-- Select Classe 4 -->
-    <label class="col-sm-1 col-form-label">Classe 4 : </label>
-    <select id="Classe4" class="form-control col-sm-2"  formControlName="Classe4">
-        <option value=""></option>
-        <option *ngFor="let elem of selectClasse" value="{{elem.Id}}">{{elem.NomFR}}</option>
-    </select>
+        <!-- Select Classe 1 -->
+        <div class="col-sm-5 row">
+            <label class="col-sm col-form-label">Classe 1 : </label>
+            <select id="Classe1" class="form-control col-sm" formControlName="Classe1">
+                <option value=""></option>
+                <option *ngFor="let elem of selectClasse" value="{{elem.Id}}">{{elem.NomFR}}</option>
+            </select>
+        <!-- Select Classe 2 -->
+            <label class="col-sm col-form-label">Classe 2 : </label>
+            <select id="Classe2" class="form-control col-sm"  formControlName="Classe2">
+                <option value=""></option>
+                <option *ngFor="let elem of selectClasse" value="{{elem.Id}}">{{elem.NomFR}}</option>
+            </select>
+        </div>
+        <!-- Select Classe 3 -->
+        <div class="col-sm-5 row">
+            <label class="col-sm col-form-label">Classe 3 : </label>
+            <select id="Classe3" class="form-control col-sm"  formControlName="Classe3">
+                <option value=""></option>
+                <option *ngFor="let elem of selectClasse" value="{{elem.Id}}">{{elem.NomFR}}</option>
+            </select>
+        <!-- Select Classe 4 -->
+            <label class="col-sm col-form-label">Classe 4 : </label>
+            <select id="Classe4" class="form-control col-sm"  formControlName="Classe4">
+                <option value=""></option>
+                <option *ngFor="let elem of selectClasse" value="{{elem.Id}}">{{elem.NomFR}}</option>
+            </select>
+        </div>
     </div>
-    <div class="col-sm-12 mx-auto form-group row" style="width: 300px;">
-        <button type="submit" [disabled]="!SearchForm.valid" class=" btn btn-secondary btn-lg">Valider</button>
+    <div *ngIf="AddForm.errors?.AllClasseNeened && (AddForm.touched || AddForm.dirty)" class="cross-validation-error-message alert alert-danger">
+        Les 4 classes doivent être sélectionnées.
     </div>
+    <div class="form-group row">
+        <label class="col-sm-1 col-form-label">Images</label>
+        <input type="file" class="form-control-file col-sm-4" multiple (change)="checkImages(input)" #input id="inputImages">
+        <div *ngIf="Loading" class="spinner-border text-dark" role="status">
+            <span class="sr-only">Loading...</span>
+        </div>
+        <button type="submit" style="margin-left:30px;width:100px;" [disabled]="!AddForm.valid || !OkImage$" class=" btn btn-danger btn-sm">Valider</button>
+    </div>
+    <ng-container *ngIf="errorImage != ''">
+        <div class="alert alert-danger" role="alert">{{errorImage}}</div>
+    </ng-container>
 </form>   
 <hr/> 
-        <!-- Message validation Pseudo 
-        <div *ngIf="inscriptionForm.controls.pseudo.invalid && (inscriptionForm.controls.pseudo.dirty || inscriptionForm.controls.pseudo.touched)" class="alert alert-danger">
-            <div *ngIf="inscriptionForm.controls.pseudo.errors.required">
-                Le pseudo doit être renseigné.
-            </div>
-            <div *ngIf="inscriptionForm.controls.pseudo.errors.minlength">
-                Votre pseudo ne peux pas faire moins de 3 caractères.
-            </div>
-            <div *ngIf="inscriptionForm.controls.pseudo.errors.maxlength">
-                Votre pseudo ne peux pas faire plus de 20 caractères.
-            </div>
-            <div *ngIf="inscriptionForm.controls.pseudo.errors?.PseudoExist">
-                Ce pseudo est déjà pris! Faites preuve de plus d'imagination que diable!
-            </div>
-        </div>
-        Champ E-mail 
-        <div class="col-sm-12 form-group row">
-            <label class="col-sm-4 col-form-label">E-mail : </label>
-            <div class="col-sm-8">
-                <input type="email" class="form-control" formControlName="email">
-            </div>
-        </div>
-         Message Validation E-mail 
-        <div *ngIf="inscriptionForm.controls.email.invalid && (inscriptionForm.controls.email.dirty || inscriptionForm.controls.email.touched)" class="alert alert-danger">
-            <div *ngIf="inscriptionForm.controls.email.errors.required">
-                L'E-mail doit être renseigné.
-            </div>
-            <div *ngIf="inscriptionForm.controls.email.errors.emailFormat">
-                Le format de l'e-mail est incorrect.
-            </div>
-            <div *ngIf="inscriptionForm.controls.email.errors?.MailExist && (inscriptionForm.touched || inscriptionForm.dirty)">
-                Cet E-mail est déjà utilisé. Pour retrouver vos informations : <a class="link" routerLink='/RetrievePassword'>Cliquez ici!</a> 
-            </div>
-        </div>
-         Champ Vérification E-mail 
-        <div class="col-sm-12 form-group row">
-            <label class="col-sm-4 col-form-label">Confirmer E-mail : </label>
-            <div class="col-sm-8">
-                <input type="text" class="form-control" formControlName="emailVerif">
-            </div>
-        </div>
-         Message Validation Vérification E-mail 
-        <div *ngIf="inscriptionForm.controls.emailVerif.invalid && (inscriptionForm.controls.emailVerif.dirty || inscriptionForm.controls.emailVerif.touched)" class="alert alert-danger">
-            <div *ngIf="inscriptionForm.controls.emailVerif.errors.required">
-                L'E-mail doit être renseigné.
-            </div>
-        </div>
-        <div *ngIf="inscriptionForm.errors?.EmailMatch && (inscriptionForm.touched || inscriptionForm.dirty)" class="cross-validation-error-message alert alert-danger">
-            Les deux E-mails doivent correspondre.
-        </div>
-         Champ Password 
-        <div class="col-sm-12 form-group row">
-            <label class="col-sm-4 col-form-label">Password : </label>
-            <div class="col-sm-8">
-                <input type="password" class="form-control" formControlName="password">
-            </div>
-        </div>
-         Message Validation Password 
-        <div *ngIf="inscriptionForm.controls.password.invalid && (inscriptionForm.controls.password.dirty || inscriptionForm.controls.password.touched)" class="alert alert-danger">
-            <div *ngIf="inscriptionForm.controls.password.errors.required">
-                Le mot de passe doit être renseigné.
-            </div>
-            <div *ngIf="inscriptionForm.controls.password.errors.minlength">
-                Votre mot de passe ne peux pas faire moins de 8 caractères.
-            </div>
-            <div *ngIf="inscriptionForm.controls.password.errors.maxlength">
-                Votre mot de passe ne peux pas faire plus de 40 caractères.
-            </div>
-        </div>
-         Champ Vérification Password
-        <div class="col-sm-12 form-group row">
-            <label class="col-sm-4 col-form-label">Confirmer Password :</label>
-            <div class="col-sm-8">
-                <input type="password" class="form-control" formControlName="passwordVerif">
-            </div>
-        </div>
-        Message Validation Vérification Password 
-        <div *ngIf="inscriptionForm.controls.passwordVerif.invalid && (inscriptionForm.controls.passwordVerif.dirty || inscriptionForm.controls.passwordVerif.touched)" class="alert alert-danger">
-            <div *ngIf="inscriptionForm.controls.passwordVerif.errors.required">
-                Le mot de passe doit être renseigné.
-            </div>
-        </div>
-        <div *ngIf="inscriptionForm.errors?.PasswordMatch && (inscriptionForm.touched || inscriptionForm.dirty)" class="cross-validation-error-message alert alert-danger">
-            Les deux mots de passe doivent correspondre.
-        </div>
-         Bouton de Validation -->
         
-
-<div class="alert alert-danger" *ngIf="ShowAucunEnregistrement">
-    Oops, aucun enregistrement n'a été trouvé. Essayez peut-être avec moins de filtres!
-</div>
-<ng-container class="centered" *ngFor="let Enregistrement of Enregistrements">
-    <div class="mx-auto col-sm-8" >
-        <div class="row">
-            <div class="col-sm-3"><b>Continent :</b> {{Enregistrement.BossZone.Zone.ContinentFR}}</div>
-            <div class="col-sm-5"><b>Zone :</b> {{Enregistrement.BossZone.Zone.ZoneFR}}</div>
-            <div class="col-sm-4"><b>Boss :</b> {{Enregistrement.BossZone.Boss.NomFR}}</div>
-        </div>
-        <div class="row">
-            <div class="col-sm-4"><b>Posteur :</b> {{Enregistrement.Utilisateur.Pseudo}}
-            </div>
-            <div class="col-sm-7"><b>Team :</b> {{Enregistrement.Team.Classe1.NomFR}} - {{Enregistrement.Team.Classe2.NomFR}} - {{Enregistrement.Team.Classe3.NomFR}} - {{Enregistrement.Team.Classe4.NomFR}}</div>
-            
-        </div>
-        <div class="row">
-            <img [src]="Enregistrement.ImagePath1" height="390px"> 
-            <img [src]="Enregistrement.ImagePath2" height="390px">  
-            <img [src]="Enregistrement.ImagePath3" height="390px">  
-            <img [src]="Enregistrement.ImagePath4" height="390px">
-        </div>

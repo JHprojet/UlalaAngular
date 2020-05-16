@@ -10,6 +10,7 @@ import { Subject, zip } from 'rxjs';
 import { Favori } from './models/Favori';
 import { Vote } from './models/vote';
 import { MesTeams } from './models/mes-teams';
+import { TranslateService } from '@ngx-translate/core';
 
 
 
@@ -31,8 +32,12 @@ export class AppComponent {
   Vote$:Subject<boolean>;
   Teams$:Subject<boolean>;
 
-  constructor(private teamService:MesTeamsDAL,private favService:FavoriDAL,private voteService:VoteDAL,private accessService:AccessComponent,private router:Router, private UtilisateurService:UtilisateurDAL) {
+  constructor(translate: TranslateService,private teamService:MesTeamsDAL,private favService:FavoriDAL,private voteService:VoteDAL,private accessService:AccessComponent,private router:Router, private UtilisateurService:UtilisateurDAL) {
     this.data = this.accessService.data;
+    translate.addLangs(['en','fr']);
+    translate.setDefaultLang('fr');
+    translate.use('fr');
+    console.log(translate.getLangs());
   }
 
   Connection()
@@ -47,7 +52,7 @@ export class AppComponent {
       this.accessService.setSession("User",result);
       
       this.data["User"] = this.accessService.getSession("User");
-      this.UtilisateurService.getUtilisateurByPseudo(this.login).subscribe(result2 => {
+      this.UtilisateurService.getUserByPseudo(this.login).subscribe(result2 => {
         if (result2.ActivationToken != '')
         {
           this.accessService.setSession("Id",result2.Id);
@@ -60,7 +65,7 @@ export class AppComponent {
         {
           this.accessService.setSession("Info",result2);
           this.data["Info"] = this.accessService.data["Info"];
-          this.favService.getFavorisByUtilisateurId(this.data["Info"].Id).subscribe(result => {
+          this.favService.getFavoritesByUserId(this.data["Info"].Id).subscribe(result => {
             this.accessService.setSession("Fav",result);
             this.Fav$.next(true);
           }, error => {
@@ -74,7 +79,7 @@ export class AppComponent {
             this.accessService.setSession("Votes",new Array<Vote>());
             this.Vote$.next(true);
           });
-          this.teamService.getMesTeamsByUserId(this.data["Info"].Id).subscribe(result => {
+          this.teamService.getMyTeamsByUserId(this.data["Info"].Id).subscribe(result => {
             this.accessService.setSession("Teams",result);
             this.Teams$.next(true);
           }, error => {

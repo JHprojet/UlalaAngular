@@ -27,7 +27,7 @@ export class RetrievePasswordComponent implements OnInit {
     this.MessageMail = "";
     if (this.Mail == "") this.MessageMail = "Champ obligatoire.";
     else if (!re.test(this.Mail)) this.MessageMail = "Merci de saisir un E-mail au bon format."
-    else this.utilisateurService.getUtilisateurByMail(this.Mail).subscribe(response => {
+    else this.utilisateurService.getUserByMail(this.Mail).subscribe(response => {
               CheckMail$.next(true);
             }, error =>{
               this.MessageMail = "Aucun compte n'est lié à cet E-mail.";
@@ -41,7 +41,7 @@ export class RetrievePasswordComponent implements OnInit {
     zip(CheckMail$).subscribe(() => {
       if(this.MessageMail == '')
       {
-        this.utilisateurService.GenererNouveauPassword(this.Mail).subscribe(result => {
+        this.utilisateurService.GenerateAndSendNewPassword(this.Mail).subscribe(result => {
           this.MessageOK = "Votre nouveau mot de passe a été envoyé par E-mail. Pensez à vérifier vos spams!"
           setTimeout(()=> this.MessageOK ='', 5000);
           this.Mail = '';
@@ -60,7 +60,7 @@ export class RetrievePasswordComponent implements OnInit {
     zip(CheckMail$).subscribe(() => {
       if(this.MessageMail == '')
       {
-        this.utilisateurService.RetrouverPseudo(this.Mail).subscribe(result => {
+        this.utilisateurService.FindUsernameByMail(this.Mail).subscribe(result => {
           this.MessageOK = "Votre pseudo a été envoyé par E-mail. Pensez à vérifier vos spams!"
           setTimeout(()=> this.MessageOK ='', 5000);
           this.Mail = '';

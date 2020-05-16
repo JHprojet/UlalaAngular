@@ -28,7 +28,7 @@ const routes: Routes = [];
 
 @NgModule({
   imports: [RouterModule.forRoot([
-    {path : '', component: HomeComponent},
+    {path : '', component: HomeComponent, canActivate: [IsAnonyme]},
     {path : 'contact', component: ContactComponent, canActivate: [IsAnonyme]},
     {path : 'rgpd', component: RgpdComponent, canActivate: [IsAnonyme]},
     {path : 'classes', component: ClasseComponent, canActivate: [IsAnonyme]},

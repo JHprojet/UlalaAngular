@@ -16,22 +16,22 @@ export class EnregistrementDAL {
     })
   };
   
-  getEnregistrements(): Observable<Enregistrement[]> {
+  getStrategies(): Observable<Enregistrement[]> {
     return this.http.get<Enregistrement[]>(EndPoint+'Enregistrement', this.httpOptions)
   }
-  getEnregistrement(id:number): Observable<Enregistrement> {
+  getStrategyById(id:number): Observable<Enregistrement> {
     return this.http.get<Enregistrement>(EndPoint+'Enregistrement/'+id, this.httpOptions)
   }
-  getEnregistrementsByInfos(U:string, BZ:string, IdC1:string, IdC2:string, IdC3:string, IdC4:string): Observable<Enregistrement[]> {
+  getStrategiesByInfos(U:string, BZ:string, IdC1:string, IdC2:string, IdC3:string, IdC4:string): Observable<Enregistrement[]> {
     return this.http.get<Enregistrement[]>(EndPoint+'Enregistrement/?U='+U+'&BZ='+BZ+'&C1='+IdC1+'&C2='+IdC2+'&C3='+IdC3+'&C4='+IdC4, this.httpOptions)
   }
-  postEnregistrement(monObjet: Enregistrement): Observable<Enregistrement> {
+  postStrategy(monObjet: Enregistrement): Observable<Enregistrement> {
     return this.http.post<Enregistrement>(EndPoint+'Enregistrement', monObjet, this.httpOptions)
   }
-  putEnregistrement(monObjet: Enregistrement, id: number): Observable<Enregistrement> {
+  putStrategyById(monObjet: Enregistrement, id: number): Observable<Enregistrement> {
     return this.http.put<Enregistrement>(EndPoint+'Enregistrement/'+id, monObjet, this.httpOptions)
   }
-  deleteEnregistrement(id: number): Observable<Enregistrement> {
+  deleteStrategyById(id: number): Observable<Enregistrement> {
     return this.http.delete<Enregistrement>(EndPoint+'Enregistrement/'+id, this.httpOptions)
   }
   handleError(error) {

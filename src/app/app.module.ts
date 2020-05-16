@@ -16,7 +16,7 @@ import { MesInfosComponent } from './mes-infos/mes-infos.component';
 import { AddStrategieComponent } from './add-strategie/add-strategie.component';
 import { SearchStrategieComponent } from './search-strategie/search-strategie.component';
 import { InscriptionComponent } from './inscription/inscription.component'
-import { HttpClientModule } from '@angular/common/http';
+import { HttpClientModule, HttpClient } from '@angular/common/http';
 import { StorageServiceModule} from 'angular-webstorage-service';
 import { ActivationComponent } from './activation/activation.component';
 import { RetrievePasswordComponent } from './retrieve-password/retrieve-password.component';
@@ -30,6 +30,12 @@ import { IsAdmin } from './helpeur/is-admin';
 import { IsUser } from './helpeur/is-user';
 import { IsToActivate } from './helpeur/is-to-activate';
 import { IsAnonyme } from './helpeur/is-anonyme';
+import { TranslateModule, TranslateLoader } from '@ngx-translate/core';
+import { TranslateHttpLoader } from '@ngx-translate/http-loader';
+
+export function createTranslateLoader(http: HttpClient) {
+  return new TranslateHttpLoader(http, './assets/i18n/', '.json');
+}
 
 @NgModule({
   declarations: [
@@ -53,6 +59,7 @@ import { IsAnonyme } from './helpeur/is-anonyme';
     AdminStratComponent,
     TestComponent
   ],
+  exports: [TranslateModule],
   imports: [
     HttpClientModule,
     BrowserModule,
@@ -60,7 +67,20 @@ import { IsAnonyme } from './helpeur/is-anonyme';
     AppRoutingModule,
     FormsModule,
     ModalModule.forRoot(),
-    ReactiveFormsModule
+    ReactiveFormsModule,
+    TranslateModule.forRoot({
+      defaultLanguage: 'fr'
+  }),
+    TranslateModule.forRoot({
+      loader: {
+          provide: TranslateLoader,
+          useFactory: (createTranslateLoader),
+          deps: [HttpClient],
+      },
+    }),
+    TranslateModule.forRoot({
+      
+    })
   ],
   providers: [IsAnonyme,IsToActivate,IsUser,IsAdmin,AccessComponent],
   bootstrap: [AppComponent]

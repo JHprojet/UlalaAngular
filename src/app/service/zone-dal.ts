@@ -19,16 +19,16 @@ export class ZoneDAL {
   getZones(): Observable<Zone[]> {
     return this.http.get<Zone[]>(EndPoint+'Zone', this.httpOptions)
   }
-  getZone(id:number): Observable<Zone> {
+  getZoneById(id:number): Observable<Zone> {
     return this.http.get<Zone>(EndPoint+'Zone/'+id, this.httpOptions)
   }
   postZone(monObjet: Zone): Observable<Zone> {
     return this.http.post<Zone>(EndPoint+'Zone', monObjet, this.httpOptions)
   }
-  putZone(monObjet: Zone, id: number): Observable<Zone> {
+  putZoneById(monObjet: Zone, id: number): Observable<Zone> {
     return this.http.put<Zone>(EndPoint+'Zone/'+id, monObjet, this.httpOptions)
   }
-  deleteZone(id: number): Observable<Zone> {
+  deleteZoneById(id: number): Observable<Zone> {
     return this.http.delete<Zone>(EndPoint+'Zone/'+id, this.httpOptions)
   }
   handleError(error) {

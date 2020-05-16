@@ -22,16 +22,16 @@ export class TeamDal {
   getTeamByClasses(idclasse1:number,idclasse2:number,idclasse3:number,idclasse4:number): Observable<Team> {
     return this.http.get<Team>(EndPoint+'Team/'+'?C1='+idclasse1+'&C2='+idclasse2+'&C3='+idclasse3+'&C4='+idclasse4, this.httpOptions)
   }
-  getTeam(id:number): Observable<Team> {
+  getTeamById(id:number): Observable<Team> {
     return this.http.get<Team>(EndPoint+'Team/'+id, this.httpOptions)
   }
   postTeam(monObjet: Team): Observable<Team> {
     return this.http.post<Team>(EndPoint+'Team', monObjet, this.httpOptions)
   }
-  putTeam(monObjet: Team, id:number): Observable<Team> {
+  putTeamById(monObjet: Team, id:number): Observable<Team> {
     return this.http.put<Team>(EndPoint+'Team/'+id, monObjet, this.httpOptions)
   }
-  deleteTeam(id: number): Observable<Team> {
+  deleteTeamById(id: number): Observable<Team> {
     return this.http.delete<Team>(EndPoint+'Team/'+id, this.httpOptions)
   }
   handleError(error) {
