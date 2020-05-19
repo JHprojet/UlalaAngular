@@ -37,10 +37,24 @@
     "ERRORMESSAGES" : {
         "LOGIN" : "User or password not valid.",
         "WRONGACTIVATIONKEY" : "Wrong activation key, please try again. In case of problem, please contact the site administrator via the contact page.",
-        "SAVAGEERROR" : "Oops, a wild error seems to have occurred, please contact the site administrator via the contact page."
+        "SAVAGEERROR" : "Oops, a wild error seems to have occurred, please contact the site administrator via the contact page.",
+        "STRATUPLOAD" : "TRAD",
+        "SELECTBOSS" : "Select the boss.",
+        "SELECTZONE" : "Select the zone.",
+        "SELECTCONTINENT" : "Select the continent.",
+        "SELECTTEAM" : "Select the team.",
+        "SELECTCLASSES" : "Select all the 4 classes.",
+        "SELECT4IMAGES" : "You have to select 4 images.",
+        "BADIMAGEFORMAT" : "Your files must be with extension JPG or PNG.",
+        "SAMEIMAGEFORMAT" : "Your 4 files must be same extension.",
+        "WAIT" : "Processing, please wait...",
+        "BADIMAGE" : "Your 4 images must be as specified in the help (see next to the title to show help).",
+        "SELECTIMAGES" : "Select the 4 images of your strategy."
     },
     "INFOMESSAGES" : {
-        "RETRIEVEPASSWORD" : "Lost your password or username? Please click here!"
+        "RETRIEVEPASSWORD" : "Lost your password or username? Please click here!",
+        "CLOSEHELP" : "Close help",
+        "DISPLAYHELP" : "Show help"
     },
     "ACTIVATION" : {
         "TITLE" : "Activation",
@@ -48,5 +62,22 @@
         "SENDTOKEN" : "Send activation key",
         "ACTIVATIONKEYNOTRECEIVED" : "You didn't receive your activation key? ",
         "CLICKHERE" : "Click here!"
+    },
+    "ADDSTRATEGY" : {
+        "TITLE" : "Add a strategy",
+        "HELP" : "<strong>Informations about adding strategies :</strong><br/><br/>1 - Select all fields : Continent, Zone, Boss, and the 4 classes of your strategy.<br/> 2 - Upload the 4 images of your strategy : All 4 images must be jpg or png and of the same extension.<br/><br/>Awaited image type : <p class=\"helpss\">(No other images will be accepted)</p><br/>",
+        "USECUSTOMSEARCH" : "Use custom search",
+        "USETEAMSEARCH" : "Use search with a personal team",
+        "CHOOSETEAM" : "Choose team",
+        "NOTEAM" : "You don't have favorite team yet. If you want to create one to make the import faster and easier :",
+        "OVERHERE" : "This way !"
+    },
+    "KEYWORD" : {
+        "CONTINENT" : "Continent",
+        "ZONE" : "Zone",
+        "BOSS" : "Boss",
+        "CLASSE" : "Classe",
+        "IMAGES" : "Images",
+        "OK" : "Confirm"
     }
 }

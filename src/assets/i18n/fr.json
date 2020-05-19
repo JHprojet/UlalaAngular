@@ -37,10 +37,24 @@
     "ERRORMESSAGES" : {
         "LOGIN" : "Utilisateur ou Mot de passe invalide",
         "WRONGACTIVATIONKEY" : "Clef d'activation erronée, merci de réessayer. En cas de problème, veuillez contacter l'administrateur du site via la page de contact.",
-        "SAVAGEERROR" : "Oops, une erreur sauvage semble être survenue, veuillez contacter l'administrateur du site via la page contact"
+        "SAVAGEERROR" : "Oops, une erreur sauvage semble être survenue, veuillez contacter l'administrateur du site via la page contact",
+        "STRATUPLOAD" : "Oops, il semblerait qu'un problème soit survenue (quel développeur de merde quand même). Veuillez réessayer.",
+        "SELECTBOSS" : "Sélectionnez le boss.",
+        "SELECTZONE" : "Sélectionnez la zone.",
+        "SELECTCONTINENT" : "Sélectionnez le continent.",
+        "SELECTTEAM" : "Sélectionnez la team.",
+        "SELECTCLASSES" : "Sélectionnez les 4 classes.",
+        "SELECT4IMAGES" : "Vous devez sélectionner 4 images.",
+        "BADIMAGEFORMAT" : "Vos fichiers doivent être uniquement au format JPG, JPEG ou PNG.",
+        "SAMEIMAGEFORMAT" : "Vos 4 fichiers doivent être du même format (JPG, JPEG, PNG).",
+        "WAIT" : "Processing, please wait...",
+        "BADIMAGE" : "Vos 4 images doivent être comme spécifié dans l'aide (voir l'aide plus haut).",
+        "SELECTIMAGES" : "Veuillez sélectionner les 4 images de votre stratégie."
     },
     "INFOMESSAGES" : {
-        "RETRIEVEPASSWORD" : "Perdu votre mot de passe ou votre pseudo? Cliquez ici!"
+        "RETRIEVEPASSWORD" : "Perdu votre mot de passe ou votre pseudo? Cliquez ici!",
+        "CLOSEHELP" : "Fermer l'aide",
+        "DISPLAYHELP" : "Afficher l'aide"
     },
     "ACTIVATION" : {
         "TITLE" : "Activation",
@@ -50,7 +64,20 @@
         "CLICKHERE" : "Cliquez ici!"
     },
     "ADDSTRATEGY" : {
-        "TITLE" : "Ajouter une stratégie"
-        
+        "TITLE" : "Ajouter une stratégie",
+        "HELP" : "<strong>Information sur l'ajout d'une stratégie :</strong><br/><br/>1 - Sélectionnez tous les champs : Continent, Zone, Boss, et les 4 classes de votre team.<br/> 2 - Uploadez les 4 images de votre stratégie : Les 4 images doivent avoir le même format et être en jpg ou en png.<br/><br/>Type des images attendu : <p class=\"helpss\">(Aucune autre image ne sera acceptée)</p><br/>",
+        "USECUSTOMSEARCH" : "Je veux utiliser la recherche personnalisée",
+        "USETEAMSEARCH" : "Je veux utiliser la recherche via une de mes teams",
+        "CHOOSETEAM" : "Choisir sa team",
+        "NOTEAM" : "Vous n'avez pas encore de team favorite. Si vous souhaitez en créer afin de simplifier la recherche de stratégie :",
+        "OVERHERE" : "C'est par ici"
+    },
+    "KEYWORD" : {
+        "CONTINENT" : "Continent",
+        "ZONE" : "Zone",
+        "BOSS" : "Boss",
+        "CLASSE" : "Classe",
+        "IMAGES" : "Images",
+        "OK" : "Valider"
     }
 }
