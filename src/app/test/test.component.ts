@@ -36,7 +36,7 @@ export class TestComponent implements OnInit {
     Classe3: [''],
     Classe4: ['']
     },{
-    updateOn: 'change', validators: [this.v.CheckZone, this.v.CheckBoss, this.v.CheckClasses]});
+    updateOn: 'change', validators: [this.v.CheckContinent, this.v.CheckZone, this.v.CheckBoss, this.v.CheckClasses]});
   //Research form with personal Team  
   AddFormWithTeam = this.fb.group({
     Team: ['', {
@@ -69,7 +69,7 @@ export class TestComponent implements OnInit {
   Images = new Array<any>();
   FileNames:string[];
   Loading: boolean;
-  errorImage: string;
+  errorImage: number;
   UploadOK:boolean;
   UploadFail:boolean;
 
@@ -79,11 +79,11 @@ export class TestComponent implements OnInit {
     this.AddForm.get('Zone').disable();
     this.UploadFail = false;
     this.UploadFail = false;
-    this.errorImage ='';
+    this.errorImage = 6;
     this.FileNames = new Array<string>();
     if(this.accessService.getSession("Info")) {
       this.accessUser = true;
-      if(this.accessService.getSession("Teams")) {
+      if(this.accessService.getSession("Teams").length) {
         this.selectMesTeams = this.accessService.getSession("Teams");
         this.AddWithTeam = true;
       }
@@ -157,6 +157,7 @@ export class TestComponent implements OnInit {
 
   switchForm() { 
     this.AddWithTeam = !this.AddWithTeam
+    this.errorImage = 6;
     this.AddForm.reset();
     this.AddFormWithTeam.reset();
     this.AddFormWithTeam.get('Boss').disable();
@@ -262,17 +263,14 @@ export class TestComponent implements OnInit {
   //#region | checkImages | Méthode de vérification des image pixel par pixel
   public checkImages(T)
   {
-    //Disable form while processing
-    this.AddForm.disable();
-    this.AddFormWithTeam.disable();
     this.OkImage$ = new Subject<boolean>(); //Initialize waiting variable
     this.Images = []; //Initialisation de la liste des 4 images
-    this.errorImage = ""; //Vide le message d'erreur
+    this.errorImage = 0; //Vide le message d'erreur
     for (let file of T.files) //Ajout des 4 images à la liste
     {
       this.Images.push(file); 
     }
-    if(T.files.length != 4) this.errorImage = "Vous devez sélectionner 4 images."; //Message erreur si nombre de fichier différent de 4.
+    if(T.files.length != 4) this.errorImage = 1; //Message erreur si nombre de fichier différent de 4.
     else 
     {
       let test: boolean = true;
@@ -280,20 +278,20 @@ export class TestComponent implements OnInit {
       { //Vérifie que les fichiers sont uniquement des fichiers image de type png, jpeg, jpg.
         if(this.getExtension(file.name) != "png" && this.getExtension(file.name) != "jpeg" && this.getExtension(file.name) != "jpg") test = false;
       }
-      if (!test) this.errorImage = "Vos fichiers doivent être uniquement au format JPG, JPEG ou PNG"; //Message erreur si pas image du bon format.
+      if (!test) this.errorImage = 2; //Message erreur si pas image du bon format.
       //Vérifications que les 4 fichiers ont le même format.
       else if(!(this.getExtension(T.files[0].name) == this.getExtension(T.files[1].name) && this.getExtension(T.files[1].name) == this.getExtension(T.files[2].name) 
               && this.getExtension(T.files[2].name) == this.getExtension(T.files[3].name))) 
-              this.errorImage = "Vos 4 fichiers doivent être du même format (JPG, JPEG, PNG)"; //Display de l'erreur si pas le même format.
+              this.errorImage = 3; //Display de l'erreur si pas le même format.
       else
       {
-        this.errorImage = "Processing, please wait..."       
+        this.errorImage = 4       
         this.CheckPixels(this.Images); //Méthode de check pixel par pixel
         //Lorsque la méthode CheckPixel se termine
         zip(this.OkImage$).subscribe(([OkImage]) => {
           if(OkImage) { //Si le test pixel par pixel est OK
             this.Loading = false;
-            this.errorImage = "";
+            this.errorImage = 0;
             this.AddForm.enable();
             this.AddFormWithTeam.enable();
             //Force la MAJ des données du component (suite bug Firefox)
@@ -302,7 +300,7 @@ export class TestComponent implements OnInit {
           }
           else if (!OkImage) { //Si le test pixel par pixel est KO
             this.Loading = false;
-            this.errorImage = "Vos 4 images doivent être comme spécifié dans l'aide (voir l'aide plus haut)."
+            this.errorImage = 5;
           }
         });
       }

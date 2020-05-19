@@ -49,6 +49,18 @@ export class CustomValidators {
         );
     };
 
+    //Check is Continent is feeled with a value
+    public CheckContinent: ValidatorFn = (control: FormGroup): ValidationErrors | null => {
+        const Continent = control.get('Continent');
+        return Continent && (Continent.value == '' || Continent.value == null) ? { 'ContinentIsNeeded' : true } : null;
+    };
+
+    //Check is Team is feeled with a value
+    public CheckTeam: ValidatorFn = (control: FormGroup): ValidationErrors | null => {
+        const Team = control.get('Team');
+        return Team && (Team.value == '' || Team.value == null) ? { 'TeamNeeded' : true } : null;
+    };
+
     //If Continent is feeled with a value, Zone must be feeled too
     public CheckZone: ValidatorFn = (control: FormGroup): ValidationErrors | null => {
         const Continent = control.get('Continent');
@@ -76,7 +88,7 @@ export class CustomValidators {
         const C2 = control.get('Classe2');
         const C3 = control.get('Classe3');
         const C4 = control.get('Classe4');
-        return C1 && C2 && C3 && C4 && (C1.value === '' || C2.value === '' || C3.value === '' || C4.value === '' || C1.value === null || C2.value === null || C3.value === null || C4.value === null) ? { 'AllClasseNeeded' : true } : null;
+        return C1 && C2 && C3 && C4 && (C1.value === '' || C2.value === '' || C3.value === '' || C4.value === '' || C1.value === null || C2.value === null || C3.value === null || C4.value === null) ? { 'AllClassesNeeded' : true } : null;
     };
 }
 

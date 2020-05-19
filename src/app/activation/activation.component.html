@@ -1,19 +1,20 @@
 <br/>
-<h2>Activation</h2>
+<h2> {{ 'ACTIVATION.TITLE' | translate }}</h2>
 <br/>
-<p>Bonjour {{Username}}, veuillez entrer votre clef d'activation reçu par mail.</p>
-
-<input type="text" [(ngModel)]="Token" name="Token">
-<button type="button" class="btn btn-btn" (click)="sendToken()">Envoyer mon code d'activation</button>
+<p>{{ 'ACTIVATION.ENTERTOKEN' | translate }}</p>
+<div class="row">
+    <input type="text" class="form-control col-sm-2" [(ngModel)]="Token" name="Token">
+    <button type="button" class="btn btn-primary" style="margin-left:30px;" (click)="sendToken()">{{ 'ACTIVATION.SENDTOKEN' | translate }}</button>
+</div>
 <br/><br/>
 <ng-container *ngIf="DisplayValidationOk || DisplayValidationError">
-    <div *ngIf="DisplayValidationOk" class="alert alert-success">Merci, votre compte à bien été activé, vous allez être rediriger dans un instant. Bonne navigation!</div>
-    <div *ngIf="DisplayValidationError" class="alert alert-danger">Clef d'activation erronée, merci de réessayer. En cas de problème, veuillez contacter l'administrateur du site via la page de contact.</div>
+    <div *ngIf="DisplayValidationOk" class="alert alert-success">{{ 'SUCCESSMESSAGES.ACCOUNTACTIVATED' | translate }}</div>
+    <div *ngIf="DisplayValidationError" class="alert alert-danger">{{ 'ERRORMESSAGES.WRONGACTIVATIONKEY' | translate }}</div>
 </ng-container>
 
-<p>Vous n'avez pas reçu votre clef d'activation par mail? <a class="link" (click)='ResendTokenByEmail()'>Cliquez ici!</a></p>
+<p>{{ 'ACTIVATION.ACTIVATIONKEYNOTRECEIVED' | translate }}<a class="link" (click)='ResendTokenByEmail()'>{{ 'ACTIVATION.CLICKHERE' | translate }}</a></p>
 
 <ng-container *ngIf="DisplayResendTokenOk || DisplayResendTokenError">
-    <div *ngIf="DisplayResendTokenOk" class="alert alert-success">Mail renvoyé, regardez dans votre boite mail ! (Et n'oubliez pas les spams!)</div>
-    <div *ngIf="DisplayResendTokenError" class="alert alert-danger">Oops, une erreur sauvage semble être survenue, veuillez contacter l'administrateur du site via la page contact rubrique 'Activation de mon compte'</div>
+    <div *ngIf="DisplayResendTokenOk" class="alert alert-success">{{ 'SUCCESSMESSAGES.KEYSEND' | translate }}</div>
+    <div *ngIf="DisplayResendTokenError" class="alert alert-danger">{{ 'ERRORMESSAGES.SAVAGEERROR' | translate }}</div>
 </ng-container>

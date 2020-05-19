@@ -1,4 +1,56 @@
 {
-    "TEXT": "Bonjour",
-    "TEXT2" :"Bonjour2"
+    "MENU": {
+        "INSC" : "S'inscrire",
+        "STRAT" : "Stratégies",
+        "SEARCHSTRATS" : "Recherche de stratégies",
+        "ADDSTRATS" : "Ajouter une stratégie",
+        "FAVSTRATS" : "Mes favorites",
+        "MYSTRATS" : "Mes stratégies",
+        "RESSOURCES" : "Ressources",
+        "CLASSES" : "Classes",
+        "SKILLS" : "Skills",
+        "TOYS" : "Jouets",
+        "BOSSLIST" : "Liste des boss par zone",
+        "MYINFOS" : "Mes infos",
+        "MYTEAMS" : "Mes teams persos",
+        "CHANGEPASSWORD" : "Changer mon mot de passe",
+        "ABOUTME" : "Mes informations",
+        "ADMIN" : "Admin",
+        "USERS" : "Utilisateur",
+        "LOGIN" : "Pseudo",
+        "PASSWORD" : "Mot de passe",
+        "CONNECT" : "Se connecter",
+        "UNCONNECT" : "Se déconnecter",
+        "CONTACT" : "Contact",
+        "DATA" : "Vos données"
+    },
+    "HOME" : {
+        "INTRO" : "Bienvenue sur le site de gestion de stratégie du jeu mobile Ulala!"
+        },
+    "SUCCESSMESSAGES" : {
+        "LOGIN" : "Connexion réussie.",
+        "DISCONNECTED" : "Vous avez bien été déconnecté.",
+        "ACCOUNTACTIVATED" : "Merci, votre compte à bien été activé, vous allez être rediriger dans un instant. Bonne navigation!",
+        "KEYSEND" : "Mail renvoyé, regardez dans votre boite mail ! (Et n'oubliez pas les spams!)",
+        "STRATUPLOAD" : "Stratégie bien importée, merci pour votre partage!"
+    },
+    "ERRORMESSAGES" : {
+        "LOGIN" : "Utilisateur ou Mot de passe invalide",
+        "WRONGACTIVATIONKEY" : "Clef d'activation erronée, merci de réessayer. En cas de problème, veuillez contacter l'administrateur du site via la page de contact.",
+        "SAVAGEERROR" : "Oops, une erreur sauvage semble être survenue, veuillez contacter l'administrateur du site via la page contact"
+    },
+    "INFOMESSAGES" : {
+        "RETRIEVEPASSWORD" : "Perdu votre mot de passe ou votre pseudo? Cliquez ici!"
+    },
+    "ACTIVATION" : {
+        "TITLE" : "Activation",
+        "ENTERTOKEN" : "Veuillez entrer votre clef d'activation reçu par mail.",
+        "SENDTOKEN" : "Envoyer ma clef d'activation",
+        "ACTIVATIONKEYNOTRECEIVED" : "Vous n'avez pas reçu votre clef d'activation par mail? ",
+        "CLICKHERE" : "Cliquez ici!"
+    },
+    "ADDSTRATEGY" : {
+        "TITLE" : "Ajouter une stratégie"
+        
+    }
 }

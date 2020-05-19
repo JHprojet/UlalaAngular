@@ -10,7 +10,6 @@
         <ng-container *ngIf="Show">Fermer l'aide</ng-container>
         <ng-container *ngIf="!Show">Afficher l'aide</ng-container>
     </button>
-   
 </div>
 <hr/>
 <div class="help" *ngIf="Show">
@@ -25,31 +24,34 @@
     <hr/>
 </div>
 
-<button type="submit" class="mx-auto btn btn-info" (click)="switchForm()">
+<button *ngIf="accessUser" type="submit" class="mx-auto btn btn-info" (click)="switchForm()">
     <ng-container *ngIf="AddWithTeam">Je veux utiliser la recherche personnalisée</ng-container>
     <ng-container *ngIf="!AddWithTeam">Je veux utiliser la recherche via une de mes teams</ng-container>
+    
 </button>
-<br/><br/>
+<br *ngIf="accessUser"/><br *ngIf="accessUser"/>
 <form [formGroup]="AddFormWithTeam" (ngSubmit)="onSubmitWithTeam()" *ngIf="AddWithTeam" class="form-group">
-    <div *ngIf="selectMesTeams.length != 0" class="form-group row">
-        <label class="col-form-label col-sm-2">Choisir sa team</label>
-        <select id="Team" class="form-control col-sm-2" (change)="GetBossViaTeam(C)" #C formControlName="Team">
-            <option value=""></option>
-            <option *ngFor="let MaTeam of selectMesTeams" value={{MaTeam.Id}}>{{MaTeam.NomTeam}}</option>
-        </select>
-        <label class="col-sm-1 col-form-label">Boss</label>
-        <select class="form-control col-sm-3" formControlName="Boss">
-            <option value=""></option>
-            <option *ngFor="let boss of selectBoss" value={{boss}}>{{boss}}</option>
-        </select>
-    </div>
-    <div class="form-group row">
-        <label class="col-sm-1 col-form-label">Images</label>
-        <input type="file" class="form-control-file col-sm-4"  id="inputImages" multiple (change)="checkImages(input)" #input>
-        <div *ngIf="Loading" class="spinner-border text-dark" role="status">
-            <span class="sr-only">Loading...</span>
+    <div *ngIf="selectMesTeams.length">
+        <div class="form-group row">
+            <label class="col-form-label col-sm-2">Choisir sa team</label>
+            <select id="Team" class="form-control col-sm-2" (change)="GetBossViaTeam(C)" #C formControlName="Team">
+                <option value=""></option>
+                <option *ngFor="let MaTeam of selectMesTeams" value={{MaTeam.Id}}>{{MaTeam.NomTeam}}</option>
+            </select>
+            <label class="col-sm-1 col-form-label">Boss</label>
+            <select class="form-control col-sm-3" formControlName="Boss">
+                <option value=""></option>
+                <option *ngFor="let boss of selectBoss" value={{boss}}>{{boss}}</option>
+            </select>
         </div>
-        <button type="submit" style="margin-left:30px;width:100px;" id="inputImagesWithTeam" [disabled]="!AddFormWithTeam.valid || !OkImage$" class=" btn btn-danger btn-sm">Valider</button>
+        <div class="form-group row">
+            <label class="col-sm-1 col-form-label">Images</label>
+            <input type="file" class="form-control-file col-sm-4"  id="inputImages" multiple (change)="checkImages(input)" #input>
+            <div *ngIf="Loading" class="spinner-border text-dark" role="status">
+                <span class="sr-only">Loading...</span>
+            </div>
+            <button type="submit" style="margin-left:30px;width:100px;" id="inputImagesWithTeam" [disabled]="!AddFormWithTeam.valid || !OkImage$ || errorImage != 0" class=" btn btn-danger btn-sm">Valider</button>
+        </div>
     </div>
     <ng-container *ngIf="selectMesTeams.length == 0">
         <p>Vous n'avez pas encore de team favorite. Si vous souhaitez en créer afin de simplifier la recherche de stratégie : <a routerLink='/prefs'>C'est par ici!</a></p>
@@ -57,8 +59,13 @@
     <div *ngIf="AddFormWithTeam.errors?.BossIsNeeded && (AddFormWithTeam.touched || AddFormWithTeam.dirty)" class="cross-validation-error-message alert alert-danger">
         Le boss doit être sélectionné.
     </div>
-    <ng-container *ngIf="errorImage != ''">
-        <div class="alert alert-danger" role="alert"> {{errorImage}}</div>
+    <ng-container *ngIf="errorImage != 0 && selectMesTeams.length">
+        <div  *ngIf="errorImage == 1" class="alert alert-danger" role="alert">Vous devez sélectionner 4 images.</div>
+        <div  *ngIf="errorImage == 2" class="alert alert-danger" role="alert">Vos fichiers doivent être uniquement au format JPG, JPEG ou PNG</div>
+        <div  *ngIf="errorImage == 3" class="alert alert-danger" role="alert">Vos 4 fichiers doivent être du même format (JPG, JPEG, PNG)</div>
+        <div  *ngIf="errorImage == 4" class="alert alert-danger" role="alert">Processing, please wait...</div>
+        <div  *ngIf="errorImage == 5" class="alert alert-danger" role="alert">Vos 4 images doivent être comme spécifié dans l'aide (voir l'aide plus haut).</div>
+        <div  *ngIf="errorImage == 6" class="alert alert-danger" role="alert">Veuillez sélectionner les 4 images de votre stratégie.</div>
     </ng-container>
 </form>
 
@@ -85,10 +92,13 @@
             <option *ngFor="let elem of selectBoss" value="{{elem}}">{{elem}}</option>
         </select>
     </div>
-    <div *ngIf="AddForm.errors?.ZoneIsNeeded && (AddForm.touched || AddForm.dirty)" class="cross-validation-error-message alert alert-danger">
+    <div *ngIf="AddForm.errors?.ContinentIsNeeded" class="cross-validation-error-message alert alert-danger">
+        Le continent doit être sélectionné.
+    </div>
+    <div *ngIf="AddForm.errors?.ZoneIsNeeded" class="cross-validation-error-message alert alert-danger">
         La zone doit être sélectionnée.
     </div>
-    <div *ngIf="AddForm.errors?.BossIsNeeded && (AddForm.touched || AddForm.dirty)" class="cross-validation-error-message alert alert-danger">
+    <div *ngIf="AddForm.errors?.BossIsNeeded" class="cross-validation-error-message alert alert-danger">
         Le boss doit être sélectionné.
     </div>
     <div class="form-group row">
@@ -121,7 +131,7 @@
             </select>
         </div>
     </div>
-    <div *ngIf="AddForm.errors?.AllClasseNeened && (AddForm.touched || AddForm.dirty)" class="cross-validation-error-message alert alert-danger">
+    <div *ngIf="AddForm.errors?.AllClassesNeeded" class="cross-validation-error-message alert alert-danger">
         Les 4 classes doivent être sélectionnées.
     </div>
     <div class="form-group row">
@@ -130,10 +140,15 @@
         <div *ngIf="Loading" class="spinner-border text-dark" role="status">
             <span class="sr-only">Loading...</span>
         </div>
-        <button type="submit" style="margin-left:30px;width:100px;" [disabled]="!AddForm.valid || !OkImage$" class=" btn btn-danger btn-sm">Valider</button>
+        <button type="submit" style="margin-left:30px;width:100px;" [disabled]="!AddForm.valid || !OkImage$ || errorImage != 0" class=" btn btn-danger btn-sm">Valider</button>
     </div>
-    <ng-container *ngIf="errorImage != ''">
-        <div class="alert alert-danger" role="alert">{{errorImage}}</div>
+    <ng-container *ngIf="errorImage != 0">
+        <div  *ngIf="errorImage == 1" class="alert alert-danger" role="alert">Vous devez sélectionner 4 images.</div>
+        <div  *ngIf="errorImage == 2" class="alert alert-danger" role="alert">Vos fichiers doivent être uniquement au format JPG, JPEG ou PNG</div>
+        <div  *ngIf="errorImage == 3" class="alert alert-danger" role="alert">Vos 4 fichiers doivent être du même format (JPG, JPEG, PNG)</div>
+        <div  *ngIf="errorImage == 4" class="alert alert-danger" role="alert">Processing, please wait...</div>
+        <div  *ngIf="errorImage == 5" class="alert alert-danger" role="alert">Vos 4 images doivent être comme spécifié dans l'aide (voir l'aide plus haut).</div>
+        <div  *ngIf="errorImage == 6" class="alert alert-danger" role="alert">Veuillez sélectionner les 4 images de votre stratégie.</div>
     </ng-container>
 </form>   
 <hr/> 

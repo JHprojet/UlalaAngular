@@ -1,7 +1,7 @@
 <br/>
-<ng-container *ngIf="UploadOK != '' || UploadFail != ''">
-    <div *ngIf="UploadOK != ''" class="alert alert-success" role="alert">{{UploadOK}}</div>
-    <div *ngIf="UploadFail != ''" class="alert alert-danger" role="alert">{{UploadFail}}</div>
+<ng-container *ngIf="!UploadOK || !UploadFail">
+    <div *ngIf="UploadOK" class="alert alert-success" role="alert">{{ 'SUCCESSMESSAGES.STRATUPLOAD' | translate }}</div>
+    <div *ngIf="UploadFail" class="alert alert-danger" role="alert">Oops, il semblerait qu'un problème soit survenue (quel développeur de merde quand même). Veuillez réessayer.</div>
 </ng-container>
 <hr/>
 <div class="form-group row">
@@ -9,7 +9,7 @@
     <button (click)="ShowHelp()" type="button" class="btn btn-light dropdown-toggle">
         <ng-container *ngIf="Show">Fermer l'aide</ng-container>
         <ng-container *ngIf="!Show">Afficher l'aide</ng-container>
-        </button>
+    </button>
 </div>
 <hr/>
 <div class="help" *ngIf="Show">
@@ -18,104 +18,142 @@
    1 - Sélectionnez tous les champs : Continent, Zone, Boss, et les 4 classes de votre team.<br/>
    2 - Uploadez les 4 images de votre stratégie : Les 4 images doivent avoir le même format et être en jpg ou en png.<br/><br/>
 
-   Type des images attendu : <p class="helpss">(Aucune autre image, ne sera acceptée)</p>
+   Type des images attendu : <p class="helpss">(Aucune autre image ne sera acceptée)</p>
    <br/>
    <img src="http://192.168.1.2:8081/exemple.jpg" width="150px">
     <hr/>
 </div>
-<br/>
-<div *ngIf="currentUser.Id != 0" class="form-group row">
-    <ng-container *ngIf="selectMesTeams.length != 0">
-        <label class="form-check-label col-sm-2">Choisir sa team</label>
-        <select class="form-control col-sm-2" NgModel (change)="choixMaTeam(MaTeam)" #MaTeam>
-            <option value="0"></option>
-            <option *ngFor="let MaTeam of selectMesTeams" value={{MaTeam.Id}}>{{MaTeam.NomTeam}}</option>
-        </select>
-        <label class="col-sm-1 col-form-label">Boss</label>
-        <select class="form-control col-sm-3" NgModel (change)="changeBoss(Boss)" #Boss>
-            <option value="0"></option>
-            <option *ngFor="let boss of selectBoss" value={{boss.Id}}>{{boss.NomFR}}</option>
-        </select>
-    </ng-container>
-    <ng-container *ngIf="selectMesTeams.length == 0">
-        <p>Vous n'avez pas encore de team favorite. Si vous souhaitez en créer afin de simplifier l'ajout de stratégie : <a routerLink='/prefs'>C'est par ici!</a></p>
-    </ng-container>
-    <br/>
-</div>
-<ng-container *ngIf="currentUser.Id != 0">
-    <div *ngIf="messageIndication !=''" class="alert alert-danger" role="alert">{{messageIndication}}</div>
-</ng-container>
 
+<button *ngIf="accessUser" type="submit" class="mx-auto btn btn-info" (click)="switchForm()">
+    <ng-container *ngIf="AddWithTeam">Je veux utiliser la recherche personnalisée</ng-container>
+    <ng-container *ngIf="!AddWithTeam">Je veux utiliser la recherche via une de mes teams</ng-container>
     
+</button>
+<br *ngIf="accessUser"/><br *ngIf="accessUser"/>
+<form [formGroup]="AddFormWithTeam" (ngSubmit)="onSubmitWithTeam()" *ngIf="AddWithTeam" class="form-group">
+    <div *ngIf="selectMesTeams.length">
+        <div class="form-group row">
+            <label class="col-form-label col-sm-2">Choisir sa team</label>
+            <select id="Team" class="form-control col-sm-2" (change)="GetBossViaTeam(C)" #C formControlName="Team">
+                <option value=""></option>
+                <option *ngFor="let MaTeam of selectMesTeams" value={{MaTeam.Id}}>{{MaTeam.NomTeam}}</option>
+            </select>
+            <label class="col-sm-1 col-form-label">Boss</label>
+            <select class="form-control col-sm-3" formControlName="Boss">
+                <option value=""></option>
+                <option *ngFor="let boss of selectBoss" value={{boss}}>{{boss}}</option>
+            </select>
+        </div>
+        <div *ngIf="AddFormWithTeam.errors?.BossIsNeeded" class="cross-validation-error-message alert alert-danger">
+            Sélectionnez le boss.
+        </div>
+        <div *ngIf="AddFormWithTeam.errors?.TeamNeeded" class="cross-validation-error-message alert alert-danger">
+            Sélectionnez votre team.
+        </div>
+        <div class="form-group row">
+            <label class="col-sm-1 col-form-label">Images</label>
+            <input type="file" class="form-control-file col-sm-4"  id="inputImages" multiple (change)="checkImages(input)" #input>
+            <div *ngIf="Loading" class="spinner-border text-dark" role="status">
+                <span class="sr-only">Loading...</span>
+            </div>
+            <button type="submit" style="margin-left:30px;width:100px;" id="inputImagesWithTeam" [disabled]="!AddFormWithTeam.valid || !OkImage$ || errorImage != 0" class=" btn btn-danger btn-sm">Valider</button>
+        </div>
+    </div>
+    <ng-container *ngIf="selectMesTeams.length == 0">
+        <p>Vous n'avez pas encore de team favorite. Si vous souhaitez en créer afin de simplifier la recherche de stratégie : <a routerLink='/prefs'>C'est par ici!</a></p>
+    </ng-container>
+    
+    <ng-container *ngIf="errorImage != 0 && selectMesTeams.length">
+        <div  *ngIf="errorImage == 1" class="alert alert-danger" role="alert">Vous devez sélectionner 4 images.</div>
+        <div  *ngIf="errorImage == 2" class="alert alert-danger" role="alert">Vos fichiers doivent être uniquement au format JPG, JPEG ou PNG</div>
+        <div  *ngIf="errorImage == 3" class="alert alert-danger" role="alert">Vos 4 fichiers doivent être du même format (JPG, JPEG, PNG)</div>
+        <div  *ngIf="errorImage == 4" class="alert alert-danger" role="alert">Processing, please wait...</div>
+        <div  *ngIf="errorImage == 5" class="alert alert-danger" role="alert">Vos 4 images doivent être comme spécifié dans l'aide (voir l'aide plus haut).</div>
+        <div  *ngIf="errorImage == 6" class="alert alert-danger" role="alert">Veuillez sélectionner les 4 images de votre stratégie.</div>
+    </ng-container>
+</form>
 
 
-<ng-container *ngIf="MaTeam.Id == 0">
+
+<form [formGroup]="AddForm" (ngSubmit)="onSubmit()" *ngIf="!AddWithTeam">
     <div class="form-group row">
-        <label class="col-sm-1 col-form-label">Continent</label>
-        <select class="form-control col-sm-2" NgModel (change)="changeContinent(Continent)" #Continent>
-            <option value="0"></option>
-            <option *ngFor="let zone of selectContinent">{{zone.ContinentFR}}</option>
+        <!-- Select Continent -->
+        <label class="col-sm-2 col-form-label">Continent : </label>
+        <select id="Continent" class="form-control col-sm-2" (change)="GetZones(C)" #C formControlName="Continent">
+            <option value=""></option>
+            <option *ngFor="let elem of selectContinent" value="{{elem}}">{{elem}}</option>
         </select>
-        <label class="col-sm-1 col-form-label">Zone</label>
-        <select class="form-control col-sm-3" NgModel (change)="changeZone(Zone)" #Zone>
-            <option value="0"></option>
-            <option *ngFor="let zone of selectZone" value={{zone.Id}}>{{zone.ZoneFR}}</option>
+        <!-- Select Zone -->
+        <label class="col-sm-1 col-form-label">Zone : </label>
+        <select id="Zone" class="form-control col-sm-3" (change)="GetBoss(C,Z)" #Z formControlName="Zone">
+            <option value=""></option>
+            <option *ngFor="let elem of selectZone" value="{{elem}}">{{elem}}</option>
         </select>
-        <label class="col-sm-1 col-form-label">Boss</label>
-        <select class="form-control col-sm-3" NgModel (change)="changeBoss(Boss)" #Boss>
-                <option value="0"></option>
-                <option *ngFor="let boss of selectBoss" value={{boss.Id}}>{{boss.NomFR}}</option>
+        <!-- Select Boss -->
+        <label class="col-sm-1 col-form-label">Boss : </label>
+        <select id="Boss" class="form-control col-sm-3"  formControlName="Boss">
+            <option value=""></option>
+            <option *ngFor="let elem of selectBoss" value="{{elem}}">{{elem}}</option>
         </select>
     </div>
-    <ng-container *ngIf="messageBossZone != ''">
-        <div class="alert alert-danger" role="alert"> {{messageBossZone}}</div>
-    </ng-container>
-
-
-    <br/>
-    <div class="form-group row">
-        <label class="col-sm-1 col-form-label">Classe 1</label>
-        <select class="form-control col-sm-2" NgModel (change)="changeClasse1(Classe1)" #Classe1>
-            <option value="0"></option>
-            <option *ngFor="let classe of selectClasse" value={{classe.Id}}>{{classe.NomFR}}</option>
-        </select>
-
-        <label class="col-sm-1 col-form-label">Classe 2</label>
-        <select class="form-control col-sm-2" NgModel (change)="changeClasse2(Classe2)" #Classe2>
-            <option value="0"></option>
-            <option *ngFor="let classe of selectClasse" value={{classe.Id}}>{{classe.NomFR}}</option>
-        </select>
-
-        <label class="col-sm-1 col-form-label">Classe 3</label>
-        <select class="form-control col-sm-2" NgModel (change)="changeClasse3(Classe3)" #Classe3>
-            <option value="0"></option>
-            <option *ngFor="let classe of selectClasse" value={{classe.Id}}>{{classe.NomFR}}</option>
-        </select>
-
-        <label class="col-sm-1 col-form-label">Classe 4</label>
-        <select class="form-control col-sm-2" NgModel (change)="changeClasse4(Classe4)" #Classe4>
-            <option value="0"></option>
-            <option *ngFor="let classe of selectClasse" value={{classe.Id}}>{{classe.NomFR}}</option>
-        </select>
+    <div *ngIf="AddForm.errors?.ContinentIsNeeded" class="cross-validation-error-message alert alert-danger">
+        Sélectionnez le continent.
     </div>
-    <ng-container *ngIf="DisplayMessageClasse">
-        <div class="alert alert-danger" role="alert">Veuillez sélectionner les 4 classes.</div>
+    <div *ngIf="AddForm.errors?.ZoneIsNeeded" class="cross-validation-error-message alert alert-danger">
+        Sélectionnez la zone.
+    </div>
+    <div *ngIf="AddForm.errors?.BossIsNeeded" class="cross-validation-error-message alert alert-danger">
+        Sélectionnez le boss.
+    </div>
+    <div class="form-group row">
+        <!-- Select Classe 1 -->
+        <div class="col-sm-5 row">
+            <label class="col-sm col-form-label">Classe 1 : </label>
+            <select id="Classe1" class="form-control col-sm" formControlName="Classe1">
+                <option value=""></option>
+                <option *ngFor="let elem of selectClasse" value="{{elem.Id}}">{{elem.NomFR}}</option>
+            </select>
+        <!-- Select Classe 2 -->
+            <label class="col-sm col-form-label">Classe 2 : </label>
+            <select id="Classe2" class="form-control col-sm"  formControlName="Classe2">
+                <option value=""></option>
+                <option *ngFor="let elem of selectClasse" value="{{elem.Id}}">{{elem.NomFR}}</option>
+            </select>
+        </div>
+        <!-- Select Classe 3 -->
+        <div class="col-sm-5 row">
+            <label class="col-sm col-form-label">Classe 3 : </label>
+            <select id="Classe3" class="form-control col-sm"  formControlName="Classe3">
+                <option value=""></option>
+                <option *ngFor="let elem of selectClasse" value="{{elem.Id}}">{{elem.NomFR}}</option>
+            </select>
+        <!-- Select Classe 4 -->
+            <label class="col-sm col-form-label">Classe 4 : </label>
+            <select id="Classe4" class="form-control col-sm"  formControlName="Classe4">
+                <option value=""></option>
+                <option *ngFor="let elem of selectClasse" value="{{elem.Id}}">{{elem.NomFR}}</option>
+            </select>
+        </div>
+    </div>
+    <div *ngIf="AddForm.errors?.AllClassesNeeded" class="cross-validation-error-message alert alert-danger">
+        Sélectionnez les 4 classes.
+    </div>
+    <div class="form-group row">
+        <label class="col-sm-1 col-form-label">Images</label>
+        <input type="file" class="form-control-file col-sm-4" multiple (change)="checkImages(input)" #input id="inputImages">
+        <div *ngIf="Loading" class="spinner-border text-dark" role="status">
+            <span class="sr-only">Loading...</span>
+        </div>
+        <button type="submit" style="margin-left:30px;width:100px;" [disabled]="!AddForm.valid || !OkImage$ || errorImage != 0" class=" btn btn-danger btn-sm">Valider</button>
+    </div>
+    <ng-container *ngIf="errorImage != 0">
+        <div  *ngIf="errorImage == 1" class="alert alert-danger" role="alert">Vous devez sélectionner 4 images.</div>
+        <div  *ngIf="errorImage == 2" class="alert alert-danger" role="alert">Vos fichiers doivent être uniquement au format JPG ou PNG</div>
+        <div  *ngIf="errorImage == 3" class="alert alert-danger" role="alert">Vos 4 fichiers doivent être du même format (JPG ou PNG)</div>
+        <div  *ngIf="errorImage == 4" class="alert alert-danger" role="alert">En cours de traitement, veuillez patienter.</div>
+        <div  *ngIf="errorImage == 5" class="alert alert-danger" role="alert">Vos 4 images doivent être comme spécifié dans l'aide (voir l'aide plus haut).</div>
+        <div  *ngIf="errorImage == 6" class="alert alert-danger" role="alert">Veuillez sélectionner les 4 images de votre stratégie.</div>
     </ng-container>
-
-</ng-container>
-<br/>
-<div class="form-group row">
-    <label class="col-sm-1 col-form-label">Images</label>
-    <input type="file" class="form-control-file col-sm-4"  id="inputImages" multiple="multiple" (change)="checkImages(input)" #input>
-    <div *ngIf="Loading" class="spinner-border text-dark" role="status">
-        <span class="sr-only">Loading...</span>
-      </div>
-</div>
-
-<ng-container *ngIf="errorImage != ''">
-    <div class="alert alert-danger" role="alert"> {{errorImage}}</div>
-</ng-container>
-    <br/>
-    <button *ngIf="((messageBossZone == '' && !DisplayMessageClasse && DisplayBoutonSansTeam) || messageIndication == '') && errorImage == '' && !Loading" class="btn btn-primary" type="submit" (click)="upload()">Envoyer</button>
-
-
+</form>   
+<hr/> 
+        

@@ -167,6 +167,15 @@ export class AccessComponent {
                 this.session.remove("Teams");
                 delete this.data[Teams];
                 break;}
+            case "All" : {
+                this.deleteSession(Teams);
+                this.deleteSession(Fav);
+                this.deleteSession(Votes);
+                this.deleteSession(Id);
+                this.deleteSession(Pseudo);
+                this.deleteSession(User);
+                this.deleteSession(Info);
+                break;}
         }
     }
 

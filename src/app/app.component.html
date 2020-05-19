@@ -3,76 +3,79 @@
   <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
     <span class="navbar-toggler-icon"></span>
   </button>
-  <div>{{'TEXT'|translate}}</div>
   <div class="collapse navbar-collapse" id="navbarSupportedContent">
     <ul class="navbar-nav mr-auto">
        <li *ngIf="!data['Info']" class="nav-item active">
-        <a class="nav-link" routerLink='/inscription'>S'incrire</a>
+        <a class="nav-link"  routerLink='/inscription'>{{ 'MENU.INSC' | translate }}</a>
       </li>
       <li class="nav-item dropdown">
         <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-          Stratégies
+          {{ 'MENU.STRAT' | translate }}
         </a>
         <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-          <a class="dropdown-item" routerLink='/searchstrat'>Recherche de stratégies</a>
-          <a class="dropdown-item" routerLink='/addstrat'>Ajouter une stratégie</a>
+          <a class="dropdown-item" routerLink='/searchstrat'>{{ 'MENU.SEARCHSTRATS' | translate }}</a>
+          <a class="dropdown-item" routerLink='/addstrat'>{{ 'MENU.ADDSTRATS' | translate }}</a>
           <ng-container *ngIf="data['Info']">
             <div class="dropdown-divider"></div>
-            <a class="dropdown-item" routerLink='/favstrat'>Mes favorites</a>
-            <a class="dropdown-item" routerLink='/mystrat'>Mes stratégies</a>
+            <a class="dropdown-item" routerLink='/favstrat'>{{ 'MENU.FAVSTRATS' | translate }}</a>
+            <a class="dropdown-item" routerLink='/mystrat'>{{ 'MENU.MYSTRATS' | translate }}</a>
           </ng-container>
         </div>
       </li>
       <li class="nav-item dropdown">
         <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-          Ressources
+          {{ 'MENU.RESSOURCES' | translate }}
         </a>
         <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-          <a class="dropdown-item" routerLink='/classes'>Classes</a>
-          <a class="dropdown-item" routerLink='/skills'>Skills</a>
-          <a class="dropdown-item" routerLink='/toys'>Jouets</a>
+          <a class="dropdown-item" routerLink='/classes'>{{ 'MENU.CLASSES' | translate }}</a>
+          <a class="dropdown-item" routerLink='/skills'>{{ 'MENU.SKILLS' | translate }}</a>
+          <a class="dropdown-item" routerLink='/toys'>{{ 'MENU.TOYS' | translate }}</a>
           <div class="dropdown-divider"></div>
-          <a class="dropdown-item" routerLink='/listboss'>Liste des boss par zone</a>
+          <a class="dropdown-item" routerLink='/listboss'>{{ 'MENU.BOSSLIST' | translate }}</a>
         </div>
       </li>
       <li class="nav-item dropdown" *ngIf="data['Info']">
         <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-          Mes infos
+          {{ 'MENU.MYINFOS' | translate }}
         </a>
         <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-          <a class="dropdown-item" routerLink='/prefs'>Mes teams persos</a>
-          <a class="dropdown-item" routerLink='/pass'>Changer mon mot de passe</a>
-          <a class="dropdown-item" routerLink='/myinfos'>Mes informations</a>
+          <a class="dropdown-item" routerLink='/prefs'>{{ 'MENU.MYTEAMS' | translate }}</a>
+          <a class="dropdown-item" routerLink='/pass'>{{ 'MENU.CHANGEPASSWORD' | translate }}</a>
+          <a class="dropdown-item" routerLink='/myinfos'>{{ 'MENU.ABOUTME' | translate }}</a>
         </div>
       </li>
       <li *ngIf="data['Info'] && data['Info'].Role && data['Info'].Role == 'Admin'" class="nav-item dropdown">
         <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-          Admin
+          {{ 'MENU.ADMIN' | translate }}
         </a>
         <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-          <a class="dropdown-item" routerLink='/admusers'>Utilisateurs</a>
-          <a class="dropdown-item" routerLink='/admstrats'>Stratégies</a>
+          <a class="dropdown-item" routerLink='/admusers'>{{ 'MENU.USERS' | translate }}</a>
+          <a class="dropdown-item" routerLink='/admstrats'>{{ 'MENU.STRAT' | translate }}</a>
         </div>
  
       </li>
+      <select class="form-control col-sm-4" NgModel (change)="ChangeLangage(Langage)" #Langage>
+        <option value="fr">Français</option>
+        <option value="en">English</option>
+    </select>
+     
     </ul>
     <form class="form-inline my-2 my-lg-0">
-      <input *ngIf="!data['Info']" class="form-control mr-sm-2" type="text" placeholder="Login" aria-label="Login" [(ngModel)]="login" name="login">
-      <input *ngIf="!data['Info']" class="form-control mr-sm-2" type="password" placeholder="Mot de passe" aria-label="Mot de passe" [(ngModel)]="password" name="password">
-      <button *ngIf="!data['Info']" class="btn btn-outline-success my-1 my-sm-0" type="submit" (click)="Connection()">Se connecter</button>
-      <button *ngIf="data['Info']" class="btn btn-outline-success my-1 my-sm-0" type="submit" (click)="Disconnection()">Se déconnecter</button>
+      <input *ngIf="!data['Info']" class="form-control mr-sm-2" type="text" placeholder="{{ 'MENU.LOGIN' | translate }}" aria-label="Login" [(ngModel)]="login" name="login">
+      <input *ngIf="!data['Info']" class="form-control mr-sm-2" type="password" placeholder="{{ 'MENU.PASSWORD' | translate }}" aria-label="Mot de passe" [(ngModel)]="password" name="password">
+      <button *ngIf="!data['Info']" class="btn btn-outline-success my-1 my-sm-0" type="submit" (click)="Connection()">{{ 'MENU.CONNECT' | translate }}</button>
+      <button *ngIf="data['Info']" class="btn btn-outline-success my-1 my-sm-0" type="submit" (click)="Disconnection()">{{ 'MENU.UNCONNECT' | translate }}</button>
     </form>
   </div>
 </nav>
 
 <div class="container">
-<ng-container *ngIf="MessageRecupPassword != '' || ErrorLogin != '' || OkLogin != '' || NotConnected != '' || Disconnected != ''">
+<ng-container *ngIf="MessageRecupPassword || ErrorLogin || OkLogin || Disconnected">
   <br/>
-  <div *ngIf="ErrorLogin != ''" class="alert alert-danger">{{ErrorLogin}}</div>
-  <div *ngIf="MessageRecupPassword != ''" class="alert alert-info"><a class="link" routerLink='/RetrievePassword'>{{MessageRecupPassword}}</a></div>
-  <div *ngIf="NotConnected != ''" class="alert alert-danger">{{NotConnected}}</div>
-  <div *ngIf="OkLogin != ''" class="alert alert-success">{{OkLogin}}</div>
-  <div *ngIf="Disconnected != ''" class="alert alert-success">{{Disconnected}}</div>
+  <div *ngIf="ErrorLogin" class="alert alert-danger">{{ 'ERRORMESSAGES.LOGIN' | translate }}</div>
+  <div *ngIf="MessageRecupPassword" class="alert alert-info"><a class="link" routerLink='/RetrievePassword'>{{ 'INFOMESSAGES.RETRIEVEPASSWORD' | translate }}</a></div>
+  <div *ngIf="OkLogin" class="alert alert-success">{{ 'SUCCESSMESSAGES.LOGIN' | translate }}</div>
+  <div *ngIf="Disconnected" class="alert alert-success">{{ 'SUCCESSMESSAGES.DISCONNECTED' | translate }}</div>
 </ng-container>
 <router-outlet></router-outlet>
 </div>
@@ -81,14 +84,11 @@
   <div class="collapse navbar-collapse justify-content-center" id="navbarSupportedContent">
     <ul class="navbar-nav">
        <li class="nav-item active">
-          <a class="nav-link" routerLink='/contact'>Contact </a>
+          <a class="nav-link" routerLink='/contact'>{{ 'MENU.CONTACT' | translate }} </a>
       </li>
       <li class="nav-item active">
-        <a class="nav-link" routerLink='/rgpd'>Vos données </a>
+        <a class="nav-link" routerLink='/rgpd'>{{ 'MENU.DATA' | translate }} </a>
       </li> 
-      <li class="nav-item active">
-        <a class="nav-link" routerLink='/'>Blabla</a>
-      </li>
     </ul>
   </div>
 </nav>

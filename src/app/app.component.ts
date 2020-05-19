@@ -10,9 +10,7 @@ import { Subject, zip } from 'rxjs';
 import { Favori } from './models/Favori';
 import { Vote } from './models/vote';
 import { MesTeams } from './models/mes-teams';
-import { TranslateService } from '@ngx-translate/core';
-
-
+import { TranslateService, LangChangeEvent } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-root',
@@ -21,33 +19,39 @@ import { TranslateService } from '@ngx-translate/core';
 })
 export class AppComponent {
   public data:any=[];
+  //A faire : save la langue en session pour gérer prob après connection + bouton à initialisé  à la bonne valeur.
+  langage:string = 'fr';
   login:string;
   password:string;
-  ErrorLogin:string = "";
-  OkLogin:string ="";
-  NotConnected:string="";
-  Disconnected:string="";
-  MessageRecupPassword:string="";
+  ErrorLogin:boolean = false;
+  OkLogin:boolean = false;
+  Disconnected:boolean = false;
+  MessageRecupPassword:boolean = false;
   Fav$:Subject<boolean>;
   Vote$:Subject<boolean>;
   Teams$:Subject<boolean>;
 
-  constructor(translate: TranslateService,private teamService:MesTeamsDAL,private favService:FavoriDAL,private voteService:VoteDAL,private accessService:AccessComponent,private router:Router, private UtilisateurService:UtilisateurDAL) {
+  constructor(private translate: TranslateService,private teamService:MesTeamsDAL,private favService:FavoriDAL,private voteService:VoteDAL,private accessService:AccessComponent,private router:Router, private UtilisateurService:UtilisateurDAL) {
     this.data = this.accessService.data;
-    translate.addLangs(['en','fr']);
-    translate.setDefaultLang('fr');
-    translate.use('fr');
-    console.log(translate.getLangs());
+      this.translate.setDefaultLang(this.langage);
   }
 
+  
+  
+  ChangeLangage(Langage)
+  {
+    this.langage = Langage.value;
+    this.translate.use(Langage.value);
+  }
+  
   Connection()
   {
     this.Fav$ = new Subject<boolean>();
     this.Vote$ = new Subject<boolean>();
     this.Teams$ = new Subject<boolean>();
-    this.MessageRecupPassword="";
-    this.ErrorLogin = "";
-    this.OkLogin = "";
+    this.MessageRecupPassword = false;
+    this.ErrorLogin = false;
+    this.OkLogin = false;
     this.UtilisateurService.CheckUser(new Utilisateur({Pseudo:this.login, Password:this.password})).subscribe(result => {
       this.accessService.setSession("User",result);
       
@@ -65,29 +69,29 @@ export class AppComponent {
         {
           this.accessService.setSession("Info",result2);
           this.data["Info"] = this.accessService.data["Info"];
-          this.favService.getFavoritesByUserId(this.data["Info"].Id).subscribe(result => {
+          this.favService.getFavoritesByUserId(result2.Id).subscribe(result => {
             this.accessService.setSession("Fav",result);
             this.Fav$.next(true);
           }, error => {
             this.accessService.setSession("Fav",new Array<Favori>());
             this.Fav$.next(true);
           });
-          this.voteService.getVotesByUser(this.data["Info"].Id).subscribe(result => {
+          this.voteService.getVotesByUser(result2.Id).subscribe(result => {
             this.accessService.setSession("Votes",result);
             this.Vote$.next(true);
           }, error => {
             this.accessService.setSession("Votes",new Array<Vote>());
             this.Vote$.next(true);
           });
-          this.teamService.getMyTeamsByUserId(this.data["Info"].Id).subscribe(result => {
+          this.teamService.getMyTeamsByUserId(result2.Id).subscribe(result => {
             this.accessService.setSession("Teams",result);
             this.Teams$.next(true);
           }, error => {
             this.accessService.setSession("Teams",new Array<MesTeams>());
             this.Teams$.next(true);
           });
-          this.OkLogin = "Connexion réussie.";
-          setTimeout(() => this.OkLogin = "", 3000);
+          this.OkLogin = true;
+          setTimeout(() => this.OkLogin = false, 3000);
           //A faire : trouver un moyen de call le ngoninit du component actuel
           zip(this.Fav$,this.Teams$,this.Vote$).subscribe(([Fav, Teams, Vote]) => {
             if(Fav && Teams && Vote) location.reload();
@@ -95,22 +99,20 @@ export class AppComponent {
         }  
       });
     },error => {
-      this.MessageRecupPassword="Perdu votre mot de passe ou votre pseudo? Cliquez ici!";
-      this.ErrorLogin = "Utilisateur ou Mot de passe invalide";
-      setTimeout(() => this.ErrorLogin = "", 3000);
-      setTimeout(() => this.MessageRecupPassword = "", 7000);
+      this.MessageRecupPassword=true;
+      this.ErrorLogin = true;
+      setTimeout(() => this.ErrorLogin = false, 3000);
+      setTimeout(() => this.MessageRecupPassword = false, 7000);
     });
   }
 
   Disconnection()
   {
-    this.accessService.deleteSession("Info");
-    this.accessService.deleteSession("User");
-    delete this.data["Info"];
-    delete this.data["User"];
+    this.accessService.deleteSession("All");
+    this.data = [];
     this.router.navigateByUrl('/');
-    this.Disconnected = "Vous avez bien été déconnecté.";
-    setTimeout(() => this.Disconnected = "", 3000);
+    this.Disconnected = true;
+    setTimeout(() => this.Disconnected = false, 3000);
   }
 }
 

@@ -1,7 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { ClasseDAL } from '../service/classe-dal';
 import { Classe } from '../models/Classe';
-import { AccessComponent } from '../helpeur/access-component';
 
 @Component({
   selector: 'app-classe',

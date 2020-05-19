@@ -1,4 +1,52 @@
 {
-    "TEXT": "Hello",
-    "TEXT2" :"Hello2"
+    "MENU": {
+        "INSC" : "Register",
+        "STRAT" : "Strategies",
+        "SEARCHSTRATS" : "Search for strategies",
+        "ADDSTRATS" : "Add strategies",
+        "FAVSTRATS" : "My favorite",
+        "MYSTRATS" : "My strategies",
+        "RESSOURCES" : "Ressources",
+        "CLASSES" : "Classes",
+        "SKILLS" : "Skills",
+        "TOYS" : "Toys",
+        "BOSSLIST" : "Bosslist by area",
+        "MYINFOS" : "My infos",
+        "MYTEAMS" : "My personal teams",
+        "CHANGEPASSWORD" : "Change my password",
+        "ABOUTME" : "My informations",
+        "ADMIN" : "Admin",
+        "USERS" : "Users",
+        "LOGIN" : "Login",
+        "PASSWORD" : "Password",
+        "CONNECT" : "Log in",
+        "UNCONNECT" : "Log off",
+        "CONTACT" : "Contact",
+        "DATA" : "Your datas"
+    },
+    "HOME" : {
+        "INTRO" : "Welcome to the Ulala mobile game strategy management site!"
+        },
+    "SUCCESSMESSAGES" : {
+        "LOGIN" : "Connexion succeed.",
+        "DISCONNECTED" : "You have been properly disconnected.",
+        "ACCOUNTACTIVATED" : "Your account has been activated, you will be redirect to home page. Have fun!",
+        "KEYSEND" : "Mail sent, look in your mailbox! (And don't forget the spam!)",
+        "STRATUPLOAD" : "Strategy well imported, thank you for sharing!"
+    },
+    "ERRORMESSAGES" : {
+        "LOGIN" : "User or password not valid.",
+        "WRONGACTIVATIONKEY" : "Wrong activation key, please try again. In case of problem, please contact the site administrator via the contact page.",
+        "SAVAGEERROR" : "Oops, a wild error seems to have occurred, please contact the site administrator via the contact page."
+    },
+    "INFOMESSAGES" : {
+        "RETRIEVEPASSWORD" : "Lost your password or username? Please click here!"
+    },
+    "ACTIVATION" : {
+        "TITLE" : "Activation",
+        "ENTERTOKEN" : "Please enter your activation key received by email.",
+        "SENDTOKEN" : "Send activation key",
+        "ACTIVATIONKEYNOTRECEIVED" : "You didn't receive your activation key? ",
+        "CLICKHERE" : "Click here!"
+    }
 }
