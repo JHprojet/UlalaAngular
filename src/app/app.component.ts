@@ -34,10 +34,9 @@ export class AppComponent {
   constructor(private translate: TranslateService,private teamService:MesTeamsDAL,private favService:FavoriDAL,private voteService:VoteDAL,private accessService:AccessComponent,private router:Router, private UtilisateurService:UtilisateurDAL) {
     this.data = this.accessService.data;
       this.translate.setDefaultLang(this.langage);
+      this.translate.use(this.langage);
   }
 
-  
-  
   ChangeLangage(Langage)
   {
     this.langage = Langage.value;

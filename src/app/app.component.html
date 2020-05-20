@@ -54,11 +54,10 @@
         </div>
  
       </li>
-      <select class="form-control col-sm-4" NgModel (change)="ChangeLangage(Langage)" #Langage>
-        <option value="fr">Français</option>
-        <option value="en">English</option>
-    </select>
-     
+      
+      <button class="language" style="margin-left:20px" (click)="ChangeLangage(fr)" value="fr" #fr><img src="../assets/images/fr.jpg" width="35px" height="20px"></button>
+      <button class="language" style="margin-left:10px" (click)="ChangeLangage(en)" value="en" #en><img src="../assets/images/en.png" width="35px" height="20px"></button>
+  
     </ul>
     <form class="form-inline my-2 my-lg-0">
       <input *ngIf="!data['Info']" class="form-control mr-sm-2" type="text" placeholder="{{ 'MENU.LOGIN' | translate }}" aria-label="Login" [(ngModel)]="login" name="login">

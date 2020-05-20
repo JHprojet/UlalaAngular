@@ -15,6 +15,7 @@ import { MesTeams } from '../models/mes-teams';
 import { AccessComponent } from '../helpeur/access-component';
 import { Validators, FormBuilder } from '@angular/forms';
 import { CustomValidators } from '../service/Validators/validators';
+import { TranslateService, LangChangeEvent } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-add-strategie',
@@ -23,7 +24,8 @@ import { CustomValidators } from '../service/Validators/validators';
 })
 
 export class AddStrategieComponent implements OnInit {
-  //Research form with custom parameters
+
+  //Upload form with custom parameters
   AddForm = this.fb.group({
     Continent: ['', {
       validators: [Validators.required]}],
@@ -37,7 +39,7 @@ export class AddStrategieComponent implements OnInit {
     Classe4: ['']
     },{
     updateOn: 'change', validators: [this.v.CheckContinent, this.v.CheckZone, this.v.CheckBoss, this.v.CheckClasses]});
-  //Research form with personal Team  
+  //Upload form with personal Team  
   AddFormWithTeam = this.fb.group({
     Team: ['', {
       validators: [Validators.required]}],
@@ -46,115 +48,158 @@ export class AddStrategieComponent implements OnInit {
   },{
     updateOn: 'change', validators: [this.v.CheckBossWithTeam, this.v.CheckTeam]});
 
-  
-    // /!\ Réécriture en cours de add-strategy.component - Encore en cours de réalisation /!\
-
-  constructor(private teamService:TeamDal,private imageService:ImageDAL,private cd:ChangeDetectorRef,private classeService:ClasseDAL,private bossZoneService:BosszoneDAL,private accessService:AccessComponent,private v:CustomValidators,private enregistrementService:EnregistrementDAL,private fb:FormBuilder) { }
-  //Mise en mémoire de la liste de tous les boss par zone
+  constructor(private translate:TranslateService, private teamService:TeamDal, private imageService:ImageDAL,
+            private cd:ChangeDetectorRef, private classeService:ClasseDAL, private bossZoneService:BosszoneDAL,
+            private accessService:AccessComponent, private v:CustomValidators, private enregistrementService:EnregistrementDAL,
+            private fb:FormBuilder) { }
+  //Variable to keep available all the BossZone informations
   AllBossZone:BossZone[] = new Array<BossZone>();
-  //Variables de remplissage des select
-  selectContinent:string[] = new Array<string>();
-  selectZone:string[] = new Array<string>();
-  selectBoss:string[] = new Array<string>();
+  //Variables to feel the selects
+  selectContinent:BossZone[] = new Array<BossZone>();
+  selectZone:BossZone[] = new Array<BossZone>();
+  selectBoss:BossZone[] = new Array<BossZone>();
   selectClasse:Classe[] = new Array<Classe>();
-  selectMesTeams:MesTeams[] = new Array<MesTeams>();
-  //S'il s'agit d'un utilisateur connecté
+  selectMyTeams:MesTeams[] = new Array<MesTeams>();
+  //Boolean for connected user
   accessUser:boolean = false;
-  //Variable d'affichage/hide de l'aide
+  //Variable displaying help
   Show:boolean = false;
+  //Variable used to show only the selected form
   AddWithTeam = false;
-  //Variables utilisées pour utilisation de zip.
+  //Variables used for images processing
   OkImage$:Subject<boolean>;
-  //Variables de gestion Images uploadées
   Images = new Array<any>();
   FileNames:string[];
   Loading: boolean;
   errorImage: number;
   UploadOK:boolean;
   UploadFail:boolean;
+  //Variable langage
+  Lang:string;
 
   ngOnInit(): void {
+    //Get current langage
+    this.Lang = this.translate.currentLang;
+    //Disable part of the forms (For selects using other selects values)
     this.AddFormWithTeam.get('Boss').disable();
     this.AddForm.get('Boss').disable();
     this.AddForm.get('Zone').disable();
+    //Init message displaying variables
     this.UploadFail = false;
-    this.UploadFail = false;
+    this.UploadOK = false;
+    //Init Images processing variables
     this.errorImage = 6;
     this.FileNames = new Array<string>();
+    //If a user is connected
     if(this.accessService.getSession("Info")) {
       this.accessUser = true;
+      //Get favorites teams of the users (Write in Session)
       if(this.accessService.getSession("Teams").length) {
-        this.selectMesTeams = this.accessService.getSession("Teams");
+        this.selectMyTeams = this.accessService.getSession("Teams");
         this.AddWithTeam = true;
       }
       else {
         this.AddWithTeam = false;
-        this.selectMesTeams = new Array<MesTeams>();
+        this.selectMyTeams = new Array<MesTeams>();
       }
     }
-    //Récupération de la liste des boss par zone
+    //Get all BossZone informations
     this.bossZoneService.getBossZones().subscribe(result => {
+      //Writing result in dedicated variable
       this.AllBossZone = result;
-      this.AllBossZone.forEach(element => {
-        if(!this.selectContinent.includes(element.Zone.ContinentFR))this.selectContinent.push(element.Zone.ContinentFR);
-      });
+      //Feeling selectContinent with unique Continent values
+      var unique = [];
+      for( let i = 0; i < result.length; i++ ) {
+        if( !unique[result[i].Zone.ContinentFR]) {
+          this.selectContinent.push(result[i]);
+          unique[result[i].Zone.ContinentFR] = 1;
+        }
+      }
     });
+    //Get classes information to feel selectClasse
     this.classeService.getClasses().subscribe(result => {
       this.selectClasse = result;
     });
+    //Register to LangChangeEvent and write selected langage in variable Lang
+    this.translate.onLangChange.subscribe((event: LangChangeEvent) => {
+      this.Lang = event.lang;
+    });
   }
 
-  //Rempli la liste déroulante Zone de SearchBoss
+  //Feeling Zone select values (Custom form)
   public GetZones(Continent) {
+    //Init cascading values
     this.selectZone = [];
     this.selectBoss = [];
     this.AddForm.controls.Zone.setValue("");
     this.AddForm.controls.Boss.setValue("");
     this.AddForm.controls.Boss.disable();
     this.AddForm.controls.Zone.disable();
-    this.AllBossZone.forEach(item => {
-      if(item.Zone.ContinentFR == Continent.value && !this.selectZone.includes(item.Zone.ZoneFR)) this.selectZone.push(item.Zone.ZoneFR);
-    });
+    //Feeling selectZone with unique Zone values depending on Continent value
+    var unique = [];
+    for( let i = 0; i < this.AllBossZone.length; i++ ) {
+      if( !unique[this.AllBossZone[i].Zone.ZoneFR] && this.AllBossZone[i].Zone.ContinentFR == Continent.value) {
+        this.selectZone.push(this.AllBossZone[i]);
+        unique[this.AllBossZone[i].Zone.ZoneFR] = 1;
+      }
+    }
+    //If a value has been selected for Continent, enable Zone control
     if(Continent.value != '') this.AddForm.get('Zone').enable();
   }
 
-  //Rempli la liste déroulante boss de SearchBoss
+  //Feeling Boss select values (Custom form)
   public GetBoss(Continent,Zone) {
+    //Init cascading values
     this.selectBoss = [];
     this.AddForm.controls.Boss.disable();
     this.AddForm.controls.Boss.setValue("");
     this.AddFormWithTeam.controls.Boss.setValue("");
-    this.AllBossZone.forEach(item => {
-      if(item.Zone.ContinentFR == Continent.value && item.Zone.ZoneFR == Zone.value && !this.selectBoss.includes(item.Boss.NomFR)) this.selectBoss.push(item.Boss.NomFR);
-    });
+    //Feeling selectBoss with unique Boss values depending on Continent and Zone values
+    var unique = [];
+    for( let i = 0; i < this.AllBossZone.length; i++ ) {
+      if( !unique[this.AllBossZone[i].Zone.ZoneFR] 
+          && this.AllBossZone[i].Zone.ContinentFR == Continent.value
+          && this.AllBossZone[i].Zone.ZoneFR == Zone.value ) {
+        this.selectBoss.push(this.AllBossZone[i]);
+        unique[this.AllBossZone[i].Boss.NomFR] = 1;
+      }
+    }
+    //If a value have been selected for Zone, enable Zone control
     if(Zone.value != '') this.AddForm.controls.Boss.enable();
   }
   
-  //Rempli la liste déroulante boss de SearchBossWithTeam
-  GetBossViaTeam(TeamId) {
-    this.AddForm.reset();
-    this.AddForm.controls.Boss.disable();
-    this.AddForm.controls.Zone.disable();
+  //Feeling Boss select values (Favorite team form)
+  GetBossViaTeam(MaTeamId) {
+    //Init cascading values
     this.selectBoss = [];
     this.AddFormWithTeam.controls.Boss.setValue("");
-    let ZoneId;
-    if(TeamId.value != "")
-      {
-      this.selectMesTeams.forEach(item => {
-        if(item.Id == TeamId.value) ZoneId = item.Zone.Id;
-      });
-      this.AllBossZone.forEach(item => {
-        if(ZoneId == item.Zone.Id && !this.selectBoss.includes(item.Boss.NomFR)) this.selectBoss.push(item.Boss.NomFR); 
-      });
+    //If a team has been selected
+    if(MaTeamId.value != "")
+    {
+      //Get Zone Name corresponding to selected team
+      let ZoneFR = this.selectMyTeams.find(team => team.Id == MaTeamId.value).Zone.ZoneFR;
+      //Feeling selectBoss with unique Boss values depending on Zone Name
+      let unique = [];
+      for( let i = 0; i < this.AllBossZone.length; i++ ) {
+        if( !unique[this.AllBossZone[i].Zone.ZoneFR] 
+            && this.AllBossZone[i].Zone.ZoneFR == ZoneFR ) {
+          this.selectBoss.push(this.AllBossZone[i]);
+          unique[this.AllBossZone[i].Boss.NomFR] = 1;
+        }
+      }
+      //enable select
       this.AddFormWithTeam.get('Boss').enable();
     }
+    //disable select
     else this.AddFormWithTeam.get('Boss').disable();
   }
-   //Méthode permettant le changement de texte et le display ou non du texte d'aide quand on clique sur le bouton.
-   public ShowHelp(){
+
+   //Switch variable Show to display or hide help
+  public ShowHelp(){
     this.Show = !this.Show;
   }
 
+  //If user switch form, init both form + init both input type file multiple
   switchForm() { 
     this.AddWithTeam = !this.AddWithTeam
     this.errorImage = 6;
@@ -169,49 +214,52 @@ export class AddStrategieComponent implements OnInit {
     if(ToClean2) ToClean2.value = "";
   }
 
+  //Send strategy to API when submitted with favorite team
   onSubmitWithTeam() {
-    let E:Enregistrement = new Enregistrement({Utilisateur:new Utilisateur({Id:1}), BossZone:new BossZone({}), Team:new Team({})})
-    this.AllBossZone.forEach(item => {
-      if(item.Zone.Id == this.selectMesTeams.find(team => team.Id == this.AddFormWithTeam.value.Team).Zone.Id && item.Boss.NomFR == this.AddFormWithTeam.value.Boss) {
-        E.BossZone.Id = item.Id;
-        E.Team.Id = this.selectMesTeams.find(team => team.Id == this.AddFormWithTeam.value.Team).Team.Id;
-      }
-    });
+    //Create strategy to send and add init internal objects **(Must be changed via API to simplify)**
+    let E:Enregistrement = new Enregistrement({Utilisateur:new Utilisateur({Id:1}), BossZone:new BossZone({Id:this.AddFormWithTeam.value.Boss}), Team:new Team({})})
+    //Feeling Team.Id via form valuer
+    E.Team.Id = this.selectMyTeams.find(team => team.Id == this.AddFormWithTeam.value.Team).Id;
+    //Adding User Id to the strategy if its a connected user (else Id = 1 is Anonymous player in DB)
     if(this.accessService.getSession("Info")) { E.Utilisateur.Id = this.accessService.getSession("Info").Id }
+    //Upload 4 Images
     for (let item of this.Images) { this.uploadFile(item); }
+    //Feeling paths of the images to the strategy
     E.ImagePath1 = "http://192.168.1.2:8081/"+this.FileNames[0];
     E.ImagePath2 = "http://192.168.1.2:8081/"+this.FileNames[1];
     E.ImagePath3 = "http://192.168.1.2:8081/"+this.FileNames[2];
     E.ImagePath4 = "http://192.168.1.2:8081/"+this.FileNames[3];
+    //Post strategy
     this.enregistrementService.postStrategy(E).subscribe(result => { 
-      this.ngOnInit();
+      //If success, reset form + input file and display success message (5s)
+      this.AddFormWithTeam.reset();
+      this.AddFormWithTeam.controls.Boss.disable();
       let ToClean = document.getElementById("inputImages") as HTMLInputElement;
       ToClean.value = "";
       this.UploadOK = true;
-      setTimeout(() => this.UploadOK=false,3000)
+      setTimeout(() => this.UploadOK=false,5000)
     }, error => {
+      //If fail, display error message (5s)
       this.UploadFail = true;
-      setTimeout(() => this.UploadFail= false,3000)
+      setTimeout(() => this.UploadFail= false,5000)
     })
   }
 
+  //Send strategy to API when submitted with custom form
   onSubmit()
   {
-    //Initialize Object to send
+    //Create strategy to send and add init internal objects **(Must be changed via API to simplify)**
     let E:Enregistrement = new Enregistrement({Utilisateur:new Utilisateur({Id:1}), BossZone:new BossZone({}), Team:new Team({})})
-    //Get and Add BossZone Id
-    this.AllBossZone.forEach(item => {
-      if(item.Zone.ZoneFR == this.AddForm.value.Zone && item.Boss.NomFR == this.AddForm.value.Boss) {
-        E.BossZone.Id = item.Id;
-      }
-    });
-    //Get and Add Team Id
+    //Add BossZone Id
+    E.BossZone.Id = this.AddForm.value.Boss;
+    //Add Team Id
     let Team$ = new Subject<boolean>();
+    //Get team Id depending on 4 classes
     this.teamService.getTeamByClasses(this.AddForm.value.Classe1,this.AddForm.value.Classe2,this.AddForm.value.Classe3,this.AddForm.value.Classe4).subscribe(result => {
       E.Team.Id = result.Id;
       Team$.next(true);
     });
-    //Add the user Id if connected
+    //Adding User Id to the strategy if its a connected user (else Id = 1 is Anonymous player in DB)
     if(this.accessService.getSession("Info")) E.Utilisateur.Id = this.accessService.getSession("Info").Id;
     //Upload of the 4 images
     for (let item of this.Images) { this.uploadFile(item); }
@@ -224,24 +272,23 @@ export class AddStrategieComponent implements OnInit {
     zip(Team$).subscribe(([Team$]) => {
       //Post strategy
       this.enregistrementService.postStrategy(E).subscribe(result => { 
-        //Reset form
+        //If success, reset form + input file + display success message (5s)
         this.AddForm.reset();
         this.AddForm.controls.Boss.disable();
         this.AddForm.controls.Zone.disable();
         let ToClean = document.getElementById("inputImages") as HTMLInputElement;
         ToClean.value = "";
-        //Display success message (3 secondes duration)
         this.UploadOK = true;
-        setTimeout(() => this.UploadOK=false,3000)
+        setTimeout(() => this.UploadOK=false,5000)
       }, error => {
-        //Display fail message (5 secondes duration)
+        //If fail, display error message (5s)
         this.UploadFail = true;
         setTimeout(() => this.UploadFail= false,5000)
       })
     });
   }
 
-  //#region | uploadFile | Upload des 4 images une fois ces dernières validées
+  //Uploading the 4 images
   public uploadFile(file)
   {
     let IMG = new Image; //Create new Image.
@@ -253,84 +300,76 @@ export class AddStrategieComponent implements OnInit {
     IMG.lastModifiedDate = file.lastModifiedDate; //Add last modified date
     let reader = new FileReader();
     reader.onload = () => {
-      IMG.fileAsBase64 = reader.result.toString(); // Store base64 encoded representation of file
-      this.imageService.uploadImage(IMG) // POST to server
-        .subscribe(resp => { }); ////////////////////////// PROCESS TO ADD
+      IMG.fileAsBase64 = reader.result.toString(); //Store base64 encoded representation of file
+      this.imageService.uploadImage(IMG) // POST to API
+        .subscribe(resp => { }); // **PROCESS TO ADD**
     }  
-    reader.readAsDataURL(file); // Read the file
+    reader.readAsDataURL(file); //Read the file
   }
 
-  //#region | checkImages | Méthode de vérification des image pixel par pixel
+  //Perform full check of the images (Number of images, Extensions, Pixel check)
   public checkImages(T)
   {
     this.OkImage$ = new Subject<boolean>(); //Initialize waiting variable
-    this.Images = []; //Initialisation de la liste des 4 images
-    this.errorImage = 0; //Vide le message d'erreur
-    for (let file of T.files) //Ajout des 4 images à la liste
-    {
-      this.Images.push(file); 
-    }
-    if(T.files.length != 4) this.errorImage = 1; //Message erreur si nombre de fichier différent de 4.
+    this.Images = []; //Initialize image list
+    this.errorImage = 0; //Empty errorMessage
+    for (let file of T.files) { this.Images.push(file); } //Add the images to the list
+    if(T.files.length != 4) this.errorImage = 1; //Error message if not 4 files
     else 
     {
       let test: boolean = true;
       for (let file of T.files)
-      { //Vérifie que les fichiers sont uniquement des fichiers image de type png, jpeg, jpg.
+      { //Check image extension
         if(this.getExtension(file.name) != "png" && this.getExtension(file.name) != "jpeg" && this.getExtension(file.name) != "jpg") test = false;
       }
-      if (!test) this.errorImage = 2; //Message erreur si pas image du bon format.
-      //Vérifications que les 4 fichiers ont le même format.
+      if (!test) this.errorImage = 2; //Display error message if 1 image or more have bad extension
+      //Check if all files have same extension
       else if(!(this.getExtension(T.files[0].name) == this.getExtension(T.files[1].name) && this.getExtension(T.files[1].name) == this.getExtension(T.files[2].name) 
               && this.getExtension(T.files[2].name) == this.getExtension(T.files[3].name))) 
-              this.errorImage = 3; //Display de l'erreur si pas le même format.
+              this.errorImage = 3; //Display error message if extension not matching
       else
       {
-        this.errorImage = 4       
-        this.CheckPixels(this.Images); //Méthode de check pixel par pixel
-        //Lorsque la méthode CheckPixel se termine
+        this.errorImage = 4; //Display processing message
+        this.CheckPixels(this.Images); //Check if images are as expected.
+        //When check is done
         zip(this.OkImage$).subscribe(([OkImage]) => {
-          if(OkImage) { //Si le test pixel par pixel est OK
-            this.Loading = false;
-            this.errorImage = 0;
-            this.AddForm.enable();
-            this.AddFormWithTeam.enable();
-            //Force la MAJ des données du component (suite bug Firefox)
+          this.Loading = false; //Stop processing image
+          if(OkImage) { //If test = OK
+            this.errorImage = 0; //Delete error
+            this.AddForm.enable(); //Enable forms
+            this.AddFormWithTeam.enable(); //Enable forms
+            //Following Firefox bug, force Angular update
             this.cd.detectChanges();
             this.cd.markForCheck();
           }
           else if (!OkImage) { //Si le test pixel par pixel est KO
-            this.Loading = false;
-            this.errorImage = 5;
+            this.errorImage = 5; //Error message
           }
         });
       }
     }
   }
-  //#endregion
   
-  //#region | getExtension | Récupération de l'extension du fichier
+  //Get extension of a file
   public getExtension(path) {
-    var basename = path.split(/[\\/]/).pop();  // Extrait le nom du fichier (supporte les séparateurs '\\' et '/')
-    let pos = basename.lastIndexOf('.');       // Cherche la position du '.'
-    if (basename === '' || pos < 1) return ""; // Si le nom est vide ou le '.' est introuvale (-1) ou arrive en premier (0)
-    return basename.slice(pos + 1);            // Extrait l'extension sans le '.'
+    var basename = path.split(/[\\/]/).pop();  // Extract file name (Supporting '\\' and '/')
+    let pos = basename.lastIndexOf('.');       // Look for '.' position
+    if (basename === '' || pos < 1) return ""; // If file name is empty or the '.' is not found or is in first position
+    return basename.slice(pos + 1);            // Extract extension without the '.'
   }
-  //#endregion
 
-  //#region | newGuid | Création chaîne de caractère GUID (enfin presque)
+  //Create GUID (almost)
   public newGuid() {
     return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-      var r = Math.random() * 16 | 0,
-        v = c == 'x' ? r : (r & 0x3 | 0x8);
+      var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
       return v.toString(16);
     });
   }
-  //#endregion
 
-   //#region | CheckPixels | Méthode qui vérifie le nombre de pixel identique pour vérifier que les images sont du format attendu
-  //Forte probabilité d'amélioration possible.
-  public CheckPixels(Images:any[])
+  //Check images between them pixel by pixels
+  public CheckPixels(Images:any[]):void
   {
+    //Init waiting variables (for pixel scan and checking pixel table between images)
     let scan1$ = new Subject<boolean>();
     let scan2$ = new Subject<boolean>();
     let scan3$ = new Subject<boolean>();
@@ -338,94 +377,65 @@ export class AddStrategieComponent implements OnInit {
     let calc1$ = new Subject<boolean>();
     let calc2$ = new Subject<boolean>();
     let calc3$ = new Subject<boolean>();
-    //Création d'un tableau de pixel par image
+    //Init pixel's tables
     let tab1 = [];
     let tab2 = [];
     let tab3 = [];
     let tab4 = [];
-    //Création des 4 readers (A noter : trouver une solution pour n'avoir qu'un reader)
+    //Create 4 readers (Prefering 4 than 1 so can process 4 images synchronously)
     let reader = new FileReader();
     let reader1 = new FileReader();
     let reader2 = new FileReader();
     let reader3 = new FileReader();
-    //Passage Loading a true pour activer le message et le logo de Loading
+    //Activate Processing animation
     this.Loading = true;
-    //Import de Jimp
-    var Jimp = require('jimp');
-    //A noter : Solution à trouver pour éviter la répétition sur les 4 prochaines méthodes
-    //Remplissage tableau de pixel image 1
-    reader.onload = () => {
-      Jimp.read(reader.result.toString()).then(image => {
-        image.resize(100,220);
-        image.scan(0, 0, image.bitmap.width, image.bitmap.height, function(x, y, idx) {
-          tab1.push(image.getPixelColor(x, y));
-        })
-        scan1$.next(true);
-      })
-    }
+    //Feeling 4 pixel's tables
+    this.GetPixels(reader, scan1$, tab1);
+    this.GetPixels(reader1, scan2$, tab2);
+    this.GetPixels(reader2, scan3$, tab3);
+    this.GetPixels(reader3, scan4$, tab4);
     reader.readAsDataURL(Images[0]);
-    //Remplissage tableau de pixel image 2
-    reader2.onload = () => {
-      Jimp.read(reader2.result.toString()).then(image => {
-        image.resize(100,220);
-        image.scan(0, 0, image.bitmap.width, image.bitmap.height, function(x, y, idx) {
-          tab2.push(image.getPixelColor(x, y));
-        })
-        scan2$.next(true);
-      })
-    }
-    reader2.readAsDataURL(Images[1]);
-    //Remplissage tableau de pixel image 3
-    reader3.onload = () => {
-      Jimp.read(reader3.result.toString()).then(image => {
-        image.resize(100,220);
-        image.scan(0, 0, image.bitmap.width, image.bitmap.height, function(x, y, idx) {
-          tab3.push(image.getPixelColor(x, y));
-        });
-        scan3$.next(true);
-      })
-    }
-    reader3.readAsDataURL(Images[2]);
-    //Remplissage tableau de pixel image 4
-    reader1.onload = () => {
-       Jimp.read(reader1.result.toString()).then(image => {
-        image.resize(100,220);
-        image.scan(0, 0, image.bitmap.width, image.bitmap.height, function(x, y, idx) {
-          tab4.push(image.getPixelColor(x, y));
-        })
-        scan4$.next(true);
-      })
-    }
-    reader1.readAsDataURL(Images[3]);
-    //Une fois les 4 tableaux de pixel remplis
+    reader1.readAsDataURL(Images[1]);
+    reader2.readAsDataURL(Images[2]);
+    reader3.readAsDataURL(Images[3]);
+    //Once the 4 images have been processed
     zip(scan1$, scan2$, scan3$, scan4$).subscribe(() => {
-      //Vérification du nombre de pixel identique entre les tableaux
+      //Checking differences between images
       this.CalcPourcentSimil(tab1, tab2, calc1$);
       this.CalcPourcentSimil(tab2, tab3, calc2$);
       this.CalcPourcentSimil(tab3, tab4, calc3$);
     });
-    //Une fois les 3 vérifications effectuées
+    //Once the 3 verifications are done
     zip(calc1$, calc2$, calc3$).subscribe(([calc1, calc2, calc3]) => {
-      if (calc1 && calc2 && calc3 ) this.OkImage$.next(true); // Si les 3 vérifications sont à true renvoi le Subject à true;
-      else this.OkImage$.next(false); //Sinon false
+      if (calc1 && calc2 && calc3 ) this.OkImage$.next(true); // If checking is OK, Subject to true;
+      else this.OkImage$.next(false); // If checking is NOK, Subject to false;
     });
   }
-  //#endregion
 
-  //#region | CalcPourcentSimil | Méthode qui vérifie le nombre de pixel entre 2 tableaux de pixel. Retourne true ou false.
-  public CalcPourcentSimil(IMG1:any[], IMG2:any[], C$)
+  //Reader used to feel a pixel's table and return a Subject when done processing
+  GetPixels(reader:FileReader,subject$:Subject<boolean>,tab:Array<number>):void
   {
-    let NumTot:number = 0;
-    let NumIdentique:number = 0;
-    let Percent:number = 0;
-    for (let element of IMG1)
-    {
-      if(element == IMG2[NumTot]) { NumIdentique++; }
-      NumTot++;
+    var Jimp = require('jimp');
+    reader.onload = () => {
+      Jimp.read(reader.result.toString()).then(image => {
+        image.resize(100,220);
+        image.scan(0, 0, image.bitmap.width, image.bitmap.height, function(x, y, idx) {
+          tab.push(image.getPixelColor(x, y));
+        })
+        subject$.next(true);
+      })
     }
-    Percent = NumIdentique / NumTot * 100;
-    if(Percent > 25) C$.next(true); //Si + de 25% identique OK
-    else C$.next(false); //sinon KO
   }
-  //#endregion
+  
+  //Check the % of identical pixels between 2 pixel's table
+  public CalcPourcentSimil(IMG1:any[], IMG2:any[], subject$):void
+  {
+    let samePixel:number = 0;
+    let percent:number = 0;
+    //For each pixel identical NumIdenti
+    for(let i=0; i<=IMG1.length;i++) { if(IMG1[i] == IMG2[i]) { samePixel++; } }
+    percent = samePixel / IMG1.length * 100;
+    if(percent > 25) subject$.next(true); //Subject to true if 25%+ pixels matches
+    else subject$.next(false); //else subject to false
+  }
 }
