@@ -32,7 +32,8 @@
         "DISCONNECTED" : "You have been properly disconnected.",
         "ACCOUNTACTIVATED" : "Your account has been activated, you will be redirect to home page. Have fun!",
         "KEYSEND" : "Mail sent, look in your mailbox! (And don't forget the spam!)",
-        "STRATUPLOAD" : "Strategy well imported, thank you for sharing!"
+        "STRATUPLOAD" : "Strategy well imported, thank you for sharing!",
+        "EDIT" : "Change has been made succefully"
     },
     "ERRORMESSAGES" : {
         "LOGIN" : "User or password not valid.",
@@ -49,7 +50,16 @@
         "SAMEIMAGEFORMAT" : "Your 4 files must be same extension.",
         "WAIT" : "Processing, please wait...",
         "BADIMAGE" : "Your 4 images must be as specified in the help (see next to the title to show help).",
-        "SELECTIMAGES" : "Select the 4 images of your strategy."
+        "SELECTIMAGES" : "Select the 4 images of your strategy.",
+        "VALIDATORS" : {
+            "USERNAMEREQUIRED" : "Username must be filled in",
+            "USERNAMEMIN" : "Username min caracters : 3.",
+            "USERNAMEMAX" : "USername max caracters : 20.",
+            "USERNAMETAKEN" : "This username is allready taken",
+            "MAILREQUIRED" : "Mail must be filled in",
+            "MAILFORMAT" : "Mail bad format",
+            "MAILTAKEN" : "This mail is already in use"
+        }
     },
     "INFOMESSAGES" : {
         "RETRIEVEPASSWORD" : "Lost your password or username? Please click here!",
@@ -78,6 +88,43 @@
         "BOSS" : "Boss",
         "CLASSE" : "Classe",
         "IMAGES" : "Images",
-        "OK" : "Confirm"
+        "OK" : "Confirm",
+        "YES" : "Yes",
+        "NO" : "No",
+        "CLASSES" : "Classes",
+        "ID" : "Id",
+        "NOTE" : "Note",
+        "USER" : "User",
+        "ASC" : "Asc",
+        "DSC" : "Dsc",
+        "MAIL" : "Mail",
+        "EDIT" : "Edit",
+        "CLICKHERE" : "Cliquez ici!",
+        "USERNAME" : "Username",
+        "ROLE" : "Role",
+        "ACTIVE" : "Active"
+    },
+    "ADMINSTRAT" : {
+        "TITLE" : "Strategy Management",
+        "ID" : "The Id contains",
+        "USERNAME" : "Username contains",
+        "SORTBY" : "Order by",
+        "ORDER" : "Order",
+        "SEARCHSTRATEGY" : "Search strategies",
+        "MESSMODAL1" : "Are you sure you want to delete this strategy?",
+        "MESSMODAL2" : "This action is irreversible!"
+    },
+    "PAGINATOR" : {
+        "NEXT" : "Next",
+        "PREVIOUS" : "Previous",
+        "LAST" : "Last page",
+        "FIRST" : "First page"
+    },
+    "ADMINUSER" : {
+        "TITLE" : "User Management",
+        "MAIL" : "Mail contains",
+        "USERNAME" : "Username contains",
+        "SEARCH" : "Search users",
+        "EDITUSER" : " Edit user"
     }
 }

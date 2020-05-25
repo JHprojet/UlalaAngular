@@ -32,9 +32,10 @@ import { IsToActivate } from './helpeur/is-to-activate';
 import { IsAnonyme } from './helpeur/is-anonyme';
 import { TranslateModule, TranslateLoader } from '@ngx-translate/core';
 import { TranslateHttpLoader } from '@ngx-translate/http-loader';
+import { TableModule, Table } from 'primeng/table';
+import { PaginatorComponent } from './paginator/paginator.component';
 
 export function createTranslateLoader(http: HttpClient) {
-  console.log("createTranslateLoader Loaded");
   return new TranslateHttpLoader(http, './assets/i18n/', '.json');
 }
 
@@ -58,7 +59,8 @@ export function createTranslateLoader(http: HttpClient) {
     RetrievePasswordComponent,
     AdminUsersComponent,
     AdminStratComponent,
-    TestComponent
+    TestComponent,
+    PaginatorComponent
   ],
   exports: [TranslateModule],
   imports: [
@@ -69,7 +71,7 @@ export function createTranslateLoader(http: HttpClient) {
     FormsModule,
     ModalModule.forRoot(),
     ReactiveFormsModule,
-    
+    TableModule,
     TranslateModule.forRoot({
       loader: {
           provide: TranslateLoader,
@@ -77,7 +79,6 @@ export function createTranslateLoader(http: HttpClient) {
           deps: [HttpClient],
       },
     })
-    
   ],
   providers: [IsAnonyme,IsToActivate,IsUser,IsAdmin,AccessComponent],
   bootstrap: [AppComponent]

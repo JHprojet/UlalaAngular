@@ -1,12 +1,9 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { UtilisateurDAL } from '../service/utilisateur-dal';
 import { Utilisateur } from '../models/utilisateur';
 import { zip, Subject } from 'rxjs';
-import { AccessComponent } from '../helpeur/access-component';
-
-const Users$ = new Subject<boolean>();
-const CheckMail$ = new Subject<boolean>();
-const CheckPseudo$ = new Subject<boolean>();
+import { FormBuilder, Validators } from '@angular/forms';
+import { CustomValidators } from '../service/Validators/validators';
 
 @Component({
   selector: 'app-admin-users',
@@ -15,145 +12,164 @@ const CheckPseudo$ = new Subject<boolean>();
 })
 export class AdminUsersComponent implements OnInit {
 
-  constructor(private utilisateurService:UtilisateurDAL) { }
+  constructor(private cd:ChangeDetectorRef, private fb:FormBuilder, private v:CustomValidators,private utilisateurService:UtilisateurDAL) { }
+  //All Users
+  BaseUsers:Utilisateur[];
+  //Users send to Pagination component
   Users:Utilisateur[];
-  SearchMail:string;
-  SearchPseudo:string;
-  SearchRole:string;
+  //Users displayed depending on the pagination
+  displayUsers:Utilisateur[];
+  //Variable to fill role selection
   SelectRole:string[];
-  message:string;
+  //Variable displaying edit form
   edit:boolean;
-  EditMail:string;
-  EditPseudo:string;
-  EditRole:string;
-  EditActif:number;
-  EditUtil:Utilisateur;
-  messageError:string;
-  messageValidation:string;
-  messageEchec:string;
+  //Displaying or not messages
+  displayUsernameTaken:boolean;
+  displayMailTaken:boolean;
+  displayError:boolean;
+  displaySuccess:boolean;
+  displayNoUserFound:boolean;
+  //Form for the search filter
+  SearchForm = this.fb.group({
+    mail: [''],
+    username: [''],
+    role: ['']
+  },{
+    updateOn: 'change'});
+  //Form to edit a User
+  EditForm = this.fb.group({
+    username: ['', { 
+      validators: [Validators.required, Validators.maxLength(20), Validators.minLength(3)]
+    }],
+    mail: ['', { 
+      validators: [Validators.required, this.v.EmailValidator]
+    }],
+    id: [''],
+    actif: [''],
+    role:['']
+  },{
+    updateOn: 'blur', validators: [], asynchValidators : []});
 
   ngOnInit(): void {
+    this.displayNoUserFound = false;
     this.edit = false;
     this.Users = new Array<Utilisateur>();
+    this.BaseUsers = new Array<Utilisateur>();
+    this.displayUsers = new Array<Utilisateur>();
     this.SelectRole = ["User", "Admin"];
-    this.SearchRole="";
-    this.SearchPseudo="";
-    this.SearchMail="";
-    this.message = "";
-    this.EditMail = "";
-    this.EditPseudo = "";
-    this.EditRole = "";
-    this.EditActif = 1;
-    this.messageError = "";
-    this.messageValidation ="";
-    this.messageEchec = "";
-  }
-
-  search()
-  {
-    this.message = "";
+    this.displayNoUserFound = false;
+    this.displaySuccess = false;
+    this.displayError = false;
     this.utilisateurService.getUsers().subscribe(result => {
+      this.BaseUsers = result;
       this.Users = result;
-      Users$.next(true);
-    })
-    zip(Users$).subscribe(() => {
-      //filter utilisé pour filtrer la liste en fonction du choix via liste déroulante (Valeur par défaut mise en place)
-      this.Users = this.Users.filter(result => result.Role.includes(this.SearchRole) && result.Mail.includes(this.SearchMail) && result.Pseudo.includes(this.SearchPseudo))
-      if (this.Users.length == 0) this.message = "Aucun Utilisateur trouvé.";
     });
   }
 
-  //Assignation valeur du Role, sélection via liste déroulante (Valeur par défaut = User) pour la recherche
-  changeRole(Role) { this.SearchRole = Role.value; }
+  //Update table depending on PaginatorComponent
+  public getPagTable(data) {
+    this.displayUsers = data;
+    this.cd.detectChanges();
+    this.cd.markForCheck();
+  }
 
-  //Assignation valeur du Role lors d'une édition d'un utilisateur existant, sélection via liste déroulante
-  changeEditRole(Role) { this.EditRole = Role.value; }
+  search() {
+    this.displayNoUserFound = false;
+    //Filter the user table depending on SearchForm
+    this.Users = this.BaseUsers.filter(result => result.Role.includes(this.SearchForm.value.role) && result.Mail.includes(this.SearchForm.value.mail) && result.Pseudo.includes(this.SearchForm.value.username))
+    //Display message if no user found
+    if (this.Users.length == 0) this.displayNoUserFound = true;
+  }
 
-  //Assignation valeur "Actif" lors d'une édition d'un utilisateur existant, sélection via liste déroulante
-  changeEditActif(Actif) { this.EditActif = Actif.value; }
-
-  //Remplissage auto des champs lors de sélection d'édition.
-  Edit(id)
-  {
+  //Action on edition
+  Edit(id) {
+    //turn edit to true to show the editForm.
     this.edit = true;
-    this.EditMail = this.Users.find(result => result.Id == id).Mail; 
-    this.EditPseudo = this.Users.find(result => result.Id == id).Pseudo;
-    this.EditActif = this.Users.find(result => result.Id == id).Actif;
-    this.EditRole = this.Users.find(result => result.Id == id).Role;
-    //Utilisation du timeout pour laisser le temps de remplir les variables ci-avant.
-    //Solution à trouvé avec un zip.
-    setTimeout(() => {
-    //bis repatita, c'est moche mais ça marche. Solution à trouver pour améliorer.
-    let myRoleSelect = (document.getElementById("R") as HTMLSelectElement);
+    //Get User by Id (from Edit button)
+    this.utilisateurService.getUserAdmin(id).subscribe(result => {
+      //Auto fill informations of the form
+      this.EditForm.controls.id.setValue(result.Id);
+      this.EditForm.controls.username.setValue(result.Pseudo);
+      this.EditForm.controls.mail.setValue(result.Mail);
+      //Auto fill role select
+      let myRoleSelect = (document.getElementById("role") as HTMLSelectElement);
       for(var i, j = 0; i = myRoleSelect.options[j]; j++) {
-        if(i.value == this.EditRole) {
+        if(i.value == result.Role) {
+          this.EditForm.controls.role.setValue(result.Role);
           myRoleSelect.selectedIndex = j;
             break;
         }
       }
-      let myActifSelect = (document.getElementById("A") as HTMLSelectElement);
+      //Auto fill actif select
+      let myActifSelect = (document.getElementById("actif") as HTMLSelectElement);
       for(var i, j = 0; i = myActifSelect.options[j]; j++) {
-        if(i.value == this.EditActif) {
+        if(i.value == result.Actif) {
+          this.EditForm.controls.actif.setValue(result.Actif);
           myActifSelect.selectedIndex = j;
             break;
         }
       }
-    },100);
-    this.EditUtil = new Utilisateur({
-      Id : id,
-      Pseudo : this.EditPseudo,
-      Mail: this.EditMail,
-      Role : this.EditRole,
-      Actif : this.EditActif
-    })
-  }
-
-  //Envoi des modifications suite à édition via API.
-  Modifier()
-  {
-    this.EditUtil.Mail = this.EditMail;
-    this.EditUtil.Pseudo = this.EditPseudo;
-    this.EditUtil.Role = this.EditRole;
-    this.EditUtil.Actif = this.EditActif;
-    this.CheckPseudo(this.EditUtil.Pseudo, this.EditUtil.Id);
-    this.CheckMail(this.EditUtil.Mail, this.EditUtil.Id);
-    zip(CheckPseudo$, CheckMail$).subscribe(([Pseudo,Mail]) => {
-      if(!Pseudo) this.messageError = "Ce pseudo existe déjà sur un autre utilisateur";
-      else if(!Mail) this.messageError = "Ce Mail existe déjà sur un autre utilisateur";
-      else {
-        this.messageError = "";
-        this.edit = false;
-        this.utilisateurService.putUserById(this.EditUtil, this.EditUtil.Id).subscribe(() => {
-          this.messageValidation = "Le changement a été effectué avec succès.";
-          this.search();
-          setTimeout(() => { this.messageValidation=""; },4000)
-        }, error => {
-          this.messageEchec = "La mise à jour n'a pas fonctionnée. Tu es nul en tant qu'admin.";
-          setTimeout(() => { this.messageEchec=""; },4000)
-        });
-      } 
     });
   }
 
-  //Vérification si pseudo existe déjà lors de l'édition.
-  public CheckPseudo(Pseudo:string, Id:number)
-  {
-    this.utilisateurService.getUserByPseudo(Pseudo).subscribe(result => {
-      if(result.Id == Id) CheckPseudo$.next(true);
-      else CheckPseudo$.next(false);
-    }, error => {
-      CheckPseudo$.next(true);
-    })
+  //Send the edited user
+  Update() {
+    //Hiding error messages
+    this.displayUsernameTaken = false;
+    this.displayMailTaken = false;
+    //Initializing waiting variables
+    let checkUser$ = new Subject<boolean>();
+    let checkMail$ = new Subject<boolean>();
+    //Checking if User and Mail not allready in use on other users
+    this.checkUser(checkUser$);
+    this.checkMail(checkMail$);
+    //When both check are done
+    zip(checkUser$,checkMail$).subscribe(([checkU, checkM]) => {
+      if(!checkU) this.displayUsernameTaken = true;
+      if(!checkM) this.displayMailTaken = true;
+      if(checkU && checkM)
+      {
+        //fill the user to edit with current informations
+        let UserToEdit = new Utilisateur({
+          Id : this.EditForm.value.id,
+          Pseudo : this.EditForm.value.username,
+          Mail: this.EditForm.value.mail,
+          Role : this.EditForm.value.role,
+          Actif : this.EditForm.value.actif
+        });
+        //Call API for update
+        this.utilisateurService.putUserById(UserToEdit, UserToEdit.Id).subscribe(() => {
+          //If success, display message + update local tables + hide EditForm
+          this.displaySuccess = true;
+          this.BaseUsers[this.BaseUsers.findIndex(user => user.Id == this.EditForm.value.id)] = UserToEdit;
+          this.search();
+          this.edit = false;
+          setTimeout(() => { this.displaySuccess =false; },4000)
+        }, error => {
+          //If error, display error message
+          this.displayError = true;
+          setTimeout(() => { this.displayError = false; },4000)
+        });
+      }
+    });
   }
 
-  //Vérification si mail existe déjà lors de l'édition.
-  public CheckMail(Mail:string, Id:number)
+  //Check if username is already taken in another user
+  checkUser(sub:Subject<boolean>)
   {
-    this.utilisateurService.getUserByMail(Mail).subscribe(result => {
-      if(result.Id == Id) CheckMail$.next(true);
-      else CheckMail$.next(false);
-    }, error => {
-      CheckMail$.next(true);
-    })
+    this.utilisateurService.getUserByPseudo(this.EditForm.value.username).subscribe(result => {
+      if(this.EditForm.value.id == result.Id) sub.next(true);
+      else sub.next(false);
+    }, error => {sub.next(true)});
+  }
+
+  //Check if mail is already taken in another user
+  checkMail(sub:Subject<boolean>)
+  {
+    this.utilisateurService.getUserByMail(this.EditForm.value.mail).subscribe(result => {
+      if(this.EditForm.value.id == result.Id) sub.next(true);
+      else sub.next(false);
+    }, error => {sub.next(true)});
   }
 }
+

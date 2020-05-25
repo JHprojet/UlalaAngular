@@ -27,24 +27,19 @@ export class AddStrategieComponent implements OnInit {
 
   //Upload form with custom parameters
   AddForm = this.fb.group({
-    Continent: ['', {
-      validators: [Validators.required]}],
-    Zone: ['', {
-      validators: [Validators.required]}],
-    Boss: ['', {
-      validators: [Validators.required]}],
+    Continent: ['', { validators: [Validators.required]}],
+    Zone: ['', { validators: [Validators.required]}],
+    Boss: ['', { validators: [Validators.required]}],
     Classe1: [''],
     Classe2: [''],
     Classe3: [''],
     Classe4: ['']
-    },{
+  },{
     updateOn: 'change', validators: [this.v.CheckContinent, this.v.CheckZone, this.v.CheckBoss, this.v.CheckClasses]});
   //Upload form with personal Team  
   AddFormWithTeam = this.fb.group({
-    Team: ['', {
-      validators: [Validators.required]}],
-    Boss: ['', {
-      validators: [Validators.required]}],
+    Team: ['', { validators: [Validators.required]}],
+    Boss: ['', { validators: [Validators.required]}],
   },{
     updateOn: 'change', validators: [this.v.CheckBossWithTeam, this.v.CheckTeam]});
 

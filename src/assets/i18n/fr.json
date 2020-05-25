@@ -32,7 +32,8 @@
         "DISCONNECTED" : "Vous avez bien été déconnecté.",
         "ACCOUNTACTIVATED" : "Merci, votre compte à bien été activé, vous allez être rediriger dans un instant. Bonne navigation!",
         "KEYSEND" : "Mail renvoyé, regardez dans votre boite mail ! (Et n'oubliez pas les spams!)",
-        "STRATUPLOAD" : "Stratégie bien importée, merci pour votre partage!"
+        "STRATUPLOAD" : "Stratégie bien importée, merci pour votre partage!",
+        "EDIT" : "Le changement a été effectué avec succès."
     },
     "ERRORMESSAGES" : {
         "LOGIN" : "Utilisateur ou Mot de passe invalide",
@@ -49,7 +50,17 @@
         "SAMEIMAGEFORMAT" : "Vos 4 fichiers doivent être du même format (JPG, JPEG, PNG).",
         "WAIT" : "Processing, please wait...",
         "BADIMAGE" : "Vos 4 images doivent être comme spécifié dans l'aide (voir l'aide plus haut).",
-        "SELECTIMAGES" : "Veuillez sélectionner les 4 images de votre stratégie."
+        "SELECTIMAGES" : "Veuillez sélectionner les 4 images de votre stratégie.",
+        "VALIDATORS" : {
+            "USERNAMEREQUIRED" : "Le pseudo doit être renseigné.",
+            "USERNAMEMIN" : "Votre pseudo ne peux pas faire moins de 3 caractères.",
+            "USERNAMEMAX" : "Votre pseudo ne peux pas faire plus de 20 caractères.",
+            "USERNAMETAKEN" : "Ce pseudo est déjà pris par un autre utilisateur.",
+            "MAILREQUIRED" : "L'E-mail doit être renseigné.",
+            "MAILFORMAT" : "Le format de l'e-mail est incorrect.",
+            "MAILTAKEN" : "Cet E-mail est déjà utilisé"
+
+        }
     },
     "INFOMESSAGES" : {
         "RETRIEVEPASSWORD" : "Perdu votre mot de passe ou votre pseudo? Cliquez ici!",
@@ -78,6 +89,44 @@
         "BOSS" : "Boss",
         "CLASSE" : "Classe",
         "IMAGES" : "Images",
-        "OK" : "Valider"
+        "OK" : "Valider",
+        "YES" : "Oui",
+        "NO" : "Non",
+        "CLASSES" : "Classes",
+        "ID" : "Id",
+        "NOTE" : "Note",
+        "USER" : "Utilisateur",
+        "ASC" : "Asc",
+        "DSC" : "Dsc",
+        "MAIL" : "E-mail",
+        "EDIT" : "Editer",
+        "CLICKHERE" : "Cliquez ici!",
+        "USERNAME" : "Pseudo",
+        "ROLE" : "Rôle",
+        "ACTIVE" : "Actif"
+    },
+    "ADMINSTRAT" : {
+        "TITLE" : "Gestion des stratégies",
+        "ID" : "L'Id contient",
+        "USERNAME" : "Le pseudo contient",
+        "SORTBY" : "Tri par",
+        "ORDER" : "Ordre",
+        "SEARCHSTRATEGY" : "Chercher enregistrements",
+        "MESSMODAL1" : "Etes vous sûr de vouloir supprimer l'enregistrement sélectionnée?",
+        "MESSMODAL2" : "Cette action est irréversible!!"
+    },
+    "PAGINATOR" : {
+        "NEXT" : "Suivant",
+        "PREVIOUS" : "Précédent",
+        "LAST" : "Dernière page",
+        "FIRST" : "Première page"
+    },
+    "ADMINUSER" : {
+        "TITLE" : "Gestion Admin des Utilisateurs",
+        "MAIL" : "Le mail contient",
+        "USERNAME" : "Le pseudo contient",
+        "SEARCH" : "Chercher un utilisateur",
+        "EDITUSER" : " Modifier l'utilisateur",
+        "NOUSERFOUND" : "Aucun utilisateur trouvé."
     }
 }

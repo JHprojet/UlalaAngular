@@ -1,64 +1,106 @@
 <br/>
-<h2>Gestion des stratégies</h2>
+<h2>{{ 'ADMINSTRAT.TITLE' | translate }}</h2>
 <br/>
 
 <div class="col-sm-12 form-group row">
-    <label class="col-sm-2 col-form-label">L'Id contient :</label>
+    <label class="col-sm-2 col-form-label">
+        {{ 'ADMINSTRAT.ID' | translate }} :
+    </label>
     <div class="col-sm-1">
         <input type="text" value="{{SearchId}}" class="form-control" [(ngModel)]="SearchId" name="SearchId">
     </div>
-    <label class="col-sm-2 col-form-label">Le pseudo contient :</label>
+    <label class="col-sm-2 col-form-label">
+        {{ 'ADMINSTRAT.USERNAME' | translate }} :
+    </label>
     <div class="col-sm-2">
         <input type="text" value="{{SearchPseudo}}" class="form-control" [(ngModel)]="SearchPseudo" name="SearchPseudo">
     </div>
-    <label class="col-sm-1 col-form-label"></label>
-    <label class="col-sm-1 col-form-label">Tri par : </label>
+    <label class="col-sm-2 col-form-label">
+        {{ 'ADMINSTRAT.SORTBY' | translate }} :
+    </label>
     <select class="form-control col-sm-1" NgModel (change)="ChangeTri(Tri)" #Tri>
-        <option value="Id">Id</option>
-        <option value="Note">Note</option>
+        <option value="Id">
+            {{ 'KEYWORD.ID' | translate }}
+        </option>
+        <option value="Note">
+            {{ 'KEYWORD.NOTE' | translate }}
+        </option>
     </select>
-    <label class="col-sm-1 col-form-label">Ordre :</label>
+    <label class="col-sm-1 col-form-label">
+        {{ 'ADMINSTRAT.ORDER' | translate }} :
+    </label>
     <select class="form-control col-sm-1" NgModel (change)="ChangeOrdre(Ordre)" #Ordre>
-        <option value="0">Asc</option>
-        <option value="1">Dsc</option>
+        <option value="0">
+            {{ 'KEYWORD.ASC' | translate }}
+        </option>
+        <option value="1">
+            {{ 'KEYWORD.DSC' | translate }}
+        </option>
     </select>
 </div>
     
 <div class="col-sm-12 mx-auto form-group row" style="width: 300px;">
-    <button (click)="Search()" type="submit" class=" btn btn-secondary btn-lg">Chercher Enregistrements</button>
+    <button (click)="Search()" type="submit" class=" btn btn-secondary btn-lg">
+        {{ 'ADMINSTRAT.SEARCHSTRATEGY' | translate }}
+    </button>
 </div>
 
-<ng-template #template>
-    <div class="modal-body text-center">
-      <p>Etes vous sûr de vouloir supprimer l'enregistrement sélectionnée?</p><br/>
-      <p class="red">Cette action est irréversible!!</p><br/>
-      <button type="button" class="btn btn-default" (click)="confirm()">Oui</button>
-      <button type="button" class="btn btn-primary" (click)="decline()">Non</button>
-    </div>
-  </ng-template>
-  <hr/>
 <table class="table table-striped">
     <thead class="thead-dark">
         <tr>
-            <th>Id</th>
-            <th>Utilisateur</th>
-            <th>Continent</th>
-            <th>Zone</th>
-            <th>Boss</th>
-            <th>Classes</th>
-            <th style="width:10%;">Images</th>
-            <th>Note</th>
-            <th>X</th>
+            <th>
+                {{ 'KEYWORD.ID' | translate }}
+            </th>
+            <th>
+                {{ 'KEYWORD.USER' | translate }}
+            </th>
+            <th>
+                {{ 'KEYWORD.CONTINENT' | translate }}
+            </th>
+            <th>
+                {{ 'KEYWORD.ZONE' | translate }}
+            </th>
+            <th>
+                {{ 'KEYWORD.BOSS' | translate }}
+            </th>
+            <th>
+                {{ 'KEYWORD.CLASSES' | translate }}
+            </th>
+            <th style="width:10%;">
+                {{ 'KEYWORD.IMAGES' | translate }}
+            </th>
+            <th>
+                {{ 'KEYWORD.NOTE' | translate }}
+            </th>
+            <th>
+                X
+            </th>
         </tr>
     </thead>
     <tbody>
-        <tr *ngFor="let elem of Strats">
+        <tr *ngFor="let elem of displayStrat">
             <td class="align-middle">{{elem.Id}}</td>
             <td class="align-middle">{{elem.Utilisateur.Pseudo}}</td>
-            <td class="align-middle">{{elem.BossZone.Zone.ContinentFR}}</td>
-            <td class="align-middle">{{elem.BossZone.Zone.ZoneFR}}</td>
-            <td class="align-middle">{{elem.BossZone.Boss.NomFR}} </td>
-            <td class="align-middle">{{elem.Team.Classe1.NomFR}} - {{elem.Team.Classe2.NomFR}} <br/> {{elem.Team.Classe3.NomFR}} - {{elem.Team.Classe4.NomFR}}</td>
+            <td class="align-middle">
+                <ng-container *ngIf="Lang == 'fr'">{{elem.BossZone.Zone.ContinentFR}}</ng-container>
+                <ng-container *ngIf="Lang == 'en'">{{elem.BossZone.Zone.ContinentEN}}</ng-container>
+            </td>
+            <td class="align-middle">
+                <ng-container *ngIf="Lang == 'fr'">{{elem.BossZone.Zone.ZoneFR}}</ng-container>
+                <ng-container *ngIf="Lang == 'en'">{{elem.BossZone.Zone.ZoneEN}}</ng-container>
+            </td>
+            <td class="align-middle">
+                <ng-container *ngIf="Lang == 'fr'">{{elem.BossZone.Boss.NomFR}}</ng-container>
+                <ng-container *ngIf="Lang == 'en'">{{elem.BossZone.Boss.NomEN}}</ng-container>
+            </td>
+            <td class="align-middle">
+                <ng-container *ngIf="Lang == 'fr'">
+                    {{elem.Team.Classe1.NomFR}} - {{elem.Team.Classe2.NomFR}} <br/> {{elem.Team.Classe3.NomFR}} - {{elem.Team.Classe4.NomFR}}
+                </ng-container>
+                <ng-container *ngIf="Lang == 'en'">
+                    {{elem.Team.Classe1.NomEN}} - {{elem.Team.Classe2.NomEN}} <br/> {{elem.Team.Classe3.NomEN}} - {{elem.Team.Classe4.NomEN}}
+                </ng-container>
+            </td>
             <td class="align-middle" style="width:15%;">
                 <img src={{elem.ImagePath1}} width="30px">
                 <img src={{elem.ImagePath2}} width="30px">
@@ -70,4 +112,27 @@
         </tr>
     </tbody>  
 </table>
-<br/><br/><br/>
+
+<ng-template #template>
+    <div class="modal-body text-center">
+        <p>
+            {{ 'ADMINSTRAT.MESSMODAL1' | translate }}
+        </p>
+        <br/>
+        <p class="red">
+            {{ 'ADMINSTRAT.MESSMODAL2' | translate }}
+        </p><br/>
+        <button type="button" class="btn btn-default" (click)="confirm()">
+            {{ 'KEYWORD.YES' | translate }}
+        </button>
+        <button type="button" class="btn btn-primary" (click)="decline()">
+            {{ 'KEYWORD.NO' | translate }}
+        </button>
+    </div>
+</ng-template>
+
+<app-paginator [data]="Strats" (PagTableEvent)="getPagTable($event)"></app-paginator>
+<hr/>
+<br/>
+<br/>
+<br/>

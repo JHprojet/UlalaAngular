@@ -8,9 +8,7 @@ const EndPoint = "http://localhost:44312/api/";
 
 @Injectable({ providedIn: 'root' })
 export class UtilisateurDAL {
-  constructor(private http: HttpClient,private accessService:AccessComponent) { 
-
-  }
+  constructor(private http: HttpClient,private accessService:AccessComponent) { }
   httpOptions = {
     headers: new HttpHeaders({
       'Content-Type':  'application/json',
@@ -46,6 +44,9 @@ export class UtilisateurDAL {
   }
   getUser(id:number): Observable<Utilisateur> {
     return this.http.get<Utilisateur>(EndPoint+'Utilisateur/'+id, this.httpOptions)
+  }
+  getUserAdmin(id:number): Observable<Utilisateur> {
+    return this.http.get<Utilisateur>(EndPoint+'Admin/'+id, this.httpOptions)
   }
   getUserByPseudo(pseudo:string): Observable<Utilisateur> {
     return this.http.get<Utilisateur>(EndPoint+'Utilisateur/?pseudo='+pseudo, this.httpOptions)

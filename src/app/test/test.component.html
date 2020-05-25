@@ -1,155 +1,134 @@
 <br/>
-<ng-container *ngIf="!UploadOK || !UploadFail">
-    <div *ngIf="UploadOK" class="alert alert-success" role="alert">Stratégie bien importée, merci pour votre partage!</div>
-    <div *ngIf="UploadFail" class="alert alert-danger" role="alert">Oops, il semblerait qu'un problème soit survenue (quel développeur de merde quand même). Veuillez réessayer.</div>
-</ng-container>
-<hr/>
-<div class="form-group row">
-    &nbsp;&nbsp;<h2>Ajouter une stratégie</h2>&nbsp;&nbsp;&nbsp;&nbsp;
-    <button (click)="ShowHelp()" type="button" class="btn btn-light dropdown-toggle">
-        <ng-container *ngIf="Show">Fermer l'aide</ng-container>
-        <ng-container *ngIf="!Show">Afficher l'aide</ng-container>
-    </button>
-</div>
-<hr/>
-<div class="help" *ngIf="Show">
-    <strong>Information sur l'ajout d'une stratégie :</strong>
-    <br/><br/>
-   1 - Sélectionnez tous les champs : Continent, Zone, Boss, et les 4 classes de votre team.<br/>
-   2 - Uploadez les 4 images de votre stratégie : Les 4 images doivent avoir le même format et être en jpg ou en png.<br/><br/>
-
-   Type des images attendu : <p class="helpss">(Aucune autre image, ne sera acceptée)</p>
-   <br/>
-   <img src="http://192.168.1.2:8081/exemple.jpg" width="150px">
-    <hr/>
-</div>
-
-<button *ngIf="accessUser" type="submit" class="mx-auto btn btn-info" (click)="switchForm()">
-    <ng-container *ngIf="AddWithTeam">Je veux utiliser la recherche personnalisée</ng-container>
-    <ng-container *ngIf="!AddWithTeam">Je veux utiliser la recherche via une de mes teams</ng-container>
-    
-</button>
-<br *ngIf="accessUser"/><br *ngIf="accessUser"/>
-<form [formGroup]="AddFormWithTeam" (ngSubmit)="onSubmitWithTeam()" *ngIf="AddWithTeam" class="form-group">
-    <div *ngIf="selectMesTeams.length">
-        <div class="form-group row">
-            <label class="col-form-label col-sm-2">Choisir sa team</label>
-            <select id="Team" class="form-control col-sm-2" (change)="GetBossViaTeam(C)" #C formControlName="Team">
-                <option value=""></option>
-                <option *ngFor="let MaTeam of selectMesTeams" value={{MaTeam.Id}}>{{MaTeam.NomTeam}}</option>
-            </select>
-            <label class="col-sm-1 col-form-label">Boss</label>
-            <select class="form-control col-sm-3" formControlName="Boss">
-                <option value=""></option>
-                <option *ngFor="let boss of selectBoss" value={{boss}}>{{boss}}</option>
-            </select>
+<h2>{{ 'ADMINUSER.TITLE' | translate }}</h2>
+<br/>
+<!-- Search Options -->
+<form [formGroup]="SearchForm" (ngSubmit)="search()" class="form-group">
+    <div class="row">
+        <label class="col-sm-2 col-form-label">{{ 'ADMINUSER.MAIL' | translate }} :</label>
+        <div class="col-sm-2">
+            <input id="mail" type="text" class="form-control" formControlName="mail">
         </div>
-        <div class="form-group row">
-            <label class="col-sm-1 col-form-label">Images</label>
-            <input type="file" class="form-control-file col-sm-4"  id="inputImages" multiple (change)="checkImages(input)" #input>
-            <div *ngIf="Loading" class="spinner-border text-dark" role="status">
-                <span class="sr-only">Loading...</span>
-            </div>
-            <button type="submit" style="margin-left:30px;width:100px;" id="inputImagesWithTeam" [disabled]="!AddFormWithTeam.valid || !OkImage$ || errorImage != 0" class=" btn btn-danger btn-sm">Valider</button>
+        <label class="col-sm-2 col-form-label">{{ 'ADMINUSER.USERNAME' | translate }} :</label>
+        <div class="col-sm-2">
+            <input id="username" type="text" class="form-control" formControlName="username">
         </div>
+        <label class="col-sm-1 col-form-label">{{ 'KEYWORD.ROLE' | translate }} : </label>
+        <select class="form-control col-sm-2" formControlName="role" id="role">
+            <option value=""></option>
+            <option *ngFor="let Role of SelectRole" value={{Role}}>{{Role}}</option>
+        </select>
     </div>
-    <ng-container *ngIf="selectMesTeams.length == 0">
-        <p>Vous n'avez pas encore de team favorite. Si vous souhaitez en créer afin de simplifier la recherche de stratégie : <a routerLink='/prefs'>C'est par ici!</a></p>
-    </ng-container>
-    <div *ngIf="AddFormWithTeam.errors?.BossIsNeeded && (AddFormWithTeam.touched || AddFormWithTeam.dirty)" class="cross-validation-error-message alert alert-danger">
-        Le boss doit être sélectionné.
+    <br/>
+    <!-- Search Button -->
+    <div class="col-sm-12 mx-auto form-group row" style="width: 300px;">
+        <button type="submit" [disabled]="!SearchForm.valid" class=" btn btn-secondary btn-lg">{{ 'ADMINUSER.SEARCH' | translate }}</button>
     </div>
-    <ng-container *ngIf="errorImage != 0 && selectMesTeams.length">
-        <div  *ngIf="errorImage == 1" class="alert alert-danger" role="alert">Vous devez sélectionner 4 images.</div>
-        <div  *ngIf="errorImage == 2" class="alert alert-danger" role="alert">Vos fichiers doivent être uniquement au format JPG, JPEG ou PNG</div>
-        <div  *ngIf="errorImage == 3" class="alert alert-danger" role="alert">Vos 4 fichiers doivent être du même format (JPG, JPEG, PNG)</div>
-        <div  *ngIf="errorImage == 4" class="alert alert-danger" role="alert">Processing, please wait...</div>
-        <div  *ngIf="errorImage == 5" class="alert alert-danger" role="alert">Vos 4 images doivent être comme spécifié dans l'aide (voir l'aide plus haut).</div>
-        <div  *ngIf="errorImage == 6" class="alert alert-danger" role="alert">Veuillez sélectionner les 4 images de votre stratégie.</div>
-    </ng-container>
 </form>
-
-
-
-<form [formGroup]="AddForm" (ngSubmit)="onSubmit()" *ngIf="!AddWithTeam">
-    <div class="form-group row">
-        <!-- Select Continent -->
-        <label class="col-sm-2 col-form-label">Continent : </label>
-        <select id="Continent" class="form-control col-sm-2" (change)="GetZones(C)" #C formControlName="Continent">
-            <option value=""></option>
-            <option *ngFor="let elem of selectContinent" value="{{elem}}">{{elem}}</option>
-        </select>
-        <!-- Select Zone -->
-        <label class="col-sm-1 col-form-label">Zone : </label>
-        <select id="Zone" class="form-control col-sm-3" (change)="GetBoss(C,Z)" #Z formControlName="Zone">
-            <option value=""></option>
-            <option *ngFor="let elem of selectZone" value="{{elem}}">{{elem}}</option>
-        </select>
-        <!-- Select Boss -->
-        <label class="col-sm-1 col-form-label">Boss : </label>
-        <select id="Boss" class="form-control col-sm-3"  formControlName="Boss">
-            <option value=""></option>
-            <option *ngFor="let elem of selectBoss" value="{{elem}}">{{elem}}</option>
-        </select>
-    </div>
-    <div *ngIf="AddForm.errors?.ContinentIsNeeded" class="cross-validation-error-message alert alert-danger">
-        Le continent doit être sélectionné.
-    </div>
-    <div *ngIf="AddForm.errors?.ZoneIsNeeded" class="cross-validation-error-message alert alert-danger">
-        La zone doit être sélectionnée.
-    </div>
-    <div *ngIf="AddForm.errors?.BossIsNeeded" class="cross-validation-error-message alert alert-danger">
-        Le boss doit être sélectionné.
-    </div>
-    <div class="form-group row">
-        <!-- Select Classe 1 -->
-        <div class="col-sm-5 row">
-            <label class="col-sm col-form-label">Classe 1 : </label>
-            <select id="Classe1" class="form-control col-sm" formControlName="Classe1">
-                <option value=""></option>
-                <option *ngFor="let elem of selectClasse" value="{{elem.Id}}">{{elem.NomFR}}</option>
-            </select>
-        <!-- Select Classe 2 -->
-            <label class="col-sm col-form-label">Classe 2 : </label>
-            <select id="Classe2" class="form-control col-sm"  formControlName="Classe2">
-                <option value=""></option>
-                <option *ngFor="let elem of selectClasse" value="{{elem.Id}}">{{elem.NomFR}}</option>
-            </select>
+<hr/>
+<br/>
+<!-- Edit Form -->
+<ng-container *ngIf="edit">
+    <form [formGroup]="EditForm" (ngSubmit)="Update()" class="form-group">
+        <!-- id hidden Field -->
+        <input id="id" type="text" class="form-control" formControlName="id" hidden>
+        <!-- username Field -->
+        <div class="col-sm-12 form-group row">
+            <label class="col-sm-4 col-form-label">{{ 'KEYWORD.USERNAME' | translate }} : </label>
+            <div class="col-sm-8">
+                <input id="username" type="text" class="form-control" formControlName="username">
+            </div>
         </div>
-        <!-- Select Classe 3 -->
-        <div class="col-sm-5 row">
-            <label class="col-sm col-form-label">Classe 3 : </label>
-            <select id="Classe3" class="form-control col-sm"  formControlName="Classe3">
-                <option value=""></option>
-                <option *ngFor="let elem of selectClasse" value="{{elem.Id}}">{{elem.NomFR}}</option>
-            </select>
-        <!-- Select Classe 4 -->
-            <label class="col-sm col-form-label">Classe 4 : </label>
-            <select id="Classe4" class="form-control col-sm"  formControlName="Classe4">
-                <option value=""></option>
-                <option *ngFor="let elem of selectClasse" value="{{elem.Id}}">{{elem.NomFR}}</option>
-            </select>
+        <!-- Validation username message -->
+        <div *ngIf="EditForm.controls.username.invalid && (EditForm.controls.username.dirty || EditForm.controls.username.touched) || displayUsernameTaken" class="alert alert-danger">
+            <div *ngIf="EditForm.controls.username.errors?.required">
+                {{ 'ERRORMESSAGES.VALIDATORS.USERNAMEREQUIRED' | translate }}
+            </div>
+            <div *ngIf="EditForm.controls.username.errors?.minlength">
+                {{ 'ERRORMESSAGES.VALIDATORS.USERNAMEMIN' | translate }}
+            </div>
+            <div *ngIf="EditForm.controls.username.errors?.maxlength">
+                {{ 'ERRORMESSAGES.VALIDATORS.USERNAMEMAX' | translate }}
+            </div>
+            <div *ngIf="displayUsernameTaken">
+                {{ 'ERRORMESSAGES.VALIDATORS.USERNAMETAKEN' | translate }}
+            </div>
         </div>
-    </div>
-    <div *ngIf="AddForm.errors?.AllClassesNeeded" class="cross-validation-error-message alert alert-danger">
-        Les 4 classes doivent être sélectionnées.
-    </div>
-    <div class="form-group row">
-        <label class="col-sm-1 col-form-label">Images</label>
-        <input type="file" class="form-control-file col-sm-4" multiple (change)="checkImages(input)" #input id="inputImages">
-        <div *ngIf="Loading" class="spinner-border text-dark" role="status">
-            <span class="sr-only">Loading...</span>
+        <!-- E-mail Field -->
+        <div class="col-sm-12 form-group row">
+            <label class="col-sm-4 col-form-label">{{ 'KEYWORD.MAIL' | translate }} : </label>
+            <div class="col-sm-8">
+                <input type="mail" class="form-control" formControlName="mail">
+            </div>
         </div>
-        <button type="submit" style="margin-left:30px;width:100px;" [disabled]="!AddForm.valid || !OkImage$ || errorImage != 0" class=" btn btn-danger btn-sm">Valider</button>
-    </div>
-    <ng-container *ngIf="errorImage != 0">
-        <div  *ngIf="errorImage == 1" class="alert alert-danger" role="alert">Vous devez sélectionner 4 images.</div>
-        <div  *ngIf="errorImage == 2" class="alert alert-danger" role="alert">Vos fichiers doivent être uniquement au format JPG, JPEG ou PNG</div>
-        <div  *ngIf="errorImage == 3" class="alert alert-danger" role="alert">Vos 4 fichiers doivent être du même format (JPG, JPEG, PNG)</div>
-        <div  *ngIf="errorImage == 4" class="alert alert-danger" role="alert">Processing, please wait...</div>
-        <div  *ngIf="errorImage == 5" class="alert alert-danger" role="alert">Vos 4 images doivent être comme spécifié dans l'aide (voir l'aide plus haut).</div>
-        <div  *ngIf="errorImage == 6" class="alert alert-danger" role="alert">Veuillez sélectionner les 4 images de votre stratégie.</div>
-    </ng-container>
-</form>   
-<hr/> 
-        
+        <!-- Validation E-mail messages -->
+        <div *ngIf="EditForm.controls.mail.invalid && (EditForm.controls.mail.dirty || EditForm.controls.mail.touched)" class="alert alert-danger">
+            <div *ngIf="EditForm.controls.mail.errors?.required">
+                {{ 'ERRORMESSAGES.VALIDATORS.MAILREQUIRED' | translate }}
+            </div>
+            <div *ngIf="EditForm.controls.mail.errors?.emailFormat">
+                {{ 'ERRORMESSAGES.VALIDATORS.MAILFORMAT' | translate }}
+            </div>
+        </div>
+        <div *ngIf="displayMailTaken" class="alert alert-danger">
+            {{ 'ERRORMESSAGES.VALIDATORS.MAILTAKEN' | translate }}
+        </div>
+        <!-- Role Field -->
+        <div class="col-sm-12 form-group row">
+            <label class="col-sm-4 col-form-label">{{ 'KEYWORD.ACTIVE' | translate }} : </label>
+            <div class="col-sm-8">
+                <select class="form-control col-sm-3" formControlName="actif" id="actif">
+                    <option value="0">0</option>
+                    <option value="1">1</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Actif Field -->
+        <div class="col-sm-12 form-group row">
+            <label class="col-sm-4 col-form-label">{{ 'KEYWORD.ROLE' | translate }} : </label>
+            <div class="col-sm-8">
+                <select class="form-control col-sm-3" formControlName="role" id="role">
+                    <option *ngFor="let Role of SelectRole" value={{Role}}>{{Role}}</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="col-sm-12 mx-auto form-group row" style="width: 300px;">
+            <button type="submit" [disabled]="!EditForm.valid" class=" btn btn-secondary btn-lg">{{ 'ADMINUSER.EDITUSER' | translate }}</button>
+        </div>
+    </form>
+</ng-container>
+<div *ngIf="displayNoUserFound" class="alert alert-danger" role="alert">
+    {{ 'ADMINUSER.NOUSERFOUND' | translate }}
+</div>
+<div *ngIf="displayError" class="alert alert-danger" role="alert">
+    {{ 'ERRORMESSAGES.SAVAGEERROR' | translate }}
+</div>
+<div *ngIf="displaySuccess" class="alert alert-success" role="alert">
+    {{ 'SUCCESSMESSAGES.EDIT' | translate }}
+</div>
+<br *ngIf=" displayNoUserFound || displayError || displaySuccess "/>
+    <table class="table table-striped">
+        <thead class="thead-dark">
+            <tr>
+                <th>{{ 'KEYWORD.ID' | translate }}</th>
+                <th>{{ 'KEYWORD.USERNAME' | translate }}</th>
+                <th>{{ 'KEYWORD.MAIL' | translate }}</th>
+                <th>{{ 'KEYWORD.ROLE' | translate }}</th>
+                <th>{{ 'KEYWORD.ACTIVE' | translate }}</th>
+                <th>{{ 'KEYWORD.EDIT' | translate }}</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr *ngFor="let elem of displayUsers">
+                <td class="align-middle">{{elem.Id}}</td>
+                <td class="align-middle">{{elem.Pseudo}}</td>
+                <td class="align-middle">{{elem.Mail}}</td>
+                <td class="align-middle">{{elem.Role}} </td>
+                <td class="align-middle">{{elem.Actif}}</td>
+                <td class="align-middle"><button class="btn btn-primary" type="button" (click)="Edit(elem.Id)">{{ 'KEYWORD.EDIT' | translate }}</button></td>
+            </tr>
+        </tbody>  
+    </table>
+    <app-paginator [data]="Users" (PagTableEvent)="getPagTable($event)"></app-paginator>
+    <br/><br/><br/>
