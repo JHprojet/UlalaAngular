@@ -1,6 +1,5 @@
 import { Component, OnInit } from '@angular/core';
 import { UtilisateurDAL } from '../service/utilisateur-dal';
-import { AccessComponent } from '../helpeur/access-component';
 import { Utilisateur } from '../models/utilisateur';
 import { FormBuilder, Validators } from '@angular/forms';
 import { CustomValidators } from '../service/Validators/validators';

@@ -44,7 +44,7 @@ const routes: Routes = [];
     {path : 'favstrat', component: SearchStrategieComponent, canActivate: [IsAnonyme]},
     {path : 'inscription', component: InscriptionComponent, canActivate: [IsAnonyme]},
     {path : 'activation', component: ActivationComponent, canActivate: [IsToActivate]},
-    {path : 'RetrievePassword', component: RetrievePasswordComponent, canActivate: [IsUser]},
+    {path : 'RetrievePassword', component: RetrievePasswordComponent, canActivate: [IsAnonyme]},
     {path : 'admusers', component: AdminUsersComponent, canActivate: [IsAdmin]},
     {path : 'admstrats', component: AdminStratComponent, canActivate: [IsAdmin]},
     {path : 'test', component: TestComponent, canActivate: [IsAnonyme]}

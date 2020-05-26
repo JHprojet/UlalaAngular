@@ -33,7 +33,8 @@
         "ACCOUNTACTIVATED" : "Merci, votre compte à bien été activé, vous allez être rediriger dans un instant. Bonne navigation!",
         "KEYSEND" : "Mail renvoyé, regardez dans votre boite mail ! (Et n'oubliez pas les spams!)",
         "STRATUPLOAD" : "Stratégie bien importée, merci pour votre partage!",
-        "CHANGE" : "Le changement a été effectué avec succès."
+        "CHANGE" : "Le changement a été effectué avec succès.",
+        "REGISTER" : "Vous êtes bien inscris. Vous pouvez vous connecter en haut à droite de l'écran."
     },
     "ERRORMESSAGES" : {
         "LOGIN" : "Utilisateur ou Mot de passe invalide",
@@ -51,6 +52,7 @@
         "WAIT" : "Processing, please wait...",
         "BADIMAGE" : "Vos 4 images doivent être comme spécifié dans l'aide (voir l'aide plus haut).",
         "SELECTIMAGES" : "Veuillez sélectionner les 4 images de votre stratégie.",
+        "TRYAGAIN" : "Oops il semble qu'il y ai eu un problème. Merci de recommencer.",
         "VALIDATORS" : {
             "USERNAMEREQUIRED" : "Le pseudo doit être renseigné.",
             "USERNAMEMIN" : "Votre pseudo ne peux pas faire moins de 3 caractères.",
@@ -58,12 +60,14 @@
             "USERNAMETAKEN" : "Ce pseudo est déjà pris par un autre utilisateur.",
             "MAILREQUIRED" : "L'E-mail doit être renseigné.",
             "MAILFORMAT" : "Le format de l'e-mail est incorrect.",
-            "MAILTAKEN" : "Cet E-mail est déjà utilisé",
-            "PASSWORDREQUIRED" : "Le mot de passe doit être renseigné",
+            "MAILTAKEN" : "Cet E-mail est déjà utilisé.",
+            "PASSWORDREQUIRED" : "Le mot de passe doit être renseigné.",
             "PASSWORDMAX" : "Votre mot de passe ne peux pas faire plus de 40 caractères.",
             "PASSWORDMIN" : "Votre mot de passe ne peux pas faire moins de 8 caractères.",
-            "PASSWORDMATCHING" : "Les deux mots de passe doivent être identique",
-            "WRONGPASSWORD" : "Le mot de passe est erroné"
+            "PASSWORDMATCHING" : "Les deux mots de passe doivent être identique.",
+            "WRONGPASSWORD" : "Le mot de passe est erroné.",
+            "RETRIEVEINFO" : "Pour retrouver vos informations",
+            "MAILMATCH" : "Les deux E-mail doivent correspondre."
         }
     },
     "INFOMESSAGES" : {
@@ -145,5 +149,11 @@
         "TITLE" :"Classes de personnage",
         "ONCONST" : "En construction.",
         "LIST" : "Liste des classes"
+    },
+    "INSCRIPTION" : {
+        "TITLE" : "Formulaire d'inscription",
+        "MAIL" : "Confirmez le mail",
+        "PASSWORD" : "Confirmez mot de passe",
+        "NOW" : "Je m'inscris maintenant!"
     }
 }

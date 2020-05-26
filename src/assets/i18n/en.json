@@ -33,7 +33,8 @@
         "ACCOUNTACTIVATED" : "Your account has been activated, you will be redirect to home page. Have fun!",
         "KEYSEND" : "Mail sent, look in your mailbox! (And don't forget the spam!)",
         "STRATUPLOAD" : "Strategy well imported, thank you for sharing!",
-        "CHANGE" : "Change has been made succefully."
+        "CHANGE" : "Change has been made successfully.",
+        "REGISTER" : "You registred succefuly. You can log in at the top right of the screen"
     },
     "ERRORMESSAGES" : {
         "LOGIN" : "User or password not valid.",
@@ -51,10 +52,11 @@
         "WAIT" : "Processing, please wait...",
         "BADIMAGE" : "Your 4 images must be as specified in the help (see next to the title to show help).",
         "SELECTIMAGES" : "Select the 4 images of your strategy.",
+        "TRYAGAIN" : "Oops an error occured. Please try again.",
         "VALIDATORS" : {
             "USERNAMEREQUIRED" : "Username must be filled in.",
             "USERNAMEMIN" : "Username min caracters : 3.",
-            "USERNAMEMAX" : "USername max caracters : 20.",
+            "USERNAMEMAX" : "Username max caracters : 20.",
             "USERNAMETAKEN" : "This username is allready taken.",
             "MAILREQUIRED" : "Mail must be filled in.",
             "MAILFORMAT" : "Mail bad format.",
@@ -63,7 +65,9 @@
             "PASSWORDMAX" : "Your password can't have more than 40 caracters.",
             "PASSWORDMIN" : "Your password can't have less than 8 caracters.",
             "PASSWORDMATCHING" : "Both passwords must match.",
-            "WRONGPASSWORD" : "Wrong password."
+            "WRONGPASSWORD" : "Wrong password.",
+            "RETRIEVEINFO" : "To retrieve your infiormations",
+            "MAILMATCH" : "Both E-mail must match."
         }
     },
     "INFOMESSAGES" : {
@@ -144,5 +148,11 @@
         "TITLE" :"Character Classes",
         "ONCONST" : "Under construction",
         "LIST" : "List of classes"
+    },
+    "INSCRIPTION" : {
+        "TITLE" : "Register Form",
+        "MAIL" : "Confirm mail",
+        "PASSWORD" : "Confirm password",
+        "NOW" : "Register now!"
     }
 }

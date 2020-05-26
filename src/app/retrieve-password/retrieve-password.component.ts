@@ -15,7 +15,7 @@ export class RetrievePasswordComponent implements OnInit {
   MessageMail:string="";
   MessageOK:string="";
   MessageNOK:string="";
-  constructor(private accessService:AccessComponent,private utilisateurService:UtilisateurDAL) { }
+  constructor(private utilisateurService:UtilisateurDAL) { }
 
   ngOnInit(): void {
   }
