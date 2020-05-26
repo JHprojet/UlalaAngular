@@ -1,16 +1,30 @@
 <br/>
-<h2>Classes de personnage</h2>
+<h2>
+    {{ 'CLASSE.TITLE' | translate }}
+</h2>
 <br/><br/>
 <div class="form-group row">
-    <label class="col-sm-2 col-form-label">Liste des classes : </label>
+    <label class="col-sm-2 col-form-label">
+        {{ 'CLASSE.LIST' | translate }} :
+    </label>
     <select class="form-control col-sm-2" NgModel (change)="changeClasse(Classe)" #Classe>
         <option value="0"></option>
-        <option *ngFor="let classe of selectClasse" value={{classe.Id}}>{{classe.NomFR}}</option>
+        <option *ngFor="let classe of selectClasse" value={{classe.Id}}>
+            <ng-container *ngIf="Lang == 'fr'">{{classe.NomFR}}</ng-container>
+            <ng-container *ngIf="Lang == 'en'">{{classe.NomEN}}</ng-container>
+        </option>
     </select>
 </div>
 <ng-container *ngIf="ClasseActive.Id != null">
-<br/><h4>Informations sur le {{ClasseActive.NomFR}}</h4><br/>
-<p>A remplir via la Base de donnée</p>
+<br/>
+<h4> 
+    <ng-container *ngIf="Lang == 'fr'">{{ClasseActive.NomFR}}</ng-container>
+    <ng-container *ngIf="Lang == 'en'">{{ClasseActive.NomEN}}</ng-container>
+</h4>
+<br/>
+<p>
+    {{ 'CLASSE.ONCONST' | translate }}
+</p>
 
 
 </ng-container>

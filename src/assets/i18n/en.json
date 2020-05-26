@@ -139,5 +139,10 @@
         "CONFIRMPASSWORD" : "Confirm password",
         "NEWPASSWORD" : "New password",
         "ACTUALPASSWORD" : "Current password"
+    },
+    "CLASSE" : {
+        "TITLE" :"Character Classes",
+        "ONCONST" : "Under construction",
+        "LIST" : "List of classes"
     }
 }

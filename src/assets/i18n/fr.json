@@ -140,5 +140,10 @@
         "CONFIRMPASSWORD" : "Confirmer mot de passe",
         "NEWPASSWORD" : "Nouveau mot de passe",
         "ACTUALPASSWORD" : "Mot de passe actuel"
+    },
+    "CLASSE" : {
+        "TITLE" :"Classes de personnage",
+        "ONCONST" : "En construction.",
+        "LIST" : "Liste des classes"
     }
 }
