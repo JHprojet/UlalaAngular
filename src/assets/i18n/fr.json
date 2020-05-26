@@ -33,7 +33,7 @@
         "ACCOUNTACTIVATED" : "Merci, votre compte à bien été activé, vous allez être rediriger dans un instant. Bonne navigation!",
         "KEYSEND" : "Mail renvoyé, regardez dans votre boite mail ! (Et n'oubliez pas les spams!)",
         "STRATUPLOAD" : "Stratégie bien importée, merci pour votre partage!",
-        "EDIT" : "Le changement a été effectué avec succès."
+        "CHANGE" : "Le changement a été effectué avec succès."
     },
     "ERRORMESSAGES" : {
         "LOGIN" : "Utilisateur ou Mot de passe invalide",
@@ -58,8 +58,12 @@
             "USERNAMETAKEN" : "Ce pseudo est déjà pris par un autre utilisateur.",
             "MAILREQUIRED" : "L'E-mail doit être renseigné.",
             "MAILFORMAT" : "Le format de l'e-mail est incorrect.",
-            "MAILTAKEN" : "Cet E-mail est déjà utilisé"
-
+            "MAILTAKEN" : "Cet E-mail est déjà utilisé",
+            "PASSWORDREQUIRED" : "Le mot de passe doit être renseigné",
+            "PASSWORDMAX" : "Votre mot de passe ne peux pas faire plus de 40 caractères.",
+            "PASSWORDMIN" : "Votre mot de passe ne peux pas faire moins de 8 caractères.",
+            "PASSWORDMATCHING" : "Les deux mots de passe doivent être identique",
+            "WRONGPASSWORD" : "Le mot de passe est erroné"
         }
     },
     "INFOMESSAGES" : {
@@ -103,7 +107,9 @@
         "CLICKHERE" : "Cliquez ici!",
         "USERNAME" : "Pseudo",
         "ROLE" : "Rôle",
-        "ACTIVE" : "Actif"
+        "ACTIVE" : "Actif",
+        "VALID" : "Valider",
+        "PASSWORD" : "Mot de passe"
     },
     "ADMINSTRAT" : {
         "TITLE" : "Gestion des stratégies",
@@ -128,5 +134,11 @@
         "SEARCH" : "Chercher un utilisateur",
         "EDITUSER" : " Modifier l'utilisateur",
         "NOUSERFOUND" : "Aucun utilisateur trouvé."
+    },
+    "CHANGEPASSWORD" : {
+        "TITLE" : "Changement de mot de passe",
+        "CONFIRMPASSWORD" : "Confirmer mot de passe",
+        "NEWPASSWORD" : "Nouveau mot de passe",
+        "ACTUALPASSWORD" : "Mot de passe actuel"
     }
 }

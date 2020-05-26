@@ -1,9 +1,10 @@
 import { ValidatorFn, AbstractControl, FormGroup, ValidationErrors, AsyncValidatorFn } from '@angular/forms';
-import { Observable, of, Subject, zip } from 'rxjs';
+import { Observable, of} from 'rxjs';
 import { map, catchError } from 'rxjs/operators';
 import { UtilisateurDAL } from '../utilisateur-dal';
 import { Injectable } from '@angular/core';
 import { AccessComponent } from 'src/app/helpeur/access-component';
+import { Utilisateur } from 'src/app/models/utilisateur';
 
 @Injectable({ providedIn: 'root' })
 export class CustomValidators {
@@ -19,6 +20,8 @@ export class CustomValidators {
         };
     }
 
+    
+
     //Verify that Password and verif password match
     public PasswordMatch: ValidatorFn = (control: FormGroup): ValidationErrors | null => {
         const password = control.get('password');
@@ -33,6 +36,13 @@ export class CustomValidators {
         const emailVerif = control.get('emailVerif');
     
         return email && emailVerif && email.value !== emailVerif.value ? { 'EmailMatch' : true } : null;
+    };
+
+    public CheckPassword: AsyncValidatorFn = (control: AbstractControl): Observable<ValidationErrors | null> => {
+        let U = new Utilisateur({Pseudo: this.accessService.getSession("Info").Pseudo, Password:control.value});
+        return this.utilisateurService.CheckUser(U).pipe(
+            map(() => { return null}),catchError(() => of({'CheckPassword': true}))
+        );
     };
 
     //Check if username allready exist in DB - Async

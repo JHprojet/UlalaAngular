@@ -33,7 +33,7 @@
         "ACCOUNTACTIVATED" : "Your account has been activated, you will be redirect to home page. Have fun!",
         "KEYSEND" : "Mail sent, look in your mailbox! (And don't forget the spam!)",
         "STRATUPLOAD" : "Strategy well imported, thank you for sharing!",
-        "EDIT" : "Change has been made succefully"
+        "CHANGE" : "Change has been made succefully."
     },
     "ERRORMESSAGES" : {
         "LOGIN" : "User or password not valid.",
@@ -52,13 +52,18 @@
         "BADIMAGE" : "Your 4 images must be as specified in the help (see next to the title to show help).",
         "SELECTIMAGES" : "Select the 4 images of your strategy.",
         "VALIDATORS" : {
-            "USERNAMEREQUIRED" : "Username must be filled in",
+            "USERNAMEREQUIRED" : "Username must be filled in.",
             "USERNAMEMIN" : "Username min caracters : 3.",
             "USERNAMEMAX" : "USername max caracters : 20.",
-            "USERNAMETAKEN" : "This username is allready taken",
-            "MAILREQUIRED" : "Mail must be filled in",
-            "MAILFORMAT" : "Mail bad format",
-            "MAILTAKEN" : "This mail is already in use"
+            "USERNAMETAKEN" : "This username is allready taken.",
+            "MAILREQUIRED" : "Mail must be filled in.",
+            "MAILFORMAT" : "Mail bad format.",
+            "MAILTAKEN" : "This mail is already in use.",
+            "PASSWORDREQUIRED" : "Password must be filled in.",
+            "PASSWORDMAX" : "Your password can't have more than 40 caracters.",
+            "PASSWORDMIN" : "Your password can't have less than 8 caracters.",
+            "PASSWORDMATCHING" : "Both passwords must match.",
+            "WRONGPASSWORD" : "Wrong password."
         }
     },
     "INFOMESSAGES" : {
@@ -102,7 +107,9 @@
         "CLICKHERE" : "Cliquez ici!",
         "USERNAME" : "Username",
         "ROLE" : "Role",
-        "ACTIVE" : "Active"
+        "ACTIVE" : "Active",
+        "VALID" : "Confirm",
+        "PASSWORD" : "Password"
     },
     "ADMINSTRAT" : {
         "TITLE" : "Strategy Management",
@@ -126,5 +133,11 @@
         "USERNAME" : "Username contains",
         "SEARCH" : "Search users",
         "EDITUSER" : " Edit user"
+    },
+    "CHANGEPASSWORD" : {
+        "TITLE" : "Change password",
+        "CONFIRMPASSWORD" : "Confirm password",
+        "NEWPASSWORD" : "New password",
+        "ACTUALPASSWORD" : "Current password"
     }
 }
