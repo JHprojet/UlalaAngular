@@ -24,7 +24,7 @@ export class ChangerPasswordComponent implements OnInit {
       validators: [Validators.required]}]
   },{
     updateOn: 'blur', validators: [this.cv.PasswordMatch] });
-  //
+  //Display on success/error
   displaySuccess:boolean;
   displayError:boolean;
 
@@ -33,17 +33,20 @@ export class ChangerPasswordComponent implements OnInit {
     this.displaySuccess =false;
   }
 
+  //Send new password
   onSubmit()
   {
+    //Hide messages
     this.displaySuccess=false;
     this.displayError=false;
+    //Call API
     this.utilisateurService.changePassword(this.accessService.getSession("Info").Id,this.changePasswordForm.value.password).subscribe(result => {
-      //Si changement ok via API, reset des variables et display message réussi.
+      //If success : reset form + display success message (5s)
       this.changePasswordForm.reset();
       this.displaySuccess=true;
       setTimeout(() => this.displaySuccess=false,5000);
     }, error => {
-      //Si erreur lors de l'envoi à l'API.
+      //If error : display error message (5s)
       this.displayError=true;
       setTimeout(() => this.displayError=false,5000);
     })

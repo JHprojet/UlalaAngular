@@ -38,10 +38,11 @@ export class CustomValidators {
         return email && emailVerif && email.value !== emailVerif.value ? { 'EmailMatch' : true } : null;
     };
 
+    //Check if password is the same as DB
     public CheckPassword: AsyncValidatorFn = (control: AbstractControl): Observable<ValidationErrors | null> => {
         let U = new Utilisateur({Pseudo: this.accessService.getSession("Info").Pseudo, Password:control.value});
         return this.utilisateurService.CheckUser(U).pipe(
-            map(() => { return null}),catchError(() => of({'CheckPassword': true}))
+            map(() => { return null }),catchError(() => of({'CheckPassword': true}))
         );
     };
 
