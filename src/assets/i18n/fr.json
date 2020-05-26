@@ -113,7 +113,8 @@
         "ROLE" : "Rôle",
         "ACTIVE" : "Actif",
         "VALID" : "Valider",
-        "PASSWORD" : "Mot de passe"
+        "PASSWORD" : "Mot de passe",
+        "UNDERCONS" : "En construction"
     },
     "ADMINSTRAT" : {
         "TITLE" : "Gestion des stratégies",
@@ -155,5 +156,11 @@
         "MAIL" : "Confirmez le mail",
         "PASSWORD" : "Confirmez mot de passe",
         "NOW" : "Je m'inscris maintenant!"
+    },
+    "TOYS" : {
+        "TITLE" : "Les jouets"
+    },
+    "BOSSLIST" : {
+        "TITLE" : "Liste des boss par zone"
     }
 }
