@@ -34,7 +34,9 @@
         "KEYSEND" : "Mail sent, look in your mailbox! (And don't forget the spam!)",
         "STRATUPLOAD" : "Strategy well imported, thank you for sharing!",
         "CHANGE" : "Change has been made successfully.",
-        "REGISTER" : "You registred succefuly. You can log in at the top right of the screen"
+        "REGISTER" : "You registred succefuly. You can log in at the top right of the screen",
+        "ADDTEAM" : "Your team has been added successfully!",
+        "EDITTEAM" : "Your team has been updated successfully!"
     },
     "ERRORMESSAGES" : {
         "LOGIN" : "User or password not valid.",

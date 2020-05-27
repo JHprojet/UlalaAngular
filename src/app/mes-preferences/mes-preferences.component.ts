@@ -47,7 +47,8 @@ export class MesPreferencesComponent implements OnInit {
   selectZone:BossZone[] = new Array<BossZone>();
   selectClasse:Classe[] = new Array<Classe>();
   //Variables displaying or not messages
-  displaySuccess:boolean;
+  displaySuccessAdd:boolean;
+  displaySuccessEdit:boolean;
   displayError:boolean;
   //Variables with all personnal team of the user
   mesTeams:MesTeams[];
@@ -82,7 +83,8 @@ export class MesPreferencesComponent implements OnInit {
       this.selectClasse = result;
     });
     //Init display variables
-    this.displaySuccess = false;
+    this.displaySuccessAdd = false;
+    this.displaySuccessEdit = false;
     this.displayError = false;
     //Get personal teams from Session (Or init empty table of Teams if no personal teams)
     if(this.accessService.getSession("Teams")) this.mesTeams = this.accessService.getSession("Teams");
@@ -117,10 +119,11 @@ export class MesPreferencesComponent implements OnInit {
       Team: new Team({})
     });
     //Hide messages
-    this.displaySuccess = false;
+    this.displaySuccessAdd = false;
+    this.displaySuccessEdit = false;
     this.displayError = false;
     //If Id of the form = "" >> Add mode
-    if(this.TeamForm.value.Id == "") {
+    if(this.TeamForm.value.Id == "" || this.TeamForm.value.Id == undefined) {
       //Get Team Id and add to teamAdd variable
       this.teamService.getTeamByClasses(this.TeamForm.value.Classe1,this.TeamForm.value.Classe2,this.TeamForm.value.Classe3,this.TeamForm.value.Classe4).subscribe(result => {
         teamAdd.Team.Id = result.Id;
@@ -132,8 +135,8 @@ export class MesPreferencesComponent implements OnInit {
             this.accessService.setSession("Teams", result);
           });
           this.TeamForm.reset();
-          this.displaySuccess = true;
-          setTimeout(() => { this.displaySuccess = false}, 5000);
+          this.displaySuccessAdd = true;
+          setTimeout(() => { this.displaySuccessAdd = false}, 5000);
         }, error => {
           //On error : Display error message (5s)
           this.displayError = true
@@ -153,9 +156,9 @@ export class MesPreferencesComponent implements OnInit {
             this.mesTeams = result;
             this.accessService.setSession("Teams",this.mesTeams);
           });
-          this.displaySuccess = true;
+          this.displaySuccessEdit = true;
           this.TeamForm.reset();
-          setTimeout(() => { this.displaySuccess = false}, 5000);
+          setTimeout(() => { this.displaySuccessEdit = false}, 5000);
         }, error => {
           //On error : Display error message (5s)
           this.displayError = true

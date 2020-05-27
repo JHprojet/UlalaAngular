@@ -34,7 +34,9 @@
         "KEYSEND" : "Mail renvoyé, regardez dans votre boite mail ! (Et n'oubliez pas les spams!)",
         "STRATUPLOAD" : "Stratégie bien importée, merci pour votre partage!",
         "CHANGE" : "Le changement a été effectué avec succès.",
-        "REGISTER" : "Vous êtes bien inscris. Vous pouvez vous connecter en haut à droite de l'écran."
+        "REGISTER" : "Vous êtes bien inscris. Vous pouvez vous connecter en haut à droite de l'écran.",
+        "ADDTEAM" : "Votre team a bien été ajoutée!",
+        "EDITTEAM" : "Votre team a bien été modifiée!"
     },
     "ERRORMESSAGES" : {
         "LOGIN" : "Utilisateur ou Mot de passe invalide",

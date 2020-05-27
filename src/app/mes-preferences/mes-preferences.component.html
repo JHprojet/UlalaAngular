@@ -55,6 +55,12 @@
 <h2 *ngIf="TeamForm.value.Id == '' || TeamForm.value.Id == undefined">{{ 'MYTEAMS.ADD' | translate }} :</h2>
 <h2 *ngIf="TeamForm.value.Id != '' && TeamForm.value.Id != undefined ">{{ 'MYTEAMS.EDIT' | translate }} :</h2>
 <br/>
+<ng-container *ngIf="displaySuccessAdd || displaySuccessEdit || displayError">
+    <div class="container mx-auto" class="alert alert-success" *ngIf="displaySuccessAdd">{{ 'SUCCESSMESSAGES.ADDTEAM' | translate }}</div>
+    <div class="container mx-auto" class="alert alert-success" *ngIf="displaySuccessEdit">{{ 'SUCCESSMESSAGES.EDITTEAM' | translate }}</div>
+    <div class="container mx-auto" class="alert alert-danger" *ngIf="displayError">{{ 'ERRORMESSAGES.SAVAGEERROR' | translate }}</div>
+    <br/>
+</ng-container>
 
 <form [formGroup]="TeamForm" (ngSubmit)="onSubmit()">
     <div class="form-group row">
