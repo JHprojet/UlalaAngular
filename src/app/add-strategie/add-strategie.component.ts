@@ -213,8 +213,8 @@ export class AddStrategieComponent implements OnInit {
   onSubmitWithTeam() {
     //Create strategy to send and add init internal objects **(Must be changed via API to simplify)**
     let E:Enregistrement = new Enregistrement({Utilisateur:new Utilisateur({Id:1}), BossZone:new BossZone({Id:this.AddFormWithTeam.value.Boss}), Team:new Team({})})
-    //Feeling Team.Id via form valuer
-    E.Team.Id = this.selectMyTeams.find(team => team.Id == this.AddFormWithTeam.value.Team).Id;
+    //Feeling Team.Id via form value
+    E.Team.Id = this.selectMyTeams.find(team => team.Id == this.AddFormWithTeam.value.Team).Team.Id;
     //Adding User Id to the strategy if its a connected user (else Id = 1 is Anonymous player in DB)
     if(this.accessService.getSession("Info")) { E.Utilisateur.Id = this.accessService.getSession("Info").Id }
     //Upload 4 Images
