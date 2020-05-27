@@ -37,14 +37,12 @@ export class AppComponent {
       this.translate.use(this.langage);
   }
 
-  ChangeLangage(Langage)
-  {
+  ChangeLangage(Langage) {
     this.langage = Langage.value;
     this.translate.use(Langage.value);
   }
   
-  Connection()
-  {
+  Connection() {
     this.Fav$ = new Subject<boolean>();
     this.Vote$ = new Subject<boolean>();
     this.Teams$ = new Subject<boolean>();

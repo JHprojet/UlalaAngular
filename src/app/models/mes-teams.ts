@@ -14,6 +14,7 @@ export class MesTeams {
       this.Utilisateur = attachment.Utilisateur;
       this.Zone = attachment.Zone;
       this.Team = attachment.Team;
+      this.NomTeam = attachment.NomTeam;
       this.Actif = attachment.Actif;
     }
 }

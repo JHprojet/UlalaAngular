@@ -67,7 +67,8 @@
             "PASSWORDMATCHING" : "Les deux mots de passe doivent être identique.",
             "WRONGPASSWORD" : "Le mot de passe est erroné.",
             "RETRIEVEINFO" : "Pour retrouver vos informations",
-            "MAILMATCH" : "Les deux E-mail doivent correspondre."
+            "MAILMATCH" : "Les deux E-mail doivent correspondre.",
+            "TEAMNAMEREQUIRED" : "Le nom de la team est requise."
         }
     },
     "INFOMESSAGES" : {
@@ -114,7 +115,9 @@
         "ACTIVE" : "Actif",
         "VALID" : "Valider",
         "PASSWORD" : "Mot de passe",
-        "UNDERCONS" : "En construction"
+        "UNDERCONS" : "En construction",
+        "DELETE" : "Supprimer",
+        "TEAMNAME" : "Nom Team"
     },
     "ADMINSTRAT" : {
         "TITLE" : "Gestion des stratégies",
@@ -162,5 +165,13 @@
     },
     "BOSSLIST" : {
         "TITLE" : "Liste des boss par zone"
+    },
+    "MYINFO" : {
+        "TITLE" : "Mes informations"
+    },
+    "MYTEAMS" : {
+        "TITLE" : "Mes teams perso",
+        "ADD" : "Ajouter une team",
+        "EDIT" : "Editer ma team"
     }
 }

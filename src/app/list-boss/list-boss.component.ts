@@ -2,9 +2,8 @@ import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { BosszoneDAL } from '../service/bosszone-dal';
 import { BossZone } from '../models/boss-zone';
 import { TranslateService, LangChangeEvent } from '@ngx-translate/core';
-import { Validators, FormBuilder } from '@angular/forms';
+import { FormBuilder } from '@angular/forms';
 import { CustomValidators } from '../service/Validators/validators';
-
 
 @Component({
   selector: 'app-list-boss',

@@ -2,7 +2,6 @@ import { Component, OnInit } from '@angular/core';
 import { Utilisateur } from '../models/utilisateur';
 import { MesTeams } from '../models/mes-teams';
 import { MesTeamsDAL } from '../service/mesteams-dal';
-import { Boss } from '../models/boss';
 import { Zone } from '../models/zone';
 import { Classe } from '../models/Classe';
 import { ZoneDAL } from '../service/zone-dal';
@@ -11,11 +10,11 @@ import { BosszoneDAL } from '../service/bosszone-dal';
 import { TeamDal } from '../service/team-dal';
 import { ClasseDAL } from '../service/classe-dal';
 import { Team } from '../models/team';
-import { zip, ReplaySubject } from 'rxjs';
 import { AccessComponent } from '../helpeur/access-component';
-
-const Continent$ = new ReplaySubject<boolean>();
-const Zone$ = new ReplaySubject<boolean>();
+import { FormBuilder, Validators } from '@angular/forms';
+import { CustomValidators } from '../service/Validators/validators';
+import { TranslateService, LangChangeEvent } from '@ngx-translate/core';
+import { BossZone } from '../models/boss-zone';
 
 @Component({
   selector: 'app-mes-preferences',
@@ -23,282 +22,171 @@ const Zone$ = new ReplaySubject<boolean>();
   styleUrls: ['./mes-preferences.component.css']
 })
 export class MesPreferencesComponent implements OnInit {
-  edit:boolean;
-  utilisateur:Utilisateur;
-  teamAdd:MesTeams;
-  mesTeams:MesTeams[];
-  selectClasse: Classe[];
-  selectContinent: Zone[];
-  selectZone: Zone[];
-  selectBoss: Boss[];
-  Idclasse1: number;
-  Idclasse2: number;
-  Idclasse3: number;
-  Idclasse4: number;
-  messageClasse: string;
-  IdBZ: string;
-  messageBossZone:string;
-  zoneId: number = 0;
-  nomTeam:string;
-  messageNomTeam:string;
-  errorUpload:string;
-  teamId:number;
-  MateamId:number;
-
-  constructor(private accessService:AccessComponent,private classeService:ClasseDAL,private teamService:TeamDal,private bossZoneService:BosszoneDAL,private bossService:BossDAL,private zoneService:ZoneDAL, private mesteamsService:MesTeamsDAL) { }
+  //Research form with custom parameters
+  TeamForm = this.fb.group({
+    Id: [''],
+    NomTeam: ['', {
+      validators: [Validators.required]}],
+    Continent: ['', {
+      validators: [Validators.required]}],
+    Zone: ['', {
+      validators: [Validators.required]}],
+    Classe1: [''],
+    Classe2: [''],
+    Classe3: [''],
+    Classe4: ['']
+  },{
+    updateOn: 'change', validators:  [this.v.CheckContinent, this.v.CheckZone, this.v.CheckClasses]});
   
-  //Note globale importante : Solution à trouver pour éviter l'appelle du ngOnInit.
-  //Bis repetita concernant les Idclasse qui devraient être un tableau. Modif API à prévoir sur le modèle de Classe. 
+  //Variable Lang
+  Lang:string;
+  //Variable to keep available all the BossZone informations
+  AllBossZone:BossZone[] = new Array<BossZone>();
+  //Variables to fill in the selects
+  selectContinent:BossZone[] = new Array<BossZone>();
+  selectZone:BossZone[] = new Array<BossZone>();
+  selectClasse:Classe[] = new Array<Classe>();
+  //Variables displaying or not messages
+  displaySuccess:boolean;
+  displayError:boolean;
+  //Variables with all personnal team of the user
+  mesTeams:MesTeams[];
 
-  //A tranformer via FormBuilder pour substantiellement siimplifier le component
+  constructor(private translate:TranslateService, private v:CustomValidators, private fb:FormBuilder, private accessService:AccessComponent,private classeService:ClasseDAL,private teamService:TeamDal,private bossZoneService:BosszoneDAL,private bossService:BossDAL,private zoneService:ZoneDAL, private mesteamsService:MesTeamsDAL) { }
 
   ngOnInit(): void {
-    this.teamId = 0;
-    this.MateamId = 0;
-    this.edit = false;
-    this.errorUpload="";
-    this.nomTeam="";
-    this.messageNomTeam="";
-    this.teamAdd = new MesTeams({});
+    //Get current langage
+    this.Lang = this.translate.currentLang;
+    //Disable part of the forms (For selects using other selects values)
+    this.TeamForm.get('Zone').disable();
+    //Get all BossZone informations
+    this.bossZoneService.getBossZones().subscribe(result => {
+      //Writing result in dedicated variable
+      this.AllBossZone = result;
+      //Fill in selectContinent with unique Continent values
+      var unique = [];
+      for( let i = 0; i < result.length; i++ ) {
+        if( !unique[result[i].Zone.ContinentFR]) {
+          this.selectContinent.push(result[i]);
+          unique[result[i].Zone.ContinentFR] = 1;
+        }
+      }
+    });
+    //Register to LangChangeEvent and write selected langage in variable Lang
+    this.translate.onLangChange.subscribe((event: LangChangeEvent) => {
+      this.Lang = event.lang;
+    });
+    //Get classes information to fill in selectClasse
     this.selectClasse = new Array<Classe>();
-    this.selectContinent = new Array<Zone>();
-    this.classeService.getClasses().subscribe(result =>{
+    this.classeService.getClasses().subscribe(result => {
       this.selectClasse = result;
-    })
-    this.zoneService.getZones().subscribe(response => {
-      response.forEach(item => {
-        if (this.selectContinent.findIndex(sc => sc.ContinentFR == item.ContinentFR) == -1) {
-          this.selectContinent.push(item);
-          }
-        });
-      });
-    this.Idclasse1 = 0;
-    this.Idclasse2 = 0; 
-    this.Idclasse3 = 0; 
-    this.Idclasse4 = 0;
-    this.selectZone = new Array<Zone>();
-    this.selectBoss = new Array<Boss>();
-    this.messageClasse = "Veuillez sélectionner les 4 classes.";
-    this.IdBZ = "0";
-    this.messageBossZone = "Veuillez sélectionner un Continent.";
-    this.zoneId = 0;
-    this.utilisateur = new Utilisateur({})
-    this.utilisateur = this.accessService.getSession("Info");
+    });
+    //Init display variables
+    this.displaySuccess = false;
+    this.displayError = false;
+    //Get personal teams from Session (Or init empty table of Teams if no personal teams)
     if(this.accessService.getSession("Teams")) this.mesTeams = this.accessService.getSession("Teams");
     else this.mesTeams = new Array<MesTeams>();
   }
 
-  //Voir SearchComponent : méthode similaire
-  public changeContinent(Continent)
-  {
+   //Fill in Zone select values (Custom form)
+   public GetZones(Continent) {
+    //Init cascading values
     this.selectZone = [];
-    this.selectBoss = [];
-    this.IdBZ = "";
-    if (Continent.value == 0) this.messageBossZone = "Veuillez sélectionner un Continent.";
-    else {
-      this.messageBossZone = "Veuillez sélectionner une Zone."
-      this.zoneService.getZones().subscribe(response => { 
-        response.forEach(item => {
-          if (item.ContinentFR == Continent.value) this.selectZone.push(item);
-          //Si en mode édition de la team, changement d'état du ReplaySubject pour remplissage en cascade.
-          if (item.ContinentFR == Continent && this.edit) 
-          {
-            this.selectZone.push(item);
-            Continent$.next(true);
-          }
-        });
-      });
+    this.TeamForm.controls.Zone.setValue("");
+    this.TeamForm.controls.Zone.disable();
+    //Fill in selectZone with unique Zone values depending on Continent value
+    var unique = [];
+    for( let i = 0; i < this.AllBossZone.length; i++ ) {
+      if( !unique[this.AllBossZone[i].Zone.ZoneFR] && this.AllBossZone[i].Zone.ContinentFR == Continent.value) {
+        this.selectZone.push(this.AllBossZone[i]);
+        unique[this.AllBossZone[i].Zone.ZoneFR] = 1;
+      }
     }
+    //If a value has been selected for Continent, enable Zone control
+    if(Continent.value != '') this.TeamForm.get('Zone').enable();
   }
 
-  //Fonctionnement idem méthode précédente
-  public changeZone(Z)
+  onSubmit()
   {
-    this.selectBoss = [];
-    this.IdBZ = "0";
-    if (Z.value == 0) this.messageBossZone = "Veuillez sélectionner une Zone.";
-    else {
-    this.messageBossZone = "";
-    this.bossZoneService.getBossZones().subscribe(response => {
-      response.forEach(item => {
-        if (item.Zone.Id == Z.value) this.teamAdd.Zone = new Zone({Id:item.Zone.Id});
-        if (item.Zone.Id == Z && this.edit) 
-        {
-          this.teamAdd.Zone = new Zone({Id:item.Zone.Id});
-          Zone$.next(true);
-        }
-        });
-        
-      });
-    }
-  }
-
-  //Voir SearchComponent : méthodes similaires + remarque
-  public changeClasse1(classe)
-  {
-    this.messageClasse = "";
-    this.Idclasse1 = classe.value;
-    if(this.Idclasse1 == 0 || this.Idclasse2 == 0 || this.Idclasse3 == 0 || this.Idclasse4 == 0) this.messageClasse = "Veuillez sélectionner les 4 classes.";
-    else{
-      this.EcritureIdClasse()
-    }
-  }
-
-  public changeClasse2(classe)
-  {
-    this.messageClasse = "";
-    this.Idclasse2 = classe.value;
-    if(this.Idclasse1 == 0 || this.Idclasse2 == 0 || this.Idclasse3 == 0 || this.Idclasse4 == 0) this.messageClasse = "Veuillez sélectionner les 4 classes.";
-    else{
-      this.EcritureIdClasse()
-    }
-  }
-
-  public changeClasse3(classe)
-  {
-    this.messageClasse = "";
-    this.Idclasse3 = classe.value;
-    if(this.Idclasse1 == 0 || this.Idclasse2 == 0 || this.Idclasse3 == 0 || this.Idclasse4 == 0) this.messageClasse = "Veuillez sélectionner les 4 classes.";
-    else {
-      this.EcritureIdClasse()
-    }
-  }
-
-  public changeClasse4(classe)
-  {
-    this.messageClasse = "";
-    this.Idclasse4 = classe.value;
-    if(this.Idclasse1 == 0 || this.Idclasse2 == 0 || this.Idclasse3 == 0 || this.Idclasse4 == 0) this.messageClasse = "Veuillez sélectionner les 4 classes.";
-    else {
-      this.EcritureIdClasse()
-    }
-  }
-
-  //Update de la team correspondante a chaque changement de classe si toutes les classes ont été sélectionnées
-  public EcritureIdClasse()
-  {
-  this.teamService.getTeamByClasses(this.Idclasse1,this.Idclasse2,this.Idclasse3,this.Idclasse4).subscribe(result => {
-    this.teamAdd.Team = new Team({Id:result.Id});
+    //Init team to add via API with values
+    let teamAdd = new MesTeams({
+      Utilisateur: new Utilisateur({Id:this.accessService.getSession("Info").Id}),
+      NomTeam: this.TeamForm.value.NomTeam,
+      Zone: new Zone({Id:this.TeamForm.value.Zone}),
+      Team: new Team({})
     });
+    //Hide messages
+    this.displaySuccess = false;
+    this.displayError = false;
+    //If Id of the form = "" >> Add mode
+    if(this.TeamForm.value.Id == "") {
+      //Get Team Id and add to teamAdd variable
+      this.teamService.getTeamByClasses(this.TeamForm.value.Classe1,this.TeamForm.value.Classe2,this.TeamForm.value.Classe3,this.TeamForm.value.Classe4).subscribe(result => {
+        teamAdd.Team.Id = result.Id;
+        //Post team to API
+        this.mesteamsService.postMyTeam(teamAdd).subscribe(() => {
+          //On success : Get teams of the current user + update table + update Session + reset form + Display success message (5s)
+          this.mesteamsService.getMyTeamsByUserId(this.accessService.getSession("Info").Id).subscribe(result => {
+            this.mesTeams = result;
+            this.accessService.setSession("Teams", result);
+          });
+          this.TeamForm.reset();
+          this.displaySuccess = true;
+          setTimeout(() => { this.displaySuccess = false}, 5000);
+        }, error => {
+          //On error : Display error message (5s)
+          this.displayError = true
+          setTimeout(() => { this.displayError = false}, 5000);
+        });
+      });
+    }
+    //If Id of the form != "" >> Edit mode
+    else {
+      //Get Team Id and add to teamAdd variable
+      this.teamService.getTeamByClasses(this.TeamForm.value.Classe1,this.TeamForm.value.Classe2,this.TeamForm.value.Classe3,this.TeamForm.value.Classe4).subscribe(result => {
+        teamAdd.Team.Id = result.Id;
+        //Put team to API
+        this.mesteamsService.putMyTeamById(teamAdd, this.TeamForm.value.Id).subscribe(() => {
+          //On success : Get teams of the current user + update table + update Session + reset form + Display success message (5s)
+          this.mesteamsService.getMyTeamsByUserId(this.accessService.getSession("Info").Id).subscribe(result =>{
+            this.mesTeams = result;
+            this.accessService.setSession("Teams",this.mesTeams);
+          });
+          this.displaySuccess = true;
+          this.TeamForm.reset();
+          setTimeout(() => { this.displaySuccess = false}, 5000);
+        }, error => {
+          //On error : Display error message (5s)
+          this.displayError = true
+          setTimeout(() => { this.displayError = false}, 5000);
+        });
+      });
+    }
   }
 
-  //upload de la nouvelle team
-  public upload()
-  {
-    this.teamAdd.Utilisateur = new Utilisateur({Id:this.accessService.getSession("Info").Id});
-    this.teamAdd.NomTeam = this.nomTeam;
-    //Ajout de la team + récupération de la liste complète mise à jour
-    this.mesteamsService.postMyTeam(this.teamAdd).subscribe(result => {
-      this.mesteamsService.getMyTeamsByUserId(this.utilisateur.Id).subscribe(result =>{
-        this.mesTeams = result;
-        this.accessService.setSession("Teams",result);
-      })
-    }, error => {
-      this.errorUpload = "Un problème est survenue, merci de réessayer."
-    })
-  }
-
-  //Vérification du nom renseigné pour la team
-  //Note : Je dois ajouter un check de nom existant déjà pour une team de cet utilisateur
-  public CheckNomTeam()
-  {
-    if(this.nomTeam.length < 3) this.messageNomTeam = "Le nom de la team doit faire au moins 3 caractères."
-    else this.messageNomTeam = "";
-  }
-
-  //Suppression d'une team.
+  //Delete Team
   public DeleteTeam(id)
   {
+    //Delete via API and update table and Session on Success
     this.mesteamsService.deleteMyTeamById(id).subscribe(() => {
       this.mesTeams.splice(this.mesTeams.findIndex(team => team.Id == id),1);
       this.accessService.setSession("Teams",this.mesTeams);
     });
   }
 
-  //Remplissage automatique des champs avec les valeurs de la team à éditer.
+  //Fill in Form with values of the team to edit
   public EditTeam(id)
   {
-    this.messageClasse = "";
-    this.edit = true;
-    //Récupération de la team
-    this.mesteamsService.getMyTeam(id).subscribe(result => {
-      this.nomTeam = result.NomTeam;
-      this.MateamId = result.Id;
-      this.teamId = result.Team.Id;
-      let C1Select = (document.getElementById("C1") as HTMLSelectElement);
-      let C2Select = (document.getElementById("C2") as HTMLSelectElement);
-      let C3Select = (document.getElementById("C3") as HTMLSelectElement);
-      let C4Select = (document.getElementById("C4") as HTMLSelectElement);
-      let myContinentSelect = (document.getElementById("T") as HTMLSelectElement);
-      
-      //No comment, les quelques boucles suivantes sont à améliorer. Ca marche, même si c'est moche.
-      for(var i, j = 0; i = myContinentSelect.options[j]; j++) {
-        if(i.value == result.Zone.ContinentFR) {
-          myContinentSelect.selectedIndex = j;
-            break;
-        }
-      }
-      
-      for(var i, j = 0; i = C1Select.options[j]; j++) {
-        if(i.value == result.Team.Classe1.Id) {
-          C1Select.selectedIndex = j;
-          this.Idclasse1 = j;
-            break;
-        }
-      }
-      
-      for(var i, j = 0; i = C2Select.options[j]; j++) {
-        if(i.value == result.Team.Classe2.Id) {
-          C2Select.selectedIndex = j;
-          this.Idclasse2 = j;
-            break;
-        }
-      }
-      
-      for(var i, j = 0; i = C3Select.options[j]; j++) {
-        if(i.value == result.Team.Classe3.Id) {
-          C3Select.selectedIndex = j;
-          this.Idclasse3 = j;
-            break;
-        }
-      }
-     
-      for(var i, j = 0; i = C4Select.options[j]; j++) {
-        if(i.value == result.Team.Classe4.Id) {
-          C4Select.selectedIndex = j;
-          this.Idclasse4 = j;
-            break;
-        }
-      }
-      this.changeContinent(result.Zone.ContinentFR);
-      this.changeZone(result.Zone.Id);
-      
-       zip(Continent$, Zone$).subscribe(() => {
-        let myZoneSelect = (document.getElementById("Z") as HTMLSelectElement);
-        for(var i, j = 0; i = myZoneSelect.options[j]; j++) {
-          if(i.value == result.Zone.Id) {
-            myZoneSelect.selectedIndex = j;
-              break;
-          }
-        }
-      });
-    });
-  }
-
-  public update()
-  {
-    //Envoi de la nouvelle team pour update via API puis récupération de la liste.
-    this.teamAdd.Utilisateur = new Utilisateur({Id:this.accessService.getSession("Info").Id});
-    this.teamAdd.NomTeam = this.nomTeam;
-    if(!this.teamAdd.Team) this.teamAdd.Team = new Team({Id:this.teamId});
-    this.mesteamsService.putMyTeamById(this.teamAdd, this.MateamId).subscribe(() => {
-      this.mesteamsService.getMyTeamsByUserId(this.utilisateur.Id).subscribe(result =>{
-        this.mesTeams = result;
-        this.accessService.setSession("Teams",this.mesTeams)
-      });
-    }, error => {
-      this.errorUpload = "Un problème est survenue, merci de réessayer."
-    })
-  }
-  
+    let teamEdit = this.accessService.getSession("Teams").filter(team => team.Id == id);
+    this.TeamForm.controls.NomTeam.setValue(teamEdit[0].NomTeam);
+    this.TeamForm.controls.Id.setValue(teamEdit[0].Id);
+    this.TeamForm.controls.Classe1.setValue(teamEdit[0].Team.Classe1.Id);
+    this.TeamForm.controls.Classe2.setValue(teamEdit[0].Team.Classe2.Id);
+    this.TeamForm.controls.Classe3.setValue(teamEdit[0].Team.Classe3.Id);
+    this.TeamForm.controls.Classe4.setValue(teamEdit[0].Team.Classe4.Id);
+    this.TeamForm.controls.Continent.setValue(teamEdit[0].Zone.ContinentFR);
+    this.GetZones(this.TeamForm.controls.Continent);
+    this.TeamForm.controls.Zone.setValue(teamEdit[0].Zone.Id);
+  }  
 }

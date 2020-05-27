@@ -91,24 +91,8 @@ export class AdminUsersComponent implements OnInit {
       this.EditForm.controls.id.setValue(result.Id);
       this.EditForm.controls.username.setValue(result.Pseudo);
       this.EditForm.controls.mail.setValue(result.Mail);
-      //Auto fill role select
-      let myRoleSelect = (document.getElementById("role") as HTMLSelectElement);
-      for(var i, j = 0; i = myRoleSelect.options[j]; j++) {
-        if(i.value == result.Role) {
-          this.EditForm.controls.role.setValue(result.Role);
-          myRoleSelect.selectedIndex = j;
-            break;
-        }
-      }
-      //Auto fill actif select
-      let myActifSelect = (document.getElementById("actif") as HTMLSelectElement);
-      for(var i, j = 0; i = myActifSelect.options[j]; j++) {
-        if(i.value == result.Actif) {
-          this.EditForm.controls.actif.setValue(result.Actif);
-          myActifSelect.selectedIndex = j;
-            break;
-        }
-      }
+      this.EditForm.controls.role.setValue(result.Role);
+      this.EditForm.controls.actif.setValue(result.Actif);
     });
   }
 
