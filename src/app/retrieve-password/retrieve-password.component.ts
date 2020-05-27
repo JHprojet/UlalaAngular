@@ -1,74 +1,63 @@
 import { Component, OnInit } from '@angular/core';
 import { UtilisateurDAL } from '../service/utilisateur-dal';
-import { zip, Subject } from 'rxjs';
-import { AccessComponent } from '../helpeur/access-component';
-
-const CheckMail$ = new Subject<boolean>();
+import { FormBuilder, Validators } from '@angular/forms';
+import { CustomValidators } from '../service/Validators/validators';
 
 @Component({
   selector: 'app-retrieve-password',
   templateUrl: './retrieve-password.component.html',
   styleUrls: ['./retrieve-password.component.css']
 })
+
 export class RetrievePasswordComponent implements OnInit {
-  Mail:string="";
-  MessageMail:string="";
-  MessageOK:string="";
-  MessageNOK:string="";
-  constructor(private utilisateurService:UtilisateurDAL) { }
+  //Retrieve form
+  RetrieveForm = this.fb.group({
+    email: ['', {
+      validators: [Validators.required],
+      asyncValidators : [this.cv.CheckEmailExist]}],
+  },{
+    updateOn: 'blur'});  
+  //Variables for displaying messages
+  displayError:boolean;
+  displaySuccessUsername:boolean;
+  displaySuccessPassword:boolean;
+
+  constructor(private cv:CustomValidators,private fb:FormBuilder,private utilisateurService:UtilisateurDAL) { }
 
   ngOnInit(): void {
+    //Init displaying variables
+    this.displayError = false;
+    this.displaySuccessPassword = false;
+    this.displaySuccessUsername = false;
   }
 
-  //Check du mail renseigné sur le champ correspondant (Format + Correct ou non)
-  public VerifMail()
-  {
-    let re = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-    this.MessageMail = "";
-    if (this.Mail == "") this.MessageMail = "Champ obligatoire.";
-    else if (!re.test(this.Mail)) this.MessageMail = "Merci de saisir un E-mail au bon format."
-    else this.utilisateurService.getUserByMail(this.Mail).subscribe(response => {
-              CheckMail$.next(true);
-            }, error =>{
-              this.MessageMail = "Aucun compte n'est lié à cet E-mail.";
-            });
-  }
-
-  //Méthode appelant API vers procédure stockée d'envoi d'un mail avec nouveau password généré.
+  //Call API and send new password by mail
   public GenererPassword()
   {
-    this.VerifMail();
-    zip(CheckMail$).subscribe(() => {
-      if(this.MessageMail == '')
-      {
-        this.utilisateurService.GenerateAndSendNewPassword(this.Mail).subscribe(result => {
-          this.MessageOK = "Votre nouveau mot de passe a été envoyé par E-mail. Pensez à vérifier vos spams!"
-          setTimeout(()=> this.MessageOK ='', 5000);
-          this.Mail = '';
-        }, error => {
-          this.MessageNOK = "Oops, une erreur est survenue. Veuillez réessayer plus tard ou contacter l'administrateur du site via le formulaire de contact."
-          setTimeout(()=> this.MessageNOK ='', 5000);
-        });
-      }
+    this.utilisateurService.GenerateAndSendNewPassword(this.RetrieveForm.value.email).subscribe(success => {
+      //if success display success message (5s) and reset form.
+      this.displaySuccessPassword = true;
+      setTimeout(()=> this.displaySuccessPassword = false, 5000);
+      this.RetrieveForm.reset();
+    }, error => {
+      //if error display error message (5s).
+      this.displayError = true;
+      setTimeout(()=> this.displayError  = false, 5000);
     });
   }
 
-  //Méthode appelant API vers procédure stockée d'envoi d'un mail avec pseudo actuel.
+  //Call API and send current username by mail
   public RetrouverPseudo()
   {
-    this.VerifMail();
-    zip(CheckMail$).subscribe(() => {
-      if(this.MessageMail == '')
-      {
-        this.utilisateurService.FindUsernameByMail(this.Mail).subscribe(result => {
-          this.MessageOK = "Votre pseudo a été envoyé par E-mail. Pensez à vérifier vos spams!"
-          setTimeout(()=> this.MessageOK ='', 5000);
-          this.Mail = '';
-        }, error => {
-          this.MessageNOK = "Oops, une erreur est survenue. Veuillez réessayer plus tard ou contacter l'administrateur du site via le formulaire de contact."
-          setTimeout(()=> this.MessageNOK ='', 5000);
-        });
-      }
-    });
+      this.utilisateurService.FindUsernameByMail(this.RetrieveForm.value.email).subscribe(success => {
+        //if success display success message (5s) and reset form.
+        this.displaySuccessUsername = true;
+        setTimeout(()=> this.displaySuccessUsername = false, 5000);
+        this.RetrieveForm.reset();
+      }, error => {
+        //if error display error message (5s).
+        this.displayError = true;
+        setTimeout(()=> this.displayError = false, 5000);
+      });
   }
 }

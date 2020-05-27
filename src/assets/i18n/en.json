@@ -36,7 +36,9 @@
         "CHANGE" : "Change has been made successfully.",
         "REGISTER" : "You registred succefuly. You can log in at the top right of the screen",
         "ADDTEAM" : "Your team has been added successfully!",
-        "EDITTEAM" : "Your team has been updated successfully!"
+        "EDITTEAM" : "Your team has been updated successfully!",
+        "SENDUSERNAME" : "Your username has been sent in your mail box. Don't forget to check your spam box!",
+        "GENERATEPASSWORD" : "Your new password has been send to your mail box. Don't forget to check your spam box!"
     },
     "ERRORMESSAGES" : {
         "LOGIN" : "User or password not valid.",
@@ -70,7 +72,8 @@
             "WRONGPASSWORD" : "Wrong password.",
             "RETRIEVEINFO" : "To retrieve your informations",
             "MAILMATCH" : "Both E-mail must match.",
-            "TEAMNAMEREQUIRED" : "The name of the team is required."
+            "TEAMNAMEREQUIRED" : "The name of the team is required.",
+            "MAILDONTEXIST" : "This mail don't exist."
         }
     },
     "INFOMESSAGES" : {
@@ -174,5 +177,16 @@
         "TITLE" : "My teams",
         "ADD" : "Add a team",
         "EDIT" : "Edit my team"
+    },
+    "RETRIEVE" : {
+        "TITLE" : "Retrieve my password or username",
+        "INTRO" : "Please fill in your E-mail and then choose the action to be taken.",
+        "SENDPASSWORD" : "Send me a new password",
+        "SENDUSERNAME" :"Send me my nickname"
+    },
+    "RGPD" : {
+        "TITLE" : "Managing your data",
+        "TEXT" : "Your data will remain private and will never be passed on to a third party. The images of the strategies will be accessible to everyone.",
+        "SIGN" : "Kiss!"
     }
 }

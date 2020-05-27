@@ -36,7 +36,10 @@
         "CHANGE" : "Le changement a été effectué avec succès.",
         "REGISTER" : "Vous êtes bien inscris. Vous pouvez vous connecter en haut à droite de l'écran.",
         "ADDTEAM" : "Votre team a bien été ajoutée!",
-        "EDITTEAM" : "Votre team a bien été modifiée!"
+        "EDITTEAM" : "Votre team a bien été modifiée!",
+        "SENDUSERNAME" : "Votre pseudo a été envoyé par E-mail. Pensez à vérifier vos spams!",
+        "GENERATEPASSWORD" : "Votre nouveau mot de passe a été envoyé par E-mail. Pensez à vérifier vos spams!"
+
     },
     "ERRORMESSAGES" : {
         "LOGIN" : "Utilisateur ou Mot de passe invalide",
@@ -70,7 +73,8 @@
             "WRONGPASSWORD" : "Le mot de passe est erroné.",
             "RETRIEVEINFO" : "Pour retrouver vos informations",
             "MAILMATCH" : "Les deux E-mail doivent correspondre.",
-            "TEAMNAMEREQUIRED" : "Le nom de la team est requise."
+            "TEAMNAMEREQUIRED" : "Le nom de la team est requise.",
+            "MAILDONTEXIST" : "Cet E-mail n'existe pas."
         }
     },
     "INFOMESSAGES" : {
@@ -175,5 +179,16 @@
         "TITLE" : "Mes teams perso",
         "ADD" : "Ajouter une team",
         "EDIT" : "Editer ma team"
+    },
+    "RETRIEVE" : {
+        "TITLE" : "Retrouver mon mot de passe ou mon pseudo",
+        "INTRO" : "Veuillez renseigner votre E-mail puis choisissez l'action à entreprendre.",
+        "SENDPASSWORD" : "Me renvoyer un nouveau mot de passe",
+        "SENDUSERNAME" :"Me renvoyer mon pseudo"
+    },
+    "RGPD" : {
+        "TITLE" : "Gestion de vos données",
+        "TEXT" : "Vos données resterons privées et ne seront jamais transmises à un tier. Les images des stratégies seront pour leur part accessibles à tout un chacun.",
+        "SIGN" : "Bisous!"
     }
 }

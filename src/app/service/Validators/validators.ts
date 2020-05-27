@@ -20,8 +20,6 @@ export class CustomValidators {
         };
     }
 
-    
-
     //Verify that Password and verif password match
     public PasswordMatch: ValidatorFn = (control: FormGroup): ValidationErrors | null => {
         const password = control.get('password');
@@ -59,6 +57,14 @@ export class CustomValidators {
             map(() => { return {'MailExist': true}}),catchError(() => of(null))
         );
     };
+
+    //Check if mail allready exist in DB - Async - inverse return
+    public CheckEmailExist: AsyncValidatorFn = (control: AbstractControl): Observable<ValidationErrors | null> => {
+        return this.utilisateurService.getUserByMail(control.value).pipe(
+            map(() => { return null}),catchError(() => of({'MailExist': true}))
+        );
+    };
+
 
     //Check is Continent is feeled with a value
     public CheckContinent: ValidatorFn = (control: FormGroup): ValidationErrors | null => {
