@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { Utilisateur } from './models/utilisateur';
 import { UtilisateurDAL } from './service/utilisateur-dal';
 import { Router } from '@angular/router';
@@ -17,7 +17,7 @@ import { TranslateService, LangChangeEvent } from '@ngx-translate/core';
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.css']
 })
-export class AppComponent {
+export class AppComponent implements OnInit {
   public data:any=[];
   //A faire : save la langue en session pour gérer prob après connection + bouton à initialisé  à la bonne valeur.
   langage:string = 'fr';
@@ -31,10 +31,12 @@ export class AppComponent {
   Vote$:Subject<boolean>;
   Teams$:Subject<boolean>;
 
-  constructor(private translate: TranslateService,private teamService:MesTeamsDAL,private favService:FavoriDAL,private voteService:VoteDAL,private accessService:AccessComponent,private router:Router, private UtilisateurService:UtilisateurDAL) {
-    this.data = this.accessService.data;
-      this.translate.setDefaultLang(this.langage);
-      this.translate.use(this.langage);
+  constructor(private accessService:AccessComponent,private translate: TranslateService,private teamService:MesTeamsDAL,private favService:FavoriDAL,private voteService:VoteDAL,private router:Router, private UtilisateurService:UtilisateurDAL) { }
+  
+  ngOnInit(): void {
+    this.data = this.accessService.getSession("All");
+    this.translate.setDefaultLang(this.langage);
+    this.translate.use(this.langage);
   }
 
   ChangeLangage(Langage) {
@@ -52,20 +54,20 @@ export class AppComponent {
     this.UtilisateurService.CheckUser(new Utilisateur({Pseudo:this.login, Password:this.password})).subscribe(result => {
       this.accessService.setSession("User",result);
       
-      this.data["User"] = this.accessService.getSession("User");
+      this.data["User"] = result;
       this.UtilisateurService.getUserByPseudo(this.login).subscribe(result2 => {
         if (result2.ActivationToken != '')
         {
           this.accessService.setSession("Id",result2.Id);
           this.accessService.setSession("Pseudo",result2.Pseudo);
-          this.data["Id"] = this.accessService.data["Id"];
-          this.data["Pseudo"] = this.accessService.data["Pseudo"];
+          this.data["Id"] = this.accessService.getSession("Id");
+          this.data["Pseudo"] = this.accessService.getSession("Pseudo");
           this.router.navigateByUrl('activation');
         }
         else
         {
           this.accessService.setSession("Info",result2);
-          this.data["Info"] = this.accessService.data["Info"];
+          this.data["Info"] = result2;
           this.favService.getFavoritesByUserId(result2.Id).subscribe(result => {
             this.accessService.setSession("Fav",result);
             this.Fav$.next(true);
@@ -91,7 +93,7 @@ export class AppComponent {
           setTimeout(() => this.OkLogin = false, 3000);
           //A faire : trouver un moyen de call le ngoninit du component actuel
           zip(this.Fav$,this.Teams$,this.Vote$).subscribe(([Fav, Teams, Vote]) => {
-            if(Fav && Teams && Vote) location.reload();
+           if(Fav && Teams && Vote) setTimeout(() => { location.reload() },50000) ;
           })
         }  
       });

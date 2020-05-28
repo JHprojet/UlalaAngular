@@ -7,7 +7,7 @@ export class IsToActivate implements CanActivate {
     constructor(private router: Router,private accessService: AccessComponent) { }
 
     canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot) {
-        const IsToActivate = this.accessService.CheckAccessTest("Activation");
+        const IsToActivate = this.accessService.CheckAccess("Activation");
         if(!IsToActivate) this.router.navigateByUrl('/');
         else return true;
     }
