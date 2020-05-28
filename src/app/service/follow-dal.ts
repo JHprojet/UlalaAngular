@@ -9,26 +9,21 @@ const EndPoint = "http://localhost:44312/api/";
 @Injectable({ providedIn: 'root' })
 export class FollowDAL {
   constructor(private http: HttpClient,private accessService:AccessComponent) { }
-  httpOptions = {
-    headers: new HttpHeaders({
-      'Content-Type':  'application/json',
-      'Authorization' : this.accessService.getSession("User")??this.accessService.getSession("Anonyme")??""
-    })
-  };
+
   getAllFollow(): Observable<Follow[]> {
-    return this.http.get<Follow[]>(EndPoint+'Follow', this.httpOptions)
+    return this.http.get<Follow[]>(EndPoint+'Follow', this.Header())
   }
   getFollowbyFollowedFollower(FollowerId:number, FollowedId:number): Observable<number> {
-    return this.http.get<number>(EndPoint+'Follow/?FollowerId='+FollowerId+'&FollowedId='+FollowedId, this.httpOptions)
+    return this.http.get<number>(EndPoint+'Follow/?FollowerId='+FollowerId+'&FollowedId='+FollowedId, this.Header())
   }
   getFollow(id:number): Observable<Follow> {
-    return this.http.get<Follow>(EndPoint+'Follow/'+id, this.httpOptions)
+    return this.http.get<Follow>(EndPoint+'Follow/'+id, this.Header())
   }
   postFollow(monObjet: Follow): Observable<Follow> {
-    return this.http.post<Follow>(EndPoint+'Follow', monObjet, this.httpOptions)
+    return this.http.post<Follow>(EndPoint+'Follow', monObjet, this.Header())
   }
   deleteFollow(id: number): Observable<Follow> {
-    return this.http.delete<Follow>(EndPoint+'Follow/'+id, this.httpOptions)
+    return this.http.delete<Follow>(EndPoint+'Follow/'+id, this.Header())
   }
   handleError(error) {
     let errorMessage = '';
@@ -36,4 +31,12 @@ export class FollowDAL {
     else { errorMessage = `Error Code: ${error.status}\nMessage: ${error.message}`; }
     return throwError(errorMessage);
   }
+  private Header() {
+    let httpOptions = { headers : new HttpHeaders({
+      'Content-Type':  'application/json',
+      'Authorization' : this.accessService.getSession("User")??this.accessService.getSession("Anonyme")??""
+    })};
+    return httpOptions;
+  }
+  
 }

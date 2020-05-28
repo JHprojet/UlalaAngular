@@ -10,20 +10,22 @@ const EndPoint = "http://localhost:44312/api/";
 @Injectable({ providedIn: 'root' })
 export class ImageDAL {
   constructor(private http: HttpClient,private accessService:AccessComponent) { }
-  httpOptions = {
-    headers: new HttpHeaders({
-      'Content-Type':  'application/json',
-      'Authorization' : this.accessService.getSession("User")??this.accessService.getSession("Anonyme")??""
-    })
-  };
+
   uploadImage(image:Image):Observable<any> {
-      return this.http.post<Image>(EndPoint+'image', image, this.httpOptions);
+      return this.http.post<Image>(EndPoint+'image', image, this.Header());
   }
   handleError(error) {
     let errorMessage = '';
     if (error.error instanceof ErrorEvent) { errorMessage = `Error: ${error.error.message}`; } 
     else { errorMessage = `Error Code: ${error.status}\nMessage: ${error.message}`; }
     return throwError(errorMessage);
+  }
+  private Header() {
+    let httpOptions = { headers : new HttpHeaders({
+      'Content-Type':  'application/json',
+      'Authorization' : this.accessService.getSession("User")??this.accessService.getSession("Anonyme")??""
+    })};
+    return httpOptions;
   }
 }
 
