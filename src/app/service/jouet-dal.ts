@@ -11,18 +11,44 @@ const EndPoint = "http://localhost:44312/api/";
 export class JouetDAL {
   constructor(private http: HttpClient,private accessService:AccessComponent) { }
  
+  /**
+  * Call to API to get all Jouet
+  * @returns Observable<Jouet[]>
+  */
   getToys(): Observable<Jouet[]> {
     return this.http.get<Jouet[]>(EndPoint+'Jouet', this.Header()).pipe(catchError(this.handleError))
   }
+  /**
+  * Call to API to get a Jouet depending on his id
+  * @param id Id of the Jouet
+  * @returns Observable<Jouet>
+  */
   getToyById(id:number): Observable<Jouet> {
     return this.http.get<Jouet>(EndPoint+'Jouet/'+id, this.Header()).pipe(catchError(this.handleError))
   }
-  postToy(monObjet: Jouet): Observable<Jouet> {
-    return this.http.post<Jouet>(EndPoint+'Jouet', monObjet, this.Header()).pipe(catchError(this.handleError))
+  /**
+  * Call to API to modify an existing Jouet
+  * @param Jouet Jouet
+  * @param id Id of the Jouet to modify
+  * @returns Observable<Jouet>
+  */
+  postToy(Jouet: Jouet): Observable<Jouet> {
+    return this.http.post<Jouet>(EndPoint+'Jouet', Jouet, this.Header()).pipe(catchError(this.handleError))
   }
-  putToyById(monObjet: Jouet, id: number): Observable<Jouet> {
-    return this.http.put<Jouet>(EndPoint+'Jouet/'+id, monObjet, this.Header()).pipe(catchError(this.handleError))
+  /**
+  * Call to API to modify an existing Jouet
+  * @param Jouet Jouet
+  * @param id Id of the Jouet to modify
+  * @returns Observable<Jouet>
+  */
+  putToyById(Jouet: Jouet, id: number): Observable<Jouet> {
+    return this.http.put<Jouet>(EndPoint+'Jouet/'+id, Jouet, this.Header()).pipe(catchError(this.handleError))
   }
+  /**
+  * Call to API to delete an existing Jouet
+  * @param id Id of the Jouet to delete
+  * @returns Observable<Jouet>
+  */
   deleteToyById(id: number): Observable<Jouet> {
     return this.http.delete<Jouet>(EndPoint+'Jouet/'+id, this.Header()).pipe(catchError(this.handleError))
   }
@@ -32,6 +58,10 @@ export class JouetDAL {
     else { errorMessage = `Error Code: ${error.status}\nMessage: ${error.message}`; }
     return throwError(errorMessage);
   }
+  /**
+  * Create the httpOptions header with Authorization
+  * @returns httpOptions
+  */
   private Header() {
     let httpOptions = { headers : new HttpHeaders({
       'Content-Type':  'application/json',

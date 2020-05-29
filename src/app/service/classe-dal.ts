@@ -12,18 +12,43 @@ export class ClasseDAL {
   
   constructor(private http: HttpClient,private accessService:AccessComponent) { }
 
+  /**
+  * Call to API to get all Classe
+  * @returns Observable<Classe[]>
+  */
   getClasses(): Observable<Classe[]> {
     return this.http.get<Classe[]>(EndPoint+'Classe', this.Header())
   }
+  /**
+  * Call to API to get a Classe depending on his id
+  * @param id Id of the Classe
+  * @returns Observable<Classe>
+  */
   getClasse(id:number): Observable<Classe> {
     return this.http.get<Classe>(EndPoint+'Classe/'+id, this.Header())
   }
-  postClasse(monObjet: Classe): Observable<Classe> {
-    return this.http.post<Classe>(EndPoint+'Classe', monObjet, this.Header())
+  /**
+  * Call to API to post a new Classe
+  * @param Classe Classe
+  * @returns Observable<Classe>
+  */
+  postClasse(Classe: Classe): Observable<Classe> {
+    return this.http.post<Classe>(EndPoint+'Classe', Classe, this.Header())
   }
-  putClasse(monObjet: Classe, id: number): Observable<Classe> {
-    return this.http.put<Classe>(EndPoint+'Classe/'+id, monObjet, this.Header())
+  /**
+  * Call to API to modify an existing Classe
+  * @param Classe Classe
+  * @param id Id of the Classe to modify
+  * @returns Observable<Classe>
+  */
+  putClasse(Classe: Classe, id: number): Observable<Classe> {
+    return this.http.put<Classe>(EndPoint+'Classe/'+id, Classe, this.Header())
   }
+  /**
+  * Call to API to delete an existing Classe
+  * @param id Id of the Classe to delete
+  * @returns Observable<Classe>
+  */
   deleteClasse(id: number): Observable<Classe> {
     return this.http.delete<Classe>(EndPoint+'Classe/'+id, this.Header())
   }
@@ -33,6 +58,10 @@ export class ClasseDAL {
     else { errorMessage = `Error Code: ${error.status}\nMessage: ${error.message}`; }
     return throwError(errorMessage);
   }
+  /**
+  * Create the httpOptions header with Authorization
+  * @returns httpOptions
+  */
   private Header() {
     let httpOptions = { headers : new HttpHeaders({
       'Content-Type':  'application/json',

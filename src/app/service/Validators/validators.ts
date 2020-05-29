@@ -11,7 +11,7 @@ export class CustomValidators {
 
     constructor(private utilisateurService:UtilisateurDAL, private accessService:AccessComponent) {}
 
-    //Check mail format
+    /** Validators for FB : Check mail format */
     public EmailValidator(): ValidatorFn {
         return (control: AbstractControl): {[key: string]: any} | null => {
         let Re:RegExp = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
@@ -20,7 +20,7 @@ export class CustomValidators {
         };
     }
 
-    //Verify that Password and verif password match
+    /** Validators for FB : Check if both password are identical */
     public PasswordMatch: ValidatorFn = (control: FormGroup): ValidationErrors | null => {
         const password = control.get('password');
         const passwordVerif = control.get('passwordVerif');
@@ -28,7 +28,7 @@ export class CustomValidators {
         return password && passwordVerif && password.value !== passwordVerif.value ? { 'PasswordMatch' : true } : null;
     };
 
-    //Verify that Email and verif Email match
+    /** Validators for FB : Check if both Email are identical */
     public EmailMatch: ValidatorFn = (control: FormGroup): ValidationErrors | null => {
         const email = control.get('email');
         const emailVerif = control.get('emailVerif');
@@ -36,7 +36,7 @@ export class CustomValidators {
         return email && emailVerif && email.value !== emailVerif.value ? { 'EmailMatch' : true } : null;
     };
 
-    //Check if password is the same as DB
+    /** Async Validators for FB : Check if password is the same in DB */
     public CheckPassword: AsyncValidatorFn = (control: AbstractControl): Observable<ValidationErrors | null> => {
         let U = new Utilisateur({Pseudo: this.accessService.getSession("Info").Pseudo, Password:control.value});
         return this.utilisateurService.CheckUser(U).pipe(
@@ -44,62 +44,61 @@ export class CustomValidators {
         );
     };
 
-    //Check if username allready exist in DB - Async
+    /** Async Validators for FB : Check if username allready exist in DB */
     public CheckUsername: AsyncValidatorFn = (control: AbstractControl): Observable<ValidationErrors | null> => {
         return this.utilisateurService.getUserByPseudo(control.value).pipe(
             map(() => { return {'PseudoExist': true}}),catchError(() => of(null))
         );
     };
 
-    //Check if mail allready exist in DB - Async
+    /** Async Validators for FB : Check if mail allready exist in DB - return error if allready exist */
     public CheckEmail: AsyncValidatorFn = (control: AbstractControl): Observable<ValidationErrors | null> => {
         return this.utilisateurService.getUserByMail(control.value).pipe(
             map(() => { return {'MailExist': true}}),catchError(() => of(null))
         );
     };
 
-    //Check if mail allready exist in DB - Async - inverse return
+    /** Async Validators for FB : Check if mail allready exist in DB - return error if don't exist */
     public CheckEmailExist: AsyncValidatorFn = (control: AbstractControl): Observable<ValidationErrors | null> => {
         return this.utilisateurService.getUserByMail(control.value).pipe(
             map(() => { return null}),catchError(() => of({'MailExist': true}))
         );
     };
 
-
-    //Check is Continent is feeled with a value
+    /** Validators for FB : Check if Continent is selected */
     public CheckContinent: ValidatorFn = (control: FormGroup): ValidationErrors | null => {
         const Continent = control.get('Continent');
         return Continent && (Continent.value == '' || Continent.value == null) ? { 'ContinentIsNeeded' : true } : null;
     };
 
-    //Check is Team is feeled with a value
+    /** Validators for FB : Check if a team is selected */
     public CheckTeam: ValidatorFn = (control: FormGroup): ValidationErrors | null => {
         const Team = control.get('Team');
         return Team && (Team.value == '' || Team.value == null) ? { 'TeamNeeded' : true } : null;
     };
 
-    //If Continent is feeled with a value, Zone must be feeled too
+    /** Validators for FB : Check if Zone is selected when Continent is selected */
     public CheckZone: ValidatorFn = (control: FormGroup): ValidationErrors | null => {
         const Continent = control.get('Continent');
         const Zone = control.get('Zone');
         return Continent && Continent.value != '' && Zone && Zone.value == '' ? { 'ZoneIsNeeded' : true } : null;
     };
-
-    //If Zone is feeled with a value, Boss must be feeled too
+    
+    /** Validators for FB : Check if boss is selected when Zone is selected */
     public CheckBoss: ValidatorFn = (control: FormGroup): ValidationErrors | null => {
         const Boss = control.get('Boss');
         const Zone = control.get('Zone');
         return Zone && Zone.value != '' && Boss && Boss.value == '' ? { 'BossIsNeeded' : true } : null;
     };
 
-    //If Team is feeled with a value, Boss must be feeled too
+    /** Validators for FB : Check if boss is selected when a team is selected */
     public CheckBossWithTeam: ValidatorFn = (control: FormGroup): ValidationErrors | null => {
         const Boss = control.get('Boss');
         const Team = control.get('Team');
         return Team && Team.value != '' && Boss && Boss.value == '' ? { 'BossIsNeeded' : true } : null;
     };
 
-    //Check if 4 classes feeled with value
+    /** Validators for FB : Check if all 4 classes selected */
     public CheckClasses: ValidatorFn = (control: FormGroup): ValidationErrors | null => {
         const C1 = control.get('Classe1');
         const C2 = control.get('Classe2');
