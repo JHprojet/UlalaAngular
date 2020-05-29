@@ -4,7 +4,7 @@ import { Router } from '@angular/router';
 import { UtilisateurDAL } from '../service/utilisateur-dal';
 import { Subject } from 'rxjs';
 
-//Roles et infos utilitaires
+//Const used for differentes Session variable
 const Anonyme = "Anonyme";
 const User = "User";
 const Info = "Info";
@@ -15,17 +15,12 @@ const Votes = "Votes";
 const Teams = "Teams";
 
 export class AccessComponent {
-    //Tableau reprenant les données en Session
-    //Pas de lecture sur la Session en dehors de ce component
-    //Permet récupération via le tableau et non directement via la session
-
-    CheckAno$ = new Subject<boolean>();
 
     constructor(private utilisateurService:UtilisateurDAL,@Inject(SESSION_STORAGE) private session: WebStorageService, private routerService:Router) { }
 
-    //Permet de checker le droit d'accès aux pages
-    //La variable {role} à renseigner et celle de plus haut niveau : Admin -> User -> Anonyme
-    //role Activation = cas particulier uniquement lors du check si la personne qui se log a activé son compte
+    /** Checking access right to component depending on differents role (used in other helpeur for canActivate function)
+     * @param role Role of the checked for access to pages
+    */
     public CheckAccess(role):boolean
     {
         if(role == "Anonyme" && !this.getSession("Anonyme")) return false;
@@ -35,7 +30,9 @@ export class AccessComponent {
         else return true;
     }
 
-    //Récupération des infos de session
+    /** Get info from session 
+     * @param Token Variable to get
+    */
     public getSession(Token:string):any
     { 
         let result;
@@ -80,7 +77,10 @@ export class AccessComponent {
         return result;
     }
 
-    //Ecriture valeur en session + copie dans tableau data[]
+    /** Write on session 
+     * @param Token Variable to write
+     * @param Data Data to insert in variable
+    */
     public setSession(Token:string, Data:any):void
     {
         switch(Token) {
@@ -111,7 +111,9 @@ export class AccessComponent {
         }
     }
 
-    //Suppression d'infos en session + du tableau local data
+    /** Delete from session 
+     * @param Token Variable to remove
+    */
     public deleteSession(Token:string):void
     {
         switch(Token) {
@@ -151,7 +153,7 @@ export class AccessComponent {
         }
     }
 
-    //Récupération du JWT Anonyme + Envoi passage Subject à true pour utilisation dans les components
+    /** Get Anonymous token and set session */
     getAnonymeKey()
     {
         this.utilisateurService.GetAnonymeToken().subscribe(result => {
