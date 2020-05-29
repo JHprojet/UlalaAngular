@@ -73,7 +73,10 @@
             "RETRIEVEINFO" : "To retrieve your informations",
             "MAILMATCH" : "Both E-mail must match.",
             "TEAMNAMEREQUIRED" : "The name of the team is required.",
-            "MAILDONTEXIST" : "This mail don't exist."
+            "MAILDONTEXIST" : "This mail don't exist.",
+            "ZONEREQUIRED" : "Zone is required.",
+            "BOSSREQUIRED" : "Boss is required.",
+            "CONTINENTREQUIRED" : "Continent is required."   
         }
     },
     "INFOMESSAGES" : {
@@ -122,7 +125,8 @@
         "PASSWORD" : "Password",
         "UNDERCONS" : "Under construction",
         "DELETE" : "Delete",
-        "TEAMNAME" : "Team name"
+        "TEAMNAME" : "Team name",
+        "TEAM" : "Team"
     },
     "ADMINSTRAT" : {
         "TITLE" : "Strategy Management",
@@ -188,5 +192,14 @@
         "TITLE" : "Managing your data",
         "TEXT" : "Your data will remain private and will never be passed on to a third party. The images of the strategies will be accessible to everyone.",
         "SIGN" : "Kiss!"
-    }
+    },
+    "SEARCH" : {
+        "TITLE" : "Search strategies",
+        "NOTEAM" : "You have no personal team yet. If you want to create one to make the search easier :",
+        "NOSTRAT" : "Oops, no strategy found. Maybe try with less filters!",
+        "CHOOSETEAM" : "Choose your team",
+        "HELP" : "1 - Select continent + zone + boss.<br/>2 - Select classes if (optionnal)",
+        "HELPUSER" : "If you have personal team in My infos>My favorite teams :<br/>1 - Select your team.<br/>2 - Select your boss.<br/>the research will take inot account the 4 classes of your team",
+        "USESEARCH" : "Using the research"
+       }
 }

@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { FormBuilder, Validators } from '@angular/forms';
 import { CustomValidators } from '../service/Validators/validators';
 import { UtilisateurDAL } from '../service/utilisateur-dal';
@@ -17,6 +17,7 @@ import { Favori } from '../models/favori';
 import { FavoriDAL } from '../service/favori-dal';
 import { VoteDAL } from '../service/vote-dal';
 import { Utilisateur } from '../models/utilisateur';
+import { TranslateService, LangChangeEvent } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-search-strategie',
@@ -47,29 +48,33 @@ export class SearchStrategieComponent implements OnInit {
   },{
     updateOn: 'change', validators: [this.v.CheckBossWithTeam]});
 
-    // /!\ Réécriture en cours de search.component - Encore en cours de réalisation /!\
-
-  constructor(private voteService:VoteDAL,private favService:FavoriDAL,private v:CustomValidators,private activatedRoute:ActivatedRoute,private enregistrementService:EnregistrementDAL,private classeService:ClasseDAL,private bossZoneService:BosszoneDAL,private accessService:AccessComponent,private utilisateurService:UtilisateurDAL, private fb:FormBuilder, private cv:CustomValidators) { }
-  //Mise en mémoire de la liste de tous les boss par zone
+  constructor(private translate:TranslateService, private cd:ChangeDetectorRef, private voteService:VoteDAL,private favService:FavoriDAL,private v:CustomValidators,private activatedRoute:ActivatedRoute,private enregistrementService:EnregistrementDAL,private classeService:ClasseDAL,private bossZoneService:BosszoneDAL,private accessService:AccessComponent,private utilisateurService:UtilisateurDAL, private fb:FormBuilder, private cv:CustomValidators) { }
+  //Variable containing all BossZone
   AllBossZone:BossZone[] = new Array<BossZone>();
-  //Variables de remplissage des select
-  selectContinent:string[] = new Array<string>();
-  selectZone:string[] = new Array<string>();
-  selectBoss:string[] = new Array<string>();
+  //Variable for the display of enregistrement depending on paginatorComponent
+  displayEnregistrements:Enregistrement[] = new Array<Enregistrement>();
+  //Variable to fill in selects
+  selectContinent:BossZone[] = new Array<BossZone>();
+  selectZone:BossZone[] = new Array<BossZone>();
+  selectBoss:BossZone[] = new Array<BossZone>();
   selectClasse:Classe[] = new Array<Classe>();
-  selectMesTeams:MesTeams[] = new Array<MesTeams>();
-  //S'il s'agit d'un utilisateur connecté
+  selectMyTeams:MesTeams[] = new Array<MesTeams>();
+  //is the user connected
   accessUser:boolean = false;
-  //Variable d'affichage/hide de l'aide
+  //Displaying help
   Show:boolean = false;
-  //Route actuelle
+  //Variable displaying the choosen Form
+  SearchWithTeam:boolean = false;
+  //current Route
   currentRoute:string;
-  //Variable de display des messages
+  //Variable displaying if no enregistrement found
   DisplayNoEnregistrementMessage:boolean = false;
-  //Variable de stockage des Votes et Favoris
+  //Variable with all votes and favori of the user
   myVotes:Vote[];
   myFavs:Favori[];
-  //Getter et Setter pour les stratégies (Le getter permet de retourner les stratégies en favori si sur la route "favstrat" sinon, renvoi tous les élements)
+  //Language
+  Lang:string;
+  //Getter and Setter for strategies (The getter allow to filter strategy depending on route)
   private _enregistrement: Enregistrement[];
   get Enregistrements():Enregistrement[] {
     
@@ -91,53 +96,79 @@ export class SearchStrategieComponent implements OnInit {
     this._enregistrement = P;
   }
   
-
   ngOnInit(): void {
-    //Récupération route actuelle
+    //Get language
+    this.Lang = this.translate.currentLang;
+    //get current route
     this.activatedRoute.url.subscribe(params => {
       this.currentRoute = params[0].path;
     })
-    //Disable de certains champs des formulaires
+    //init to disbale some form parts
     this.SearchFormWithTeam.get('Boss').disable();
     this.SearchForm.get('Boss').disable();
     this.SearchForm.get('Zone').disable();
-    //Si un utilisateur est connecté récupère ses teams persos, ses favoris et ses votes
+    //If a user is connected, get his teams, Favori and Votes.
     if(this.accessService.getSession("Info")) {
       this.accessUser = true;
-      if(this.accessService.getSession("Teams")) this.selectMesTeams = this.accessService.getSession("Teams");
-      else this.selectMesTeams = new Array<MesTeams>();
+      if(this.accessService.getSession("Teams")) this.selectMyTeams = this.accessService.getSession("Teams");
+      else this.selectMyTeams = new Array<MesTeams>();
       if(this.accessService.getSession("Fav"))  this.myFavs = this.accessService.getSession("Fav");
       else  this.myFavs = new Array<Favori>();
       if(this.accessService.getSession("Votes")) this.myVotes = this.accessService.getSession("Votes");
       else this.myVotes = new Array<Vote>();
     }
-    //Récupération de la liste des boss par zone
+    //Get all BossZone list
     this.bossZoneService.getBossZones().subscribe(result => {
       this.AllBossZone = result;
-      this.AllBossZone.forEach(element => {
-        if(!this.selectContinent.includes(element.Zone.ContinentFR))this.selectContinent.push(element.Zone.ContinentFR);
-      });
+      //Fill in selectContinent with unique Continent values
+      var unique = [];
+      for( let i = 0; i < result.length; i++ ) {
+        if( !unique[result[i].Zone.ContinentFR]) {
+          this.selectContinent.push(result[i]);
+          unique[result[i].Zone.ContinentFR] = 1;
+        }
+      }
     });
+    //Get all classe to fill in selects
     this.classeService.getClasses().subscribe(result => {
       this.selectClasse = result;
     });
     //Init Enregistrements
     this.Enregistrements = new Array<Enregistrement>();
+    //Register to LangChangeEvent and write selected langage in variable Lang
+    this.translate.onLangChange.subscribe((event: LangChangeEvent) => {
+      this.Lang = event.lang;
+    });
   }
 
+  /** If user switch form, init both form and display the other form */
+  switchForm() { 
+    this.SearchWithTeam = !this.SearchWithTeam
+    this.SearchForm.reset();
+    this.SearchFormWithTeam.reset();
+    this.SearchFormWithTeam.get('Boss').disable();
+    this.SearchForm.get('Boss').disable();
+    this.SearchForm.get('Zone').disable();
+  }
+
+  /** Update strategy table depending on Paginator */
+  public getPagTable(data) {
+    this.displayEnregistrements = data;
+    this.cd.detectChanges();
+    this.cd.markForCheck();
+  }
+
+  /** Launch the strategy research */
   onSubmit() {
     let User ="", BossZoneId="", C1="", C2="", C3="", C4="";
-    this.DisplayNoEnregistrementMessage = true;
-    //Rempli User avec l'id de l'utilisateur si la route est "mystrat" pour n'afficher que les enregistrements publiés par l'utilisateur
+    //fill in User Id if route = mystrat to get only user's strategies
     if(this.currentRoute == 'mystrat') User = this.accessService.getSession("Info").Id.toString();
-    //Rempli les données de recherche si choix fait d'une team perso
+    //If the Form used is the one with a personal team
     if(this.SearchFormWithTeam.valid) {
-      this.AllBossZone.forEach(item => {
-        if(item.Zone.Id == this.selectMesTeams.find(team => team.Id == this.SearchFormWithTeam.value.Team).Zone.Id && item.Boss.NomFR == this.SearchFormWithTeam.value.Boss) {
-          BossZoneId = item.Id.toString();
-        }
-      });
-      this.selectMesTeams.forEach(item => {
+      //Get BossZoneId 
+      BossZoneId = this.SearchFormWithTeam.value.Boss;
+      //Get Classes
+      this.selectMyTeams.forEach(item => {
        if(item.Id == this.SearchFormWithTeam.value.Team) {
          C1 = item.Team.Classe1.Id.toString();
          C2 = item.Team.Classe2.Id.toString();
@@ -146,101 +177,122 @@ export class SearchStrategieComponent implements OnInit {
        }
      });
     }
-    //Rempli les données de recherche si choix fait d'une recherche à la main
+    //If the form used is the custom one
     else if(this.SearchForm.value.Boss != "") {
-      this.AllBossZone.forEach(item => {
-        if(item.Zone.ContinentFR == this.SearchForm.value.Continent && item.Zone.ZoneFR == this.SearchForm.value.Zone && item.Boss.NomFR == this.SearchForm.value.Boss)
-          BossZoneId = item.Id.toString();
-      });
+      //Get BossZoneId
+      BossZoneId = this.SearchForm.value.Boss;
+      //Get the classes 
       C1 = this.SearchForm.value.Classe1;
       C2 = this.SearchForm.value.Classe2;
       C3 = this.SearchForm.value.Classe3;
       C4 = this.SearchForm.value.Classe4;
     }
-    //Lancement de la recherche
+    //Launch search via API (Display message if no Enregistrement found)
     this.enregistrementService.getStrategiesByInfos(User, BossZoneId, C1, C2, C3, C4).subscribe(result => {
       this.Enregistrements = [];
+      this.displayEnregistrements = [];
       this.Enregistrements = result;
+      if(this.Enregistrements.length == 0) this.DisplayNoEnregistrementMessage = true;
     }, error => 
     {
       this.Enregistrements = [];
+      this.displayEnregistrements = [];
+      this.DisplayNoEnregistrementMessage = true;
     });                                            
   }
 
-  //Rempli la liste déroulante Zone de SearchBoss
+  /** Fill in options of Zone's select */
   public GetZones(Continent) {
+    //init cascading selects + disables them
     this.selectZone = [];
     this.selectBoss = [];
     this.SearchForm.controls.Zone.setValue("");
     this.SearchForm.controls.Boss.setValue("");
     this.SearchForm.controls.Boss.disable();
     this.SearchForm.controls.Zone.disable();
-    this.AllBossZone.forEach(item => {
-      if(item.Zone.ContinentFR == Continent.value && !this.selectZone.includes(item.Zone.ZoneFR)) this.selectZone.push(item.Zone.ZoneFR);
-    });
+    //Fill in selectZone with unique Zone values depending on Continent value
+    var unique = [];
+    for( let i = 0; i < this.AllBossZone.length; i++ ) {
+      if( !unique[this.AllBossZone[i].Zone.ZoneFR] && this.AllBossZone[i].Zone.ContinentFR == Continent.value) {
+        this.selectZone.push(this.AllBossZone[i]);
+        unique[this.AllBossZone[i].Zone.ZoneFR] = 1;
+      }
+    }
+    //If well filled in, enable select
     if(Continent.value != '') this.SearchForm.get('Zone').enable();
   }
 
-  //Rempli la liste déroulante boss de SearchBoss
+  /** Fill in options of Boss's select in SearchForm */
   public GetBoss(Continent,Zone) {
+    //init cascading selects + disables them
     this.selectBoss = [];
     this.SearchForm.controls.Boss.disable();
     this.SearchForm.controls.Boss.setValue("");
-    this.SearchFormWithTeam.controls.Boss.setValue("");
-    this.AllBossZone.forEach(item => {
-      if(item.Zone.ContinentFR == Continent.value && item.Zone.ZoneFR == Zone.value && !this.selectBoss.includes(item.Boss.NomFR)) this.selectBoss.push(item.Boss.NomFR);
-    });
+    //Feeling selectBoss with unique Boss values depending on Continent and Zone values
+    var unique = [];
+    for( let i = 0; i < this.AllBossZone.length; i++ ) {
+      if( !unique[this.AllBossZone[i].Zone.ZoneFR] 
+          && this.AllBossZone[i].Zone.ContinentFR == Continent.value
+          && this.AllBossZone[i].Zone.ZoneFR == Zone.value ) {
+        this.selectBoss.push(this.AllBossZone[i]);
+        unique[this.AllBossZone[i].Boss.NomFR] = 1;
+      }
+    }
+    //If well filled in, enable select
     if(Zone.value != '') this.SearchForm.controls.Boss.enable();
   }
   
-  //Rempli la liste déroulante boss de SearchBossWithTeam
+  /** Fill in options of Boss's select in SearchFormWithTeam */
   GetBossViaTeam(TeamId) {
-    this.SearchForm.reset();
-    this.SearchForm.controls.Boss.disable();
-    this.SearchForm.controls.Zone.disable();
+    //init cascading selects + disables them
     this.selectBoss = [];
+    this.SearchFormWithTeam.controls.Boss.disable();
     this.SearchFormWithTeam.controls.Boss.setValue("");
+    //Fill in select
     let ZoneId;
-    if(TeamId.value != "")
-      {
-      this.selectMesTeams.forEach(item => {
-        if(item.Id == TeamId.value) ZoneId = item.Zone.Id;
-      });
-      this.AllBossZone.forEach(item => {
-        if(ZoneId == item.Zone.Id && !this.selectBoss.includes(item.Boss.NomFR)) this.selectBoss.push(item.Boss.NomFR); 
-      });
+    if(TeamId.value != "") {
+      //Get Zone Name corresponding to selected team
+      let ZoneFR = this.selectMyTeams.find(team => team.Id == TeamId.value).Zone.ZoneFR;
+      //Feeling selectBoss with unique Boss values depending on Zone Name
+      let unique = [];
+      for( let i = 0; i < this.AllBossZone.length; i++ ) {
+        if( !unique[this.AllBossZone[i].Zone.ZoneFR] 
+            && this.AllBossZone[i].Zone.ZoneFR == ZoneFR ) {
+          this.selectBoss.push(this.AllBossZone[i]);
+          unique[this.AllBossZone[i].Boss.NomFR] = 1;
+        }
+      }
+      //If well filled in, enable select
       this.SearchFormWithTeam.get('Boss').enable();
     }
     else this.SearchFormWithTeam.get('Boss').disable();
   }
-   //Méthode permettant le changement de texte et le display ou non du texte d'aide quand on clique sur le bouton.
+   //Displaying or Hiding help
    public ShowHelp(){
     this.Show = !this.Show;
   }
 
-  //Mise en favori de l'enregistrement par l'utilisateur
-  public mettreFavori(id)
+  /** Put a strategy in user's favorites */
+  public putFavori(id)
   {
-    //Note pour plus tard, modifier fonctionnement API qui attend un modèle complet. => A transformer en Entité non complexe pour éviter de devoir instancier les objects et mettre juste l'Id à l'intérieur.
-    let fav$ = new Subject<boolean>();
     let Fav = new Favori({});
     Fav.Enregistrement = new Enregistrement({Id:id});
     Fav.Utilisateur = new Utilisateur({Id:this.accessService.getSession("Info").Id})
-    this.favService.postFavorite(Fav).subscribe(() => { fav$.next(true) });
-    zip(fav$).subscribe(() => {
+    //Post favori then get all favori of the user (update local table and session)
+    this.favService.postFavorite(Fav).subscribe(() => { 
       this.favService.getFavoritesByUserId(this.accessService.getSession("Info").Id).subscribe(result =>{
-        this.myFavs = result; //Remplissage du tableau avec tous les favoris de l'utilisateur une fois le favori envoyé avec succès via API
+        this.myFavs = result; 
         this.accessService.setSession("Fav",this.myFavs);
       });
-    });    
+    });  
   }
 
-  //Retrait des favoris par l'utilisateur
-  public retraitFavori(id)
+  /** Delete a strategy from user's favorites */
+  public deleteFavori(id)
   {
-    for (let elem of this.myFavs) { //Parcous de la liste des favoris en local. 
-      if(elem.Enregistrement.Id == id) { //Si favori trouvé dans la liste (en fonction Id envoyé via la page) 
-        //Suppression favoris via API + suppression dans le tableau local si delete OK.
+    for (let elem of this.myFavs) { 
+      if(elem.Enregistrement.Id == id) { 
+        //If Favori found : delete in DB via API + update local table and session
         this.favService.deleteFavoriteById(elem.Id).subscribe(() => {});
         this.myFavs = this.myFavs.filter(r => r.Id != elem.Id);
         this.accessService.setSession("Fav",this.myFavs);
@@ -248,18 +300,18 @@ export class SearchStrategieComponent implements OnInit {
     }
   }
 
-  public DisplayFavori(Id):boolean //Permet le display des icones favori OU non favoris (Voir .html)
+  /** Allow to display different favorite icone depending on is favorite or not */
+  public DisplayFavori(Id):boolean
   {
     let T = false;
     for(let elem of this.myFavs) { if(elem.Enregistrement.Id == Id) T = true; }
     return T;
   }
 
-  //Permet le display des icones de vote + / - / x en fonction des votes déjà effectuées ou non. 
-  //A noter qu'a chaque possibilité il y a 2 icones sur trois à faire apparaitre :
-  // Si voté + : Display x et -
-  // Si voté - : Display x et +
-  // Si pas de vote : Display + et -
+  /** Display Vote icone depending on differentes possibilities :
+  If vote + : Display x et -
+  If vote - : Display x et +
+  If no vote : Display + et - */
   public DisplayVote(Id):number 
   {
     let T:number = 0;
@@ -274,70 +326,90 @@ export class SearchStrategieComponent implements OnInit {
     return T;
   }
 
-  //Action de vote négatif sur un enregistrement par l'utilisateur en cliquant sur l'icone correspondante
-  //Méthode un peu barbare à améliorer (solution temporaire pour éviter les problèmes de votes multiples)
-  VoteMoins(Id)
+  /** Negative vote on a strategy */
+  VoteMinus(Id)
   {
+    //Init waiting variable
     let vote$ = new Subject<boolean>();
-    let V:Vote = new Vote({})
-    V.Enregistrement = new Enregistrement({Id:Id})
-    V.Utilisateur = new Utilisateur({Id:this.accessService.getSession("Info").Id})
-    V.Vote = -1;
-    for (let Vote of this.myVotes) //Parcours de la liste des votes existants
+    //Fill in Vote infos
+    let V:Vote = new Vote({
+      Enregistrement : new Enregistrement({Id:Id}),
+      Utilisateur : new Utilisateur({Id:this.accessService.getSession("Info").Id})
+    })
+    //Search in all Votes
+    for (let Vote of this.myVotes)
     {
-      if (Vote.Enregistrement && Vote.Enregistrement.Id == Id) //Si vote trouvé : suppression du vote + suppression dans le tableau local
+       //If vote allready exist
+      if (Vote.Enregistrement && Vote.Enregistrement.Id == Id)
       {
+        //Delete current vote
         this.voteService.deleteVoteById(Vote.Id).subscribe(() => {});
+        //Update local strategy table
         this.Enregistrements[this.Enregistrements.findIndex(r => r.Id == Vote.Enregistrement.Id)].Note--;
       }
     }
-    //Ajout du nouveau vote + ajout dans le tableau local
+    //Post new vote
     this.voteService.postVote(V).subscribe(() => { vote$.next(true) });
+    //Update local strategy table
     this.Enregistrements[this.Enregistrements.findIndex(r => r.Id == Id)].Note--;
     zip(vote$).subscribe(() => {
+      //Get all user votes
       this.voteService.getVotesByUser(this.accessService.getSession("Info").Id).subscribe(result =>{
-        
+        //Update local and session vote table
         this.myVotes = result; 
         this.accessService.setSession("Votes",this.myVotes);
       })
     })
   }
 
-  //Action de vote positif sur un enregistrement par l'utilisateur en cliquant sur l'icone correspondante
-  // Même remarque que méthode précédente
+  /** Positive vote on a strategy */
   VotePlus(Id)
   {
+    //Init waiting variable
     let vote$ = new Subject<boolean>();
-    let V:Vote = new Vote({})
-    V.Enregistrement = new Enregistrement({Id:Id})
-    V.Utilisateur = new Utilisateur({Id:this.accessService.getSession("Info").Id})
-    V.Vote = 1;
+    //Fill in Vote infos
+    let V:Vote = new Vote({    
+      Enregistrement : new Enregistrement({Id:Id}),
+      Utilisateur : new Utilisateur({Id:this.accessService.getSession("Info").Id})
+    });
+    //Search in all Votes
     for (let Vote of this.myVotes)
     {
+      //If vote allready exist
       if (Vote.Enregistrement && Vote.Enregistrement.Id == Id) 
       {
+        //Delete current vote
         this.voteService.deleteVoteById(Vote.Id).subscribe(() => {});
+        //Update local strategy table
         this.Enregistrements[this.Enregistrements.findIndex(r => r.Id == Vote.Enregistrement.Id)].Note++;
       }
     }
+    //Post new vote
     this.voteService.postVote(V).subscribe(() => { vote$.next(true) });
+    //Update local strategy table
     this.Enregistrements[this.Enregistrements.findIndex(r => r.Id == Id)].Note++;
     zip(vote$).subscribe(() => {
+      //Get all user votes
       this.voteService.getVotesByUser(this.accessService.getSession("Info").Id).subscribe(result =>{
+        //Update local and session vote table
         this.myVotes = result;
         this.accessService.setSession("Votes",this.myVotes);
       });
     });
   }
 
-  //Action de suppression d'un vote (si préalablement voté + ou -) via icone correspondante
+  /** Delete vote on a strategy */
   DeleteVote(Id)
   {
+    //Look for existing vote
     for (let Vote of this.myVotes)
     {
+      //If a vote allreayd exist for this strategy
       if (Vote.Enregistrement && Vote.Enregistrement.Id == Id) 
       {
+        //Delete actual vote
         this.voteService.deleteVoteById(Vote.Id).subscribe(() => {});
+        //update local and session vote table
         if (Vote.Vote == 1) this.Enregistrements[this.Enregistrements.findIndex(r => r.Id == Vote.Enregistrement.Id)].Note--;
         if (Vote.Vote == -1) this.Enregistrements[this.Enregistrements.findIndex(r => r.Id == Vote.Enregistrement.Id)].Note++;
         this.myVotes = this.myVotes.filter(r => r.Id != Vote.Id);

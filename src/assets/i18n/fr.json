@@ -74,7 +74,10 @@
             "RETRIEVEINFO" : "Pour retrouver vos informations",
             "MAILMATCH" : "Les deux E-mail doivent correspondre.",
             "TEAMNAMEREQUIRED" : "Le nom de la team est requise.",
-            "MAILDONTEXIST" : "Cet E-mail n'existe pas."
+            "MAILDONTEXIST" : "Cet E-mail n'existe pas.",
+            "ZONEREQUIRED" : "La zone est requise.",
+            "BOSSREQUIRED" : "Le boss est requis.",
+            "CONTINENTREQUIRED" : "Le continent est requis."        
         }
     },
     "INFOMESSAGES" : {
@@ -123,7 +126,8 @@
         "PASSWORD" : "Mot de passe",
         "UNDERCONS" : "En construction",
         "DELETE" : "Supprimer",
-        "TEAMNAME" : "Nom Team"
+        "TEAMNAME" : "Nom Team",
+        "TEAM" : "Team"
     },
     "ADMINSTRAT" : {
         "TITLE" : "Gestion des stratégies",
@@ -190,5 +194,14 @@
         "TITLE" : "Gestion de vos données",
         "TEXT" : "Vos données resterons privées et ne seront jamais transmises à un tier. Les images des stratégies seront pour leur part accessibles à tout un chacun.",
         "SIGN" : "Bisous!"
+    },
+    "SEARCH" : {
+        "TITLE" : "Chercher une stratégie",
+        "NOTEAM" : "Vous n'avez pas encore de team favorite. Si vous souhaitez en créer afin de simplifier la recherche de stratégie :",
+        "NOSTRAT" : "Oops, aucun enregistrement n'a été trouvé. Essayez peut-être avec moins de filtres!",
+        "CHOOSETEAM" : "Choisir sa team",
+        "HELP" : "1 - Sélectionnez un continent + une zone + un boss.<br/>2 - Sélectionner si vous le souhaitez une ou plusieurs classes",
+        "HELPUSER" : "Vous pouvez également , si vous avez enregistré une team perso dans Mes infos>Mes teams persos :<br/>1 - Selectionnez votre team.<br/>2 - Selectionnez le boss.<br/>La recherche s'effectuera automatiquement sur le boss sélectionné et les classes de votre team.",
+        "USESEARCH" : "Utilisation de la recherche"
     }
 }

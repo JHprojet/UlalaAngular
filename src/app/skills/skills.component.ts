@@ -25,7 +25,6 @@ export class SkillsComponent implements OnInit {
     this.skillService.getSkills().subscribe(result => { this.SkillsBase = result; });
     this.classeService.getClasses().subscribe(response => {
       this.selectClasse = response;
-      this.accessService.CheckAno$.closed;
     });
   }
 
