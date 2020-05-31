@@ -314,11 +314,13 @@ export class SearchStrategieComponent implements OnInit {
   If no vote : Display + et - */
   public DisplayVote(Id):number 
   {
+    
     let T:number = 0;
     for(let elem of this.myVotes)
     {
       if(elem.Enregistrement && elem.Enregistrement.Id == Id)
       {
+        console.log(elem.Vote);
         if (elem.Vote == 1) T = 1;
         if (elem.Vote == -1) T = -1;
       }
@@ -334,7 +336,8 @@ export class SearchStrategieComponent implements OnInit {
     //Fill in Vote infos
     let V:Vote = new Vote({
       Enregistrement : new Enregistrement({Id:Id}),
-      Utilisateur : new Utilisateur({Id:this.accessService.getSession("Info").Id})
+      Utilisateur : new Utilisateur({Id:this.accessService.getSession("Info").Id}),
+      Vote : -1
     })
     //Search in all Votes
     for (let Vote of this.myVotes)
@@ -349,7 +352,9 @@ export class SearchStrategieComponent implements OnInit {
       }
     }
     //Post new vote
-    this.voteService.postVote(V).subscribe(() => { vote$.next(true) });
+    this.voteService.postVote(V).subscribe(() => { 
+      console.log("vote envoyé");
+      vote$.next(true) });
     //Update local strategy table
     this.Enregistrements[this.Enregistrements.findIndex(r => r.Id == Id)].Note--;
     zip(vote$).subscribe(() => {
@@ -370,7 +375,8 @@ export class SearchStrategieComponent implements OnInit {
     //Fill in Vote infos
     let V:Vote = new Vote({    
       Enregistrement : new Enregistrement({Id:Id}),
-      Utilisateur : new Utilisateur({Id:this.accessService.getSession("Info").Id})
+      Utilisateur : new Utilisateur({Id:this.accessService.getSession("Info").Id}),
+      Vote : 1
     });
     //Search in all Votes
     for (let Vote of this.myVotes)
