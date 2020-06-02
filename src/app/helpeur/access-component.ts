@@ -13,6 +13,7 @@ const Id = "Id";
 const Fav = "Fav";
 const Votes = "Votes";
 const Teams = "Teams";
+const Lang = "Language"
 
 export class AccessComponent {
 
@@ -62,6 +63,9 @@ export class AccessComponent {
             case Teams : { 
                 result = this.session.get(Teams); 
                 break;}
+            case Lang : { 
+                result = this.session.get(Lang); 
+                break;}
             case "All" : {
                 result = new Array();
                 result.push(this.session.get(Anonyme));
@@ -72,6 +76,7 @@ export class AccessComponent {
                 result.push(this.session.get(Fav));
                 result.push(this.session.get(Votes));
                 result.push(this.session.get(Teams));
+                result.push(this.session.get(Lang));
                 break;}
         }
         return result;
@@ -108,6 +113,9 @@ export class AccessComponent {
             case Teams : { 
                 this.session.set(Teams, Data);
                 break;}
+            case Lang : { 
+                this.session.set(Lang, Data);
+                break;}
         }
     }
 
@@ -141,6 +149,9 @@ export class AccessComponent {
             case Teams : { 
                 this.session.remove(Teams);
                 break;}
+            case Lang : { 
+                this.session.remove(Lang);
+                break;}
             case "All" : {
                 this.deleteSession(Teams);
                 this.deleteSession(Fav);
@@ -149,6 +160,7 @@ export class AccessComponent {
                 this.deleteSession(Pseudo);
                 this.deleteSession(User);
                 this.deleteSession(Info);
+                this.deleteSession(Lang);
                 break;}
         }
     }
