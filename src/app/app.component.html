@@ -69,10 +69,10 @@
 </nav>
 
 <div class="container">
-<ng-container *ngIf="MessageRecupPassword || ErrorLogin || OkLogin || Disconnected">
+<ng-container *ngIf="MessageLostPassword || ErrorLogin || OkLogin || Disconnected">
   <br/>
   <div *ngIf="ErrorLogin" class="alert alert-danger">{{ 'ERRORMESSAGES.LOGIN' | translate }}</div>
-  <div *ngIf="MessageRecupPassword" class="alert alert-info"><a class="link" routerLink='/RetrievePassword'>{{ 'INFOMESSAGES.RETRIEVEPASSWORD' | translate }}</a></div>
+  <div *ngIf="MessageLostPassword" class="alert alert-info"><a class="link" routerLink='/RetrievePassword'>{{ 'INFOMESSAGES.RETRIEVEPASSWORD' | translate }}</a></div>
   <div *ngIf="OkLogin" class="alert alert-success">{{ 'SUCCESSMESSAGES.LOGIN' | translate }}</div>
   <div *ngIf="Disconnected" class="alert alert-success">{{ 'SUCCESSMESSAGES.DISCONNECTED' | translate }}</div>
 </ng-container>
