@@ -106,6 +106,7 @@
         "BOSS" : "Boss",
         "CLASSE" : "Classe",
         "IMAGES" : "Images",
+        "IMAGE" : "Image",
         "OK" : "Confirm",
         "YES" : "Yes",
         "NO" : "No",
@@ -126,7 +127,10 @@
         "UNDERCONS" : "Under construction",
         "DELETE" : "Delete",
         "TEAMNAME" : "Team name",
-        "TEAM" : "Team"
+        "TEAM" : "Team",
+        "DESC" : "Description",
+        "COST" : "Cost",
+        "NAME" : "Name"
     },
     "ADMINSTRAT" : {
         "TITLE" : "Strategy Management",
@@ -201,5 +205,8 @@
         "HELP" : "1 - Select continent + zone + boss.<br/>2 - Select classes if (optionnal)",
         "HELPUSER" : "If you have personal team in My infos>My favorite teams :<br/>1 - Select your team.<br/>2 - Select your boss.<br/>the research will take inot account the 4 classes of your team",
         "USESEARCH" : "Using the research"
-       }
+    },
+    "SKILLS" : {
+        "TITLE" : "The Skills"
+    }
 }

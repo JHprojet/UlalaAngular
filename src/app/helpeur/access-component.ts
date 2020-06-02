@@ -2,7 +2,6 @@ import { Inject } from '@angular/core';
 import { WebStorageService, SESSION_STORAGE } from 'angular-webstorage-service';
 import { Router } from '@angular/router';
 import { UtilisateurDAL } from '../service/utilisateur-dal';
-import { Subject } from 'rxjs';
 
 //Const used for differentes Session variable
 const Anonyme = "Anonyme";
@@ -168,6 +167,7 @@ export class AccessComponent {
     /** Get Anonymous token and set session */
     getAnonymeKey()
     {
+        this.deleteSession("All");
         this.utilisateurService.GetAnonymeToken().subscribe(result => {
             this.setSession(Anonyme, result);
         });

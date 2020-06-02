@@ -107,6 +107,7 @@
         "BOSS" : "Boss",
         "CLASSE" : "Classe",
         "IMAGES" : "Images",
+        "IMAGE" : "Image",
         "OK" : "Valider",
         "YES" : "Oui",
         "NO" : "Non",
@@ -127,7 +128,10 @@
         "UNDERCONS" : "En construction",
         "DELETE" : "Supprimer",
         "TEAMNAME" : "Nom Team",
-        "TEAM" : "Team"
+        "TEAM" : "Team",
+        "DESC" : "Description",
+        "COST" : "Coût",
+        "NAME" : "Nom"
     },
     "ADMINSTRAT" : {
         "TITLE" : "Gestion des stratégies",
@@ -203,5 +207,8 @@
         "HELP" : "1 - Sélectionnez un continent + une zone + un boss.<br/>2 - Sélectionner si vous le souhaitez une ou plusieurs classes",
         "HELPUSER" : "Vous pouvez également , si vous avez enregistré une team perso dans Mes infos>Mes teams persos :<br/>1 - Selectionnez votre team.<br/>2 - Selectionnez le boss.<br/>La recherche s'effectuera automatiquement sur le boss sélectionné et les classes de votre team.",
         "USESEARCH" : "Utilisation de la recherche"
+    },
+    "SKILLS" : {
+        "TITLE" : "Les Skills"
     }
 }

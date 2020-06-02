@@ -1,5 +1,5 @@
 <br/>
-<h2>Les skills</h2>
+<h2>{{ 'SKILLS.TITLE' | translate }}</h2>
 <br/>
 <div class="form-group row">
     <label class="col-sm-1 col-form-label">Classe : </label>
@@ -12,18 +12,24 @@
 <table class="table table-striped">
     <thead class="thead-dark">
         <tr>
-            <th style="width: 8%">Image</th>
-            <th style="width: 20%">Nom</th>
-            <th style="width: 47%">Description</th>
-            <th style="width: 8%">Coût</th>
-            <th style="width: 17%">Zone</th>
+            <th style="width: 8%">{{ 'KEYWORD.IMAGE' | translate }}</th>
+            <th style="width: 20%">{{ 'KEYWORD.NAME' | translate }}</th>
+            <th style="width: 47%">{{ 'KEYWORD.DESC' | translate }}</th>
+            <th style="width: 8%">{{ 'KEYWORD.COST' | translate }}</th>
+            <th style="width: 17%">{{ 'KEYWORD.ZONE' | translate }}</th>
         </tr>
     </thead>
     <tbody>
         <tr *ngFor="let element of Skills">
             <td><img src="{{element.ImagePath}}"></td>
-            <td >{{element.NomFR}}</td>
-            <td>{{element.DescFR}}</td>
+            <td>
+                <ng-container *ngIf="Lang == 'fr'">{{element.NomFR}}</ng-container>
+                <ng-container *ngIf="Lang == 'fr'">{{element.NomEN}}</ng-container>
+            </td>
+            <td>
+                <ng-container *ngIf="Lang == 'fr'">{{element.DescFR}}</ng-container>
+                <ng-container *ngIf="Lang == 'fr'">{{element.DescEN}}</ng-container>
+            </td>
             <td>{{element.Cost}}</td>
             <td>{{element.Location}}</td>
         </tr>

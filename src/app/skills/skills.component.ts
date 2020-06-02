@@ -1,12 +1,9 @@
-import { Component, OnInit, Inject } from '@angular/core';
-import { Router } from '@angular/router';
+import { Component, OnInit } from '@angular/core';
 import { SkillDAL } from '../service/skill-dal';
 import { Skill } from '../models/skill';
 import { Classe } from '../models/classe';
 import { ClasseDAL } from '../service/classe-dal';
-import { SESSION_STORAGE, WebStorageService } from 'angular-webstorage-service';
-import { AccessComponent } from '../helpeur/access-component';
-import { zip } from 'rxjs';
+import { TranslateService, LangChangeEvent } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-skills',
@@ -15,20 +12,32 @@ import { zip } from 'rxjs';
 })
 export class SkillsComponent implements OnInit {
 
-  constructor(private accessService:AccessComponent,@Inject(SESSION_STORAGE) private session: WebStorageService,private classeService:ClasseDAL,private skillService:SkillDAL,private routerService:Router) { }
-  Skills:Skill[];
+  constructor(private translate:TranslateService,private classeService:ClasseDAL,private skillService:SkillDAL) { }
+  //All skills
   SkillsBase:Skill[];
+  //Skill displayed in the table
+  Skills:Skill[];
+  //Variable to fill in the select
   selectClasse:Classe[];
+  //Language
+  Lang:string;
 
   ngOnInit(): void {
+    //Init Language
+    this.Lang = this.translate.currentLang
+    //Init and get Skills and classes
     this.Skills = new Array<Skill>();
     this.skillService.getSkills().subscribe(result => { this.SkillsBase = result; });
     this.classeService.getClasses().subscribe(response => {
       this.selectClasse = response;
     });
+    //Register to LangChangeEvent and write selected langage in variable Lang
+    this.translate.onLangChange.subscribe((event: LangChangeEvent) => {
+      this.Lang = event.lang;
+    });
   }
 
-  //Filtre la liste de skill en fonction de la liste déroulante onChange
+  //Filter Skills onchange of the select
   public changeClasse(classe)
   {
     if (classe.value == 0) this.Skills = this.SkillsBase;
