@@ -320,7 +320,6 @@ export class SearchStrategieComponent implements OnInit {
     {
       if(elem.Enregistrement && elem.Enregistrement.Id == Id)
       {
-        console.log(elem.Vote);
         if (elem.Vote == 1) T = 1;
         if (elem.Vote == -1) T = -1;
       }
@@ -353,7 +352,6 @@ export class SearchStrategieComponent implements OnInit {
     }
     //Post new vote
     this.voteService.postVote(V).subscribe(() => { 
-      console.log("vote envoyé");
       vote$.next(true) });
     //Update local strategy table
     this.Enregistrements[this.Enregistrements.findIndex(r => r.Id == Id)].Note--;

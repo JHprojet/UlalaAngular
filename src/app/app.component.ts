@@ -18,9 +18,8 @@ import { TranslateService } from '@ngx-translate/core';
   styleUrls: ['./app.component.css']
 })
 export class AppComponent implements OnInit {
-  public data:any=[];
-  //A faire : save la langue en session pour gérer prob après connection + bouton à initialisé  à la bonne valeur.
-  language:string = 'fr';
+  data:any=[];
+  language:string;
   login:string;
   password:string;
   ErrorLogin:boolean = false;
@@ -35,9 +34,9 @@ export class AppComponent implements OnInit {
   
   ngOnInit(): void {
     //Get all info from session
-    this.data = this.accessService.getSession("All"); 
+    this.data["Info"] = this.accessService.getSession("Info");
+    console.log(this.data)
     //If Language is on Session, reuse, else get Lang of navigator and apply as default
-    console.log(this.accessService.getSession("Language"))
     if(this.accessService.getSession("Language")) this.language = this.accessService.getSession("Language");
     else
     {

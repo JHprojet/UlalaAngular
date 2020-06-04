@@ -32,7 +32,6 @@ import { IsToActivate } from './helpeur/is-to-activate';
 import { IsAnonyme } from './helpeur/is-anonyme';
 import { TranslateModule, TranslateLoader } from '@ngx-translate/core';
 import { TranslateHttpLoader } from '@ngx-translate/http-loader';
-import { TableModule, Table } from 'primeng/table';
 import { PaginatorComponent } from './paginator/paginator.component';
 
 export function createTranslateLoader(http: HttpClient) {
@@ -71,7 +70,6 @@ export function createTranslateLoader(http: HttpClient) {
     FormsModule,
     ModalModule.forRoot(),
     ReactiveFormsModule,
-    TableModule,
     TranslateModule.forRoot({
       loader: {
           provide: TranslateLoader,
