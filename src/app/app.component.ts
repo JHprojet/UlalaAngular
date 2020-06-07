@@ -1,15 +1,15 @@
 import { Component, OnInit } from '@angular/core';
-import { Utilisateur } from './models/utilisateur';
-import { UtilisateurDAL } from './service/utilisateur-dal';
+import { User } from './models/user';
+import { UserService } from './services/user-service';
 import { Router } from '@angular/router';
-import { AccessComponent } from './helpeur/access-component';
-import { VoteDAL } from './service/vote-dal';
-import { FavoriDAL } from './service/favori-dal';
-import { MesTeamsDAL } from './service/mesteams-dal';
+import { AccessService } from './services/access-service';
+import { VoteService } from './services/vote-service';
+import { FavoriteStrategyService } from './services/favorite-strategy-service';
+import { TeamService } from './services/team-service';
 import { Subject, zip } from 'rxjs';
-import { Favori } from './models/Favori';
+import { FavoriteStrategy } from './models/favorite-strategy';
 import { Vote } from './models/vote';
-import { MesTeams } from './models/mes-teams';
+import { Team } from './models/team';
 import { TranslateService } from '@ngx-translate/core';
 
 @Component({
@@ -30,12 +30,12 @@ export class AppComponent implements OnInit {
   Vote$:Subject<boolean>;
   Teams$:Subject<boolean>;
   
-  constructor(private accessService:AccessComponent,private translate: TranslateService,private teamService:MesTeamsDAL,private favService:FavoriDAL,private voteService:VoteDAL,private router:Router, private UtilisateurService:UtilisateurDAL) { }
+  constructor(private accessService:AccessService,private translate: TranslateService,private teamService:TeamService,
+    private favService:FavoriteStrategyService,private voteService:VoteService,private router:Router, private userService:UserService) { }
   
   ngOnInit(): void {
     //Get all info from session
     this.data["Info"] = this.accessService.getSession("Info");
-    console.log(this.data)
     //If Language is on Session, reuse, else get Lang of navigator and apply as default
     if(this.accessService.getSession("Language")) this.language = this.accessService.getSession("Language");
     else
@@ -70,21 +70,21 @@ export class AppComponent implements OnInit {
     this.ErrorLogin = false;
     this.OkLogin = false;
     //Check via API if username and password match
-    this.UtilisateurService.CheckUser(new Utilisateur({Pseudo:this.login, Password:this.password})).subscribe(result => {
+    this.userService.CheckUser(new User({Username:this.login, Password:this.password})).subscribe(result => {
       //If match
       //Set Token in session and local table (for displaying button purpose)
       this.accessService.setSession("User",result);
       this.data["User"] = result;
       //Get the full user
-      this.UtilisateurService.getUserByPseudo(this.login).subscribe(result2 => {
+      this.userService.getUserByPseudo(this.login).subscribe(result2 => {
         //If user need to be activated via activation token
         if (result2.ActivationToken != '')
         {
           //Write Id and username in session and local table
           this.accessService.setSession("Id",result2.Id);
-          this.accessService.setSession("Pseudo",result2.Pseudo);
+          this.accessService.setSession("Pseudo",result2.Username);
           this.data["Id"] = result2.Id;
-          this.data["Pseudo"] = result2.Pseudo;
+          this.data["Pseudo"] = result2.Username;
           //Go to activation page
           this.router.navigateByUrl('activation');
         }
@@ -95,11 +95,11 @@ export class AppComponent implements OnInit {
           this.accessService.setSession("Info",result2);
           this.data["Info"] = result2;
           //Get all favorite strategies of user and store
-          this.favService.getFavoritesByUserId(result2.Id).subscribe(result => {
+          this.favService.getFavoritestrategiesByUserId(result2.Id).subscribe(result => {
             this.accessService.setSession("Fav",result);
             this.Fav$.next(true);
           }, error => {
-            this.accessService.setSession("Fav",new Array<Favori>());
+            this.accessService.setSession("Fav",new Array<FavoriteStrategy>());
             this.Fav$.next(true);
           });
           //Get all votes of user and store
@@ -111,11 +111,11 @@ export class AppComponent implements OnInit {
             this.Vote$.next(true);
           });
           //Get all favorite teams of user and store
-          this.teamService.getMyTeamsByUserId(result2.Id).subscribe(result => {
+          this.teamService.getTeamsByUserId(result2.Id).subscribe(result => {
             this.accessService.setSession("Teams",result);
             this.Teams$.next(true);
           }, error => {
-            this.accessService.setSession("Teams",new Array<MesTeams>());
+            this.accessService.setSession("Teams",new Array<Team>());
             this.Teams$.next(true);
           });
           //Display login successfull message for 3 sec

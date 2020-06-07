@@ -1,9 +1,9 @@
-import { Utilisateur } from './utilisateur';
+import { User } from './user';
 
 export class Follow {
     Id: number;
-    Follower: Utilisateur;
-    Followed: Utilisateur;
+    Follower: User;
+    Followed: User;
 
     constructor(attachment) {
         this.Id = attachment.Id;

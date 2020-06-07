@@ -1,0 +1,55 @@
+<br/>
+<h2>{{ 'BOSSLIST.TITLE' | translate }}</h2>
+<br/>
+<form [formGroup]="SearchForm" (ngSubmit)="onSubmit()">
+    <div class="form-group row">
+        <!-- Select Continent -->
+        <label class="col-sm-2 col-form-label">{{ 'KEYWORD.CONTINENT' | translate }} : </label>
+        <select id="Continent" class="form-control col-sm-2" (change)="GetZones(C)" #C formControlName="Continent">
+            <option value=""></option>
+            <option *ngFor="let elem of selectContinent" value="{{elem.Zone.ContinentFR}}">
+                <ng-container *ngIf="Lang == 'fr'">{{elem.Zone.ContinentFR}}</ng-container>
+                <ng-container *ngIf="Lang == 'en'">{{elem.Zone.ContinentEN}}</ng-container>
+            </option>
+        </select>
+        <!-- Select Zone -->
+        <label class="col-sm-1 col-form-label">{{ 'KEYWORD.ZONE' | translate }} : </label>
+        <select id="Zone" class="form-control col-sm-3" #Z formControlName="Zone">
+            <option value=""></option>
+            <option *ngFor="let elem of selectZone" value="{{elem.Zone.ZoneFR}}">
+                <ng-container *ngIf="Lang == 'fr'">{{elem.Zone.ZoneFR}}</ng-container>
+                <ng-container *ngIf="Lang == 'en'">{{elem.Zone.ZoneEN}}</ng-container>
+            </option>
+        </select>
+        <button type="submit" style="margin-left:30px;width:100px;" class=" btn btn-danger btn-sm">{{ 'KEYWORD.OK' | translate }}</button>
+    </div>   
+ </form>
+<hr/>
+<!-- Display table bossList -->
+<table class="table table-striped">
+    <thead class="thead-dark">
+        <tr>
+            <th>{{ 'KEYWORD.CONTINENT' | translate }} </th>
+            <th>{{ 'KEYWORD.ZONE' | translate }}</th>
+            <th>{{ 'KEYWORD.BOSS' | translate }}</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr *ngFor="let elem of displayBossList">
+            <td>
+                <ng-container *ngIf="Lang == 'fr'">{{elem.Zone.ContinentFR}}</ng-container>
+                <ng-container *ngIf="Lang == 'en'">{{elem.Zone.ContinentEN}}</ng-container>
+            </td>
+            <td>
+                <ng-container *ngIf="Lang == 'fr'">{{elem.Zone.ZoneFR}}</ng-container>
+                <ng-container *ngIf="Lang == 'en'">{{elem.Zone.ZoneEN}}</ng-container>
+            </td>
+            <td>
+                <ng-container *ngIf="Lang == 'fr'">{{elem.Boss.NameFR}}</ng-container>
+                <ng-container *ngIf="Lang == 'en'">{{elem.Boss.NameEN}}</ng-container>
+            </td>
+        </tr>
+    </tbody>
+</table>
+<app-paginator [data]="BossList" (PagTableEvent)="getPagTable($event)"></app-paginator>
+<br/><br/><br/>

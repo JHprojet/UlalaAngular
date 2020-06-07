@@ -1,18 +1,20 @@
-import { Classe } from './classe';
+import { User } from './user';
+import { Zone } from './zone';
+import { CharactersConfiguration } from './characters-configuration';
 
 export class Team {
     Id: number;
-    Classe1: Classe;
-    Classe2: Classe;
-    Classe3: Classe;
-    Classe4: Classe;
-    Actif: string;
+    User: User;
+    Zone: Zone;
+    CharactersConfiguration: CharactersConfiguration;
+    TeamName : string;
+    Active: number;
     constructor(attachment) {
       this.Id = attachment.Id;
-      this.Classe1 = attachment.Classe1;
-      this.Classe2 = attachment.Classe2;
-      this.Classe3 = attachment.Classe3;
-      this.Classe4 = attachment.Classe4;
-      this.Actif = attachment.Actif;
+      this.User = attachment.User;
+      this.Zone = attachment.Zone;
+      this.CharactersConfiguration = attachment.CharactersConfiguration;
+      this.TeamName = attachment.TeamName;
+      this.Active = attachment.Active;
     }
 }

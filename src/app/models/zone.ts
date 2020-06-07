@@ -4,15 +4,15 @@ export class Zone {
     ContinentEN: string;
     ZoneFR: string;
     ZoneEN: string;
-    NbZones: number;
-    Actif: number;  
+    ZoneQty: number;
+    Active: number;  
     constructor(attachment) {
       this.Id = attachment.Id;
       this.ContinentEN = attachment.ContinentEN;
       this.ContinentFR = attachment.ContinentFR;
       this.ZoneFR = attachment.ZoneFR;
       this.ZoneEN = attachment.ZoneEN;
-      this.NbZones = attachment.NbZones;
-      this.Actif = attachment.Actif;
+      this.ZoneQty = attachment.ZoneQty;
+      this.Active = attachment.Active;
     }
 }

@@ -1,0 +1,149 @@
+<br/>
+<h2>{{ 'MYTEAMS.TITLE' | translate }}</h2>
+<br/>
+<!-- Table displaying teams -->
+<table class="table table-striped">
+    <thead class="thead-dark">
+        <tr>
+            <th>
+                {{ 'KEYWORD.TEAMNAME' | translate }}
+            </th>
+            <th>
+                {{ 'KEYWORD.CONTINENT' | translate }}
+            </th>
+            <th>
+                {{ 'KEYWORD.ZONE' | translate }}
+            </th>
+            <th>
+                {{ 'KEYWORD.CLASSES' | translate }}
+            </th>
+            <th>
+                {{ 'KEYWORD.DELETE' | translate }}
+            </th>
+            <th>
+                {{ 'KEYWORD.EDIT' | translate }}
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr *ngFor="let elem of mesTeams">
+            <td>{{elem.TeamName}}</td>
+            <td>
+                <ng-container *ngIf="Lang == 'fr'">{{elem.Zone.ContinentFR}}</ng-container>
+                <ng-container *ngIf="Lang == 'en'">{{elem.Zone.ContinentEN}}</ng-container>
+            </td>
+            <td>
+                <ng-container *ngIf="Lang == 'fr'">{{elem.Zone.ZoneFR}}</ng-container>
+                <ng-container *ngIf="Lang == 'en'">{{elem.Zone.ZoneEN}}</ng-container>
+            </td>
+            <td>
+                <ng-container *ngIf="Lang == 'fr'">{{elem.CharactersConfiguration.Classe1.NameFR}} - {{elem.CharactersConfiguration.Classe2.NameFR}} - {{elem.CharactersConfiguration.Classe3.NameFR}} - {{elem.CharactersConfiguration.Classe4.NameFR}}</ng-container>
+                <ng-container *ngIf="Lang == 'en'">{{elem.CharactersConfiguration.Classe1.NameEN}} - {{elem.CharactersConfiguration.Classe2.NameEN}} - {{elem.CharactersConfiguration.Classe3.NameEN}} - {{elem.CharactersConfiguration.Classe4.NameEN}}</ng-container>
+            </td>
+            <td><button class="btn btn-primary" type="button" (click)="DeleteTeam(elem.Id)">
+                {{ 'KEYWORD.DELETE' | translate }}
+            </button></td>
+            <td><button class="btn btn-primary" type="button" (click)="EditTeam(elem.Id)">
+                {{ 'KEYWORD.EDIT' | translate }}
+            </button></td>
+        </tr>
+    </tbody>  
+</table>
+<br/>
+<!-- Title switch if add or edit mode -->
+<hr/>
+<h2 *ngIf="TeamForm.value.Id == '' || TeamForm.value.Id == undefined">{{ 'MYTEAMS.ADD' | translate }} :</h2>
+<h2 *ngIf="TeamForm.value.Id != '' && TeamForm.value.Id != undefined ">{{ 'MYTEAMS.EDIT' | translate }} :</h2>
+<br/>
+<ng-container *ngIf="displaySuccessAdd || displaySuccessEdit || displayError">
+    <div class="container mx-auto" class="alert alert-success" *ngIf="displaySuccessAdd">{{ 'SUCCESSMESSAGES.ADDTEAM' | translate }}</div>
+    <div class="container mx-auto" class="alert alert-success" *ngIf="displaySuccessEdit">{{ 'SUCCESSMESSAGES.EDITTEAM' | translate }}</div>
+    <div class="container mx-auto" class="alert alert-danger" *ngIf="displayError">{{ 'ERRORMESSAGES.SAVAGEERROR' | translate }}</div>
+    <br/>
+</ng-container>
+
+<form [formGroup]="TeamForm" (ngSubmit)="onSubmit()">
+    <div class="form-group row">
+        <!-- Hidden Id Field -->
+        <input id="Id" hidden formControlName="Id">
+        <!--Team name Field -->
+        <label class="col-sm-2 col-form-label">{{ 'KEYWORD.TEAMNAME' | translate }} : </label>
+        <input id="NomTeam" formControlName="NomTeam" class="form-control col-sm-2">
+        <!-- Select Continent -->
+        <label class="col-sm-2 col-form-label">{{ 'KEYWORD.CONTINENT' | translate }} : </label>
+        <select id="Continent" class="form-control col-sm-2" (change)="GetZones(C)" #C formControlName="Continent">
+            <option value=""></option>
+            <option *ngFor="let elem of selectContinent" value="{{elem.Zone.ContinentFR}}">
+                <ng-container *ngIf="Lang == 'fr'">{{elem.Zone.ContinentFR}}</ng-container>
+                <ng-container *ngIf="Lang == 'en'">{{elem.Zone.ContinentEN}}</ng-container>
+            </option>
+        </select>
+        <!-- Select Zone -->
+        <label class="col-sm-1 col-form-label">{{ 'KEYWORD.ZONE' | translate }} : </label>
+        <select id="Zone" class="form-control col-sm-3" #Z formControlName="Zone">
+            <option value=""></option>
+            <option *ngFor="let elem of selectZone" value="{{elem.Zone.Id}}">
+                <ng-container *ngIf="Lang == 'fr'">{{elem.Zone.ZoneFR}}</ng-container>
+                <ng-container *ngIf="Lang == 'en'">{{elem.Zone.ZoneEN}}</ng-container>
+            </option>
+        </select>
+    </div>
+    <!-- Validators message for Zone/Continent/Team name -->
+    <div *ngIf="TeamForm.controls.NomTeam.errors?.required" class="cross-validation-error-message alert alert-danger">
+        {{ 'ERRORMESSAGES.VALIDATORS.TEAMNAMEREQUIRED' | translate }}
+    </div>
+    <div *ngIf="TeamForm.errors?.ContinentIsNeeded" class="cross-validation-error-message alert alert-danger">
+        {{ 'ERRORMESSAGES.SELECTCONTINENT' | translate }}
+    </div>
+    <div *ngIf="TeamForm.errors?.ZoneIsNeeded" class="cross-validation-error-message alert alert-danger">
+        {{ 'ERRORMESSAGES.SELECTZONE' | translate }}
+    </div>
+    <div class="form-group row">
+        <div class="col-sm-5 row">
+            <!-- Select Classe 1 -->
+            <label class="col-sm col-form-label">{{ 'KEYWORD.CLASSE' | translate }} 1 : </label>
+            <select id="Classe1" class="form-control col-sm" formControlName="Classe1">
+                <option value=""></option>
+                <option *ngFor="let elem of selectClasse" value="{{elem.Id}}">
+                    <ng-container *ngIf="Lang == 'fr'">{{elem.NameFR}}</ng-container>
+                    <ng-container *ngIf="Lang == 'en'">{{elem.NameEN}}</ng-container>
+                </option>
+            </select>
+            <!-- Select Classe 2 -->
+            <label class="col-sm col-form-label">{{ 'KEYWORD.CLASSE' | translate }} 2 : </label>
+            <select id="Classe2" class="form-control col-sm"  formControlName="Classe2">
+                <option value=""></option>
+                <option *ngFor="let elem of selectClasse" value="{{elem.Id}}">
+                    <ng-container *ngIf="Lang == 'fr'">{{elem.NameFR}}</ng-container>
+                    <ng-container *ngIf="Lang == 'en'">{{elem.NameEN}}</ng-container>
+                </option>
+            </select>
+        </div>
+        <div class="col-sm-5 row">
+            <!-- Select Classe 3 -->
+            <label class="col-sm col-form-label">{{ 'KEYWORD.CLASSE' | translate }} 3 : </label>
+            <select id="Classe3" class="form-control col-sm"  formControlName="Classe3">
+                <option value=""></option>
+                <option *ngFor="let elem of selectClasse" value="{{elem.Id}}">
+                    <ng-container *ngIf="Lang == 'fr'">{{elem.NameFR}}</ng-container>
+                    <ng-container *ngIf="Lang == 'en'">{{elem.NameEN}}</ng-container>
+                </option>
+            </select>
+            <!-- Select Classe 4 -->
+            <label class="col-sm col-form-label">{{ 'KEYWORD.CLASSE' | translate }} 4 : </label>
+            <select id="Classe4" class="form-control col-sm"  formControlName="Classe4">
+                <option value=""></option>
+                <option *ngFor="let elem of selectClasse" value="{{elem.Id}}">
+                    <ng-container *ngIf="Lang == 'fr'">{{elem.NameFR}}</ng-container>
+                    <ng-container *ngIf="Lang == 'en'">{{elem.NameEN}}</ng-container>
+                </option>
+            </select>
+        </div>
+    </div>
+    <!-- Validators message for classes -->
+    <div *ngIf="TeamForm.errors?.AllClassesNeeded" class="cross-validation-error-message alert alert-danger">
+        {{ 'ERRORMESSAGES.SELECTCLASSES' | translate }}
+    </div>
+    <!-- Submit button -->
+    <button type="submit" style="margin-left:30px;width:100px;" [disabled]="!TeamForm.valid" class=" btn btn-danger btn-sm">{{ 'KEYWORD.OK' | translate }}</button>
+</form>

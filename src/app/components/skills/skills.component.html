@@ -1,0 +1,41 @@
+<br/>
+<h2>{{ 'SKILLS.TITLE' | translate }}</h2>
+<br/>
+<div class="form-group row">
+    <label class="col-sm-1 col-form-label">Classe : </label>
+    <select class="form-control col-sm-2" NgModel (change)="changeClasse(Classe)" #Classe>
+        <option value="0"></option>
+        <option *ngFor="let classe of selectClasse" value={{classe.Id}}>
+            <ng-container *ngIf="Lang == 'fr'">{{classe.NameFR}}</ng-container>
+                <ng-container *ngIf="Lang == 'en'">{{classe.NameEN}}</ng-container>
+        </option>
+    </select>
+</div>
+<br/>
+<table class="table table-striped">
+    <thead class="thead-dark">
+        <tr>
+            <th style="width: 8%">{{ 'KEYWORD.IMAGE' | translate }}</th>
+            <th style="width: 20%">{{ 'KEYWORD.NAME' | translate }}</th>
+            <th style="width: 47%">{{ 'KEYWORD.DESC' | translate }}</th>
+            <th style="width: 8%">{{ 'KEYWORD.COST' | translate }}</th>
+            <th style="width: 17%">{{ 'KEYWORD.ZONE' | translate }}</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr *ngFor="let skill of Skills">
+            <td><img src="{{BaseURL+skill.ImagePath}}"></td>
+            <td>
+                <ng-container *ngIf="Lang == 'fr'">{{skill.NameFR}}</ng-container>
+                <ng-container *ngIf="Lang == 'en'">{{skill.NameEN}}</ng-container>
+            </td>
+            <td>
+                <ng-container *ngIf="Lang == 'fr'">{{skill.DescriptionFR}}</ng-container>
+                <ng-container *ngIf="Lang == 'en'">{{skill.DescriptionEN}}</ng-container>
+            </td>
+            <td>{{skill.Cost}}</td>
+            <td>{{skill.Location}}</td>
+        </tr>
+    </tbody>  
+</table>
+<br/><br/><br/>

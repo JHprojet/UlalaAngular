@@ -1,0 +1,194 @@
+<br/>
+<hr/>
+<div class="form-group row">
+    &nbsp;&nbsp;<h3>{{ 'SEARCH.TITLE' | translate }}</h3>&nbsp;&nbsp;&nbsp;&nbsp; 
+    <button (click)="ShowHelp()" type="button" class="btn btn-light dropdown-toggle">
+        <ng-container *ngIf="!Show">{{ 'INFOMESSAGES.DISPLAYHELP' | translate }}</ng-container>
+        <ng-container *ngIf="Show">{{ 'INFOMESSAGES.CLOSEHELP' | translate }}</ng-container>
+    </button>
+</div>
+<hr/>
+<div class="help" *ngIf="Show">
+    <strong>{{ 'SEARCH.USESEARCH' | translate }} :</strong>
+    <br/><br/>
+    <div [innerHTML]="'SEARCH.HELP' | translate"></div>
+    <ng-container *ngIf="accessUser">
+        <br/>
+        <div [innerHTML]="'SEARCH.HELPUSER' | translate"></div>
+    </ng-container>
+    <hr/>
+</div>
+
+<div *ngIf="accessUser">
+    <button type="submit" class="mx-auto btn btn-info" (click)="switchForm()">
+        <ng-container *ngIf="SearchWithTeam">{{ 'ADDSTRATEGY.USECUSTOMSEARCH' | translate }}</ng-container>
+        <ng-container *ngIf="!SearchWithTeam">{{ 'ADDSTRATEGY.USETEAMSEARCH' | translate }}</ng-container>
+    </button>
+    <br/>
+    <hr/>
+</div>
+
+<form [formGroup]="SearchFormWithTeam" (ngSubmit)="onSubmit()" *ngIf="SearchWithTeam" class="form-group row">
+    <ng-container *ngIf="selectTeams.length != 0">
+        <label class="col-form-label col-sm-2">{{ 'SEARCH.CHOOSETEAM' | translate }}</label>
+        <select id="Team" class="form-control col-sm-2" (change)="GetBossViaTeam(C)" #C formControlName="Team">
+            <option value=""></option>
+            <option *ngFor="let MaTeam of selectTeams" value={{MaTeam.Id}}>{{MaTeam.TeamName}}</option>
+        </select>
+        <label class="col-sm-1 col-form-label">{{ 'KEYWORD.BOSS' | translate }}</label>
+        <select class="form-control col-sm-3" formControlName="Boss">
+            <option value=""></option>
+            <option *ngFor="let boss of selectBoss" value={{boss.Id}}>
+                <ng-container *ngIf="Lang == 'fr'">{{boss.Boss.NameFR}}</ng-container>
+                <ng-container *ngIf="Lang == 'en'">{{boss.Boss.NameEN}}</ng-container>
+            </option>
+        </select>
+        <button type="submit" style="margin-left:30px;width:100px;" [disabled]="!SearchFormWithTeam.valid" class=" btn btn-danger btn-sm">Valider</button>
+    </ng-container>
+    <ng-container *ngIf="selectTeams.length == 0">
+        <p>{{ 'SEARCH.NOTEAM' | translate }} <a routerLink='/prefs'>{{ 'KEYWORD.CLICKHERE' | translate }}</a></p>
+    </ng-container>
+</form>
+<div *ngIf="SearchFormWithTeam.errors?.BossIsNeeded && (SearchFormWithTeam.touched || SearchFormWithTeam.dirty)" class="cross-validation-error-message alert alert-danger">
+    {{ 'ERRORMESSAGES.VALIDATORS.BOSSREQUIRED' | translate }}
+</div>
+
+
+<form [formGroup]="SearchForm" (ngSubmit)="onSubmit()" *ngIf="!SearchWithTeam">
+    <div class="form-group row">
+        <!-- Select Continent -->
+        <label class="col-sm-2 col-form-label">{{ 'KEYWORD.CONTINENT' | translate }} : </label>
+        <select id="Continent" class="form-control col-sm-2" (change)="GetZones(C)" #C formControlName="Continent">
+            <option value=""></option>
+            <option *ngFor="let elem of selectContinent" value="{{elem.Zone.ContinentFR}}">
+                <ng-container *ngIf="Lang == 'fr'">{{elem.Zone.ContinentFR}}</ng-container>
+                <ng-container *ngIf="Lang == 'en'">{{elem.Zone.ContinentEN}}</ng-container>
+            </option>
+        </select>
+        <!-- Select Zone -->
+        <label class="col-sm-1 col-form-label">{{ 'KEYWORD.ZONE' | translate }} : </label>
+        <select id="Zone" class="form-control col-sm-3" (change)="GetBoss(C,Z)" #Z formControlName="Zone">
+            <option value=""></option>
+            <option *ngFor="let elem of selectZone" value="{{elem.Zone.ZoneFR}}">
+                <ng-container *ngIf="Lang == 'fr'">{{elem.Zone.ZoneFR}}</ng-container>
+                <ng-container *ngIf="Lang == 'en'">{{elem.Zone.ZoneEN}}</ng-container>
+            </option>
+        </select>
+        <!-- Select Boss -->
+        <label class="col-sm-1 col-form-label">{{ 'KEYWORD.BOSS' | translate }} : </label>
+        <select id="Boss" class="form-control col-sm-3"  formControlName="Boss">
+            <option value=""></option>
+            <option *ngFor="let elem of selectBoss" value="{{elem.Id}}">
+                <ng-container *ngIf="Lang == 'fr'">{{elem.Boss.NameFR}}</ng-container>
+                <ng-container *ngIf="Lang == 'en'">{{elem.Boss.NameEN}}</ng-container>
+            </option>
+        </select>
+    </div>
+    <div *ngIf="SearchForm.errors?.ZoneIsNeeded && (SearchForm.touched || SearchForm.dirty)" class="cross-validation-error-message alert alert-danger">
+        {{ 'ERRORMESSAGES.VALIDATORS.ZONEREQUIRED' | translate }}
+    </div>
+    <div *ngIf="SearchForm.errors?.BossIsNeeded && (SearchForm.touched || SearchForm.dirty)" class="cross-validation-error-message alert alert-danger">
+        {{ 'ERRORMESSAGES.VALIDATORS.BOSSREQUIRED' | translate }}
+    </div>
+    <div class="form-group row">
+        <!-- Select Classe 1 -->
+        <div class="col-sm-5 row">
+            <label class="col-sm col-form-label">{{ 'KEYWORD.CLASSE' | translate }} 1 : </label>
+            <select id="Classe1" class="form-control col-sm" formControlName="Classe1">
+                <option value=""></option>
+                <option *ngFor="let elem of selectClasse" value="{{elem.Id}}">
+                    <ng-container *ngIf="Lang == 'fr'">{{elem.NameFR}}</ng-container>
+                    <ng-container *ngIf="Lang == 'en'">{{elem.NameEN}}</ng-container>
+                </option>
+            </select>
+        <!-- Select Classe 2 -->
+            <label class="col-sm col-form-label">{{ 'KEYWORD.CLASSE' | translate }} 2 : </label>
+            <select id="Classe2" class="form-control col-sm"  formControlName="Classe2">
+                <option value=""></option>
+                <option *ngFor="let elem of selectClasse" value="{{elem.Id}}">
+                    <ng-container *ngIf="Lang == 'fr'">{{elem.NameFR}}</ng-container>
+                    <ng-container *ngIf="Lang == 'en'">{{elem.NameEN}}</ng-container>
+                </option>
+            </select>
+        </div>
+        <!-- Select Classe 3 -->
+        <div class="col-sm-5 row">
+            <label class="col-sm col-form-label">{{ 'KEYWORD.CLASSE' | translate }} 3 : </label>
+            <select id="Classe3" class="form-control col-sm"  formControlName="Classe3">
+                <option value=""></option>
+                <option *ngFor="let elem of selectClasse" value="{{elem.Id}}">
+                    <ng-container *ngIf="Lang == 'fr'">{{elem.NameFR}}</ng-container>
+                    <ng-container *ngIf="Lang == 'en'">{{elem.NameEN}}</ng-container>
+                </option>
+            </select>
+        <!-- Select Classe 4 -->
+            <label class="col-sm col-form-label">{{ 'KEYWORD.CLASSE' | translate }} 4 : </label>
+            <select id="Classe4" class="form-control col-sm"  formControlName="Classe4">
+                <option value=""></option>
+                <option *ngFor="let elem of selectClasse" value="{{elem.Id}}">
+                    <ng-container *ngIf="Lang == 'fr'">{{elem.NameFR}}</ng-container>
+                    <ng-container *ngIf="Lang == 'en'">{{elem.NameEN}}</ng-container>
+                </option>
+            </select>
+        </div>
+        <div class="col-sm-2 row">
+            <button type="submit"  style="margin-left:30px;width:100px;" class=" btn btn-danger btn-sm" [disabled]="!SearchForm.valid">{{ 'KEYWORD.VALID' | translate }}</button>
+        </div>
+    </div>
+</form>   
+<hr/> 
+
+<div class="alert alert-danger" *ngIf="(!Strategies || Strategies.length < 1) && DisplayNoStrategyMessage">
+    {{ 'SEARCH.NOSTRAT' | translate }}
+</div>
+<ng-container class="centered" *ngFor="let Strategy of displayStrategies">
+    <div class="mx-auto col-sm-8">
+        <div class="row">
+            <div class="col-sm-3">
+                <b>{{ 'KEYWORD.CONTINENT' | translate }} : </b> 
+                <ng-container *ngIf="Lang == 'fr'">{{Strategy.BossZone.Zone.ContinentFR}}</ng-container>
+                <ng-container *ngIf="Lang == 'en'">{{Strategy.BossZone.Zone.ContinentEN}}</ng-container>
+            </div>
+            <div class="col-sm-5">
+                <b>{{ 'KEYWORD.ZONE' | translate }} : </b> 
+                <ng-container *ngIf="Lang == 'fr'">{{Strategy.BossZone.Zone.ZoneFR}}</ng-container>
+                <ng-container *ngIf="Lang == 'en'">{{Strategy.BossZone.Zone.ZoneEN}}</ng-container>
+            </div>
+            <div class="col-sm-4">
+                <b>{{ 'KEYWORD.BOSS' | translate }} : </b> 
+                <ng-container *ngIf="Lang == 'fr'">{{Strategy.BossZone.Boss.NameFR}}</ng-container>
+                <ng-container *ngIf="Lang == 'en'">{{Strategy.BossZone.Boss.NameEN}}</ng-container>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-4">
+                <b>{{ 'KEYWORD.USER' | translate }} : </b> 
+                {{Strategy.User.Username}}
+            </div>
+            <div class="col-sm-7">
+                <b>{{ 'KEYWORD.TEAM' | translate }} : </b>
+                <ng-container *ngIf="Lang == 'fr'">{{Strategy.CharactersConfiguration.Classe1.NameFR}} - {{Strategy.CharactersConfiguration.Classe2.NameFR}} - {{Strategy.CharactersConfiguration.Classe3.NameFR}} - {{Strategy.CharactersConfiguration.Classe4.NameFR}}</ng-container>
+                <ng-container *ngIf="Lang == 'en'">{{Strategy.CharactersConfiguration.Classe1.NameEN}} - {{Strategy.CharactersConfiguration.Classe2.NameEN}} - {{Strategy.CharactersConfiguration.Classe3.NameEN}} - {{Strategy.CharactersConfiguration.Classe4.NameEN}}</ng-container>
+            </div>
+        </div>
+        <div class="row">
+            <img [src]="BaseURL+Strategy.ImagePath1" height="390px"> 
+            <img [src]="BaseURL+Strategy.ImagePath2" height="390px">  
+            <img [src]="BaseURL+Strategy.ImagePath3" height="390px">  
+            <img [src]="BaseURL+Strategy.ImagePath4" height="390px">
+        </div>
+        <div class="row">
+            <ng-container *ngIf="accessUser">
+            <img *ngIf="DisplayFavori(Strategy.Id)" src="../assets/images/fav.png" height="30px" (click)="deleteFavori(Strategy.Id)">
+            <img *ngIf="!DisplayFavori(Strategy.Id)" src="../assets/images/nofav.png" height="30px" (click)="putFavori(Strategy.Id)" >
+            <img *ngIf="DisplayVote(Strategy.Id) != 1 " src="../assets/images/plus.png" height="30px" (click)="VotePlus(Strategy.Id)">
+            <img *ngIf="DisplayVote(Strategy.Id) != 0" src="../assets/images/croix.png" height="30px" (click)="DeleteVote(Strategy.Id)">
+            <img *ngIf="DisplayVote(Strategy.Id) != -1" src="../assets/images/moins.png" height="30px" (click)="VoteMinus(Strategy.Id)">
+            </ng-container>
+            <div class="col-sm-2"><b>{{ 'KEYWORD.NOTE' | translate }} : </b> {{Strategy.Note}}</div>
+        </div>
+    </div>
+    <hr/>
+</ng-container>
+<app-paginator *ngIf="(Strategies && Strategies.length > 0)" [data]="Strategies" (PagTableEvent)="getPagTable($event)"></app-paginator>
+<br/><br/><br/>

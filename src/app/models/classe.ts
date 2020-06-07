@@ -1,12 +1,12 @@
 export class Classe {
     Id: number;
-    NomFR: string;
-    NomEN: string;
+    NameFR: string;
+    NameEN: string;
     Actif: string;
     constructor(attachment) {
       this.Id = attachment.Id;
-      this.NomEN = attachment.NomEN;
-      this.NomFR = attachment.NomFR;
+      this.NameFR = attachment.NameFR;
+      this.NameEN = attachment.NameEN;
       this.Actif = attachment.Actif;
     }
 }
