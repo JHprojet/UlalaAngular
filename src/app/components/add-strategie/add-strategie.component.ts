@@ -204,7 +204,7 @@ export class AddStrategieComponent implements OnInit {
   //Send strategy to API when submitted with favorite team
   onSubmitWithTeam() {
     //Create strategy to send and add init internal objects **(Must be changed via API to simplify)**
-    let E:Strategy = new Strategy({User:new User({Id:1}), BossZone:new BossesPerZone({Id:this.AddFormWithTeam.value.Boss}), CharactersConfiguration:new CharactersConfiguration({})})
+    let E:Strategy = new Strategy({User:new User({Id:1}), BossZone:new BossesPerZone({Id:Number(this.AddFormWithTeam.value.Boss)}), CharactersConfiguration:new CharactersConfiguration({})})
     //Feeling Team.Id via form value
     E.CharactersConfiguration.Id = this.selectMyTeams.find(CharactersConfiguration => CharactersConfiguration.Id == this.AddFormWithTeam.value.Team).CharactersConfiguration.Id;
     //Adding User Id to the strategy if its a connected user (else Id = 1 is Anonymous player in DB)
@@ -283,13 +283,14 @@ export class AddStrategieComponent implements OnInit {
     let IMG = new Image; //Create new Image.
     IMG.fileName = this.newGuid()+file.name; //Add GUID + inital name of the file
     this.FileNames.push(IMG.fileName); //Add to the name list
-    IMG.fileSize = file.size; //Add Size of the file
+    IMG.fileSize = file.size.toString(); //Add Size of the file
     IMG.fileType = file.type; //Add type of the file
     IMG.lastModifiedTime = file.lastModified; //Add last modified time
-    IMG.lastModifiedDate = file.lastModifiedDate; //Add last modified date
+    IMG.lastModifiedDate = file.lastModifiedDate.getTime(); //Add last modified date
     let reader = new FileReader();
     reader.onload = () => {
       IMG.fileAsBase64 = reader.result.toString(); //Store base64 encoded representation of file
+      console.log(IMG);
       this.imageService.uploadImage(IMG) // POST to API
         .subscribe(resp => { }); // **PROCESS TO ADD**
     }  

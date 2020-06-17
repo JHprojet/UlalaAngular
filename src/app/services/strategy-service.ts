@@ -36,7 +36,7 @@ export class StrategyService {
   * @returns Observable<Strategy[]>
   */
   getStrategiesByInfos(U:string, BZ:string, IdC1:string, IdC2:string, IdC3:string, IdC4:string): Observable<Strategy[]> {
-    return this.http.get<Strategy[]>(environement.API+'Strategy/?U='+U+'&BZ='+BZ+'&C1='+IdC1+'&C2='+IdC2+'&C3='+IdC3+'&C4='+IdC4, this.Header())
+    return this.http.get<Strategy[]>(environement.API+'Strategy/Custom?U='+U+'&BZ='+BZ+'&C1='+IdC1+'&C2='+IdC2+'&C3='+IdC3+'&C4='+IdC4, this.Header())
   }
   /**
   * Call to API to post a new Strategy
@@ -44,7 +44,7 @@ export class StrategyService {
   * @returns Observable<Strategy>
   */
   postStrategy(Strategy: Strategy): Observable<Strategy> {
-    return this.http.post<Strategy>(environement.API+'Strategy', Strategy, this.Header())
+    return this.http.post<Strategy>(environement.API+'Strategy', JSON.stringify(Strategy), this.Header())
   }
   /**
   * Call to API to modify an existing Strategy
@@ -70,7 +70,7 @@ export class StrategyService {
   private Header() {
     let httpOptions = { headers : new HttpHeaders({
       'Content-Type':  'application/json',
-      'Authorization' : this.accessService.getSession("User")??this.accessService.getSession("Anonyme")??""
+      'Authorization' : this.accessService.getSession("User")??this.accessService.getSession("Anonymous")??""
     })};
     return httpOptions;
   }

@@ -22,21 +22,21 @@ export class UserService {
   * @param Id Actif of the user 
   */
   SetRoleAndActive(Id:number, Role:string, Actif:number) {
-    return this.http.post(environement.API+'User/'+Id+'/?Role='+Role+'&Actif='+Actif , null, this.Header())
+    return this.http.post(environement.API+'User/'+Id+'/Role='+Role+'/Actif='+Actif , null, this.Header())
   }
   /**
   * Call to API to Find an existing use depending on Mail
   * @param Mail E-mail
   */
   FindUsernameByMail(Mail:string) {
-    return this.http.post(environement.API+'Login/?MailforUsername='+Mail, null, this.Header())
+    return this.http.post(environement.API+'Login/MailforUsername='+Mail, null, this.Header())
   }
   /**
   * Call to API to send new password by e-mail
   * @param Mail E-mail
   */
   GenerateAndSendNewPassword(Mail:string) {
-    return this.http.post(environement.API+'Login/?Mail='+Mail, null, this.Header())
+    return this.http.post(environement.API+'Login/Mail='+Mail, null, this.Header())
   }
   /**
   * Call to API to update password of a user
@@ -44,14 +44,14 @@ export class UserService {
   * @param NewPassword NewPassword
   */
   changePassword(Id:number,NewPassword:string) {
-    return this.http.post(environement.API+'Login/?IdUser='+Id, JSON.stringify(NewPassword), this.Header())
+    return this.http.post(environement.API+'Login/IdUser='+Id, JSON.stringify(NewPassword), this.Header())
   }
   /**
   * Call to API to send new activation token by e-mail
   * @param Id Id of the user
   */
   ResendToken(Id:number) {
-    return this.http.post(environement.API+'Login/?IdU='+Id, null, this.Header())
+    return this.http.post(environement.API+'Login/IdU='+Id, null, this.Header())
   }
   /**
   * Call to API to update activation Token send by user (to null in DB)
@@ -97,7 +97,7 @@ export class UserService {
   * @return Observable<User>
   */
   getUserByPseudo(username:string): Observable<User> {
-    return this.http.get<User>(environement.API+'User/?username='+username, this.Header())
+    return this.http.get<User>(environement.API+'User/username='+username, this.Header())
   }
   /**
   * Call to API to get a users depending on his email
@@ -105,7 +105,7 @@ export class UserService {
   * @return Observable<User>
   */
   getUserByMail(email:string): Observable<User> {
-    return this.http.get<User>(environement.API+'User/?mail='+email, this.Header());
+    return this.http.get<User>(environement.API+'User/mail='+email, this.Header());
   }
   /**
   * Call to API to post a new user
@@ -139,7 +139,7 @@ export class UserService {
   private Header() {
     let httpOptions = { headers : new HttpHeaders({
       'Content-Type':  'application/json',
-      'Authorization' : this.accessService.getSession("User")??this.accessService.getSession("Anonyme")??""
+      'Authorization' : this.accessService.getSession("User")??this.accessService.getSession("Anonymous")??""
     })};
     return httpOptions;
   }

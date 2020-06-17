@@ -178,10 +178,10 @@ export class SearchStrategieComponent implements OnInit {
       //Get BossZoneId
       BossZoneId = this.SearchForm.value.Boss;
       //Get the classes 
-      C1 = this.SearchForm.value.Classe1;
-      C2 = this.SearchForm.value.Classe2;
-      C3 = this.SearchForm.value.Classe3;
-      C4 = this.SearchForm.value.Classe4;
+      C1 = this.SearchForm.value.Classe1 ?? "";
+      C2 = this.SearchForm.value.Classe2 ?? "";
+      C3 = this.SearchForm.value.Classe3 ?? "";
+      C4 = this.SearchForm.value.Classe4 ?? "";
     }
     //Launch search via API (Display message if no Enregistrement found)
     this.stratService.getStrategiesByInfos(User, BossZoneId, C1, C2, C3, C4).subscribe(result => {

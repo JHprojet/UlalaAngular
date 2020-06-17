@@ -30,7 +30,7 @@ export class TeamService {
   * @returns Observable<Team[]>
   */
   getTeamsByUserId(id:number): Observable<Team[]> {
-    return this.http.get<Team[]>(environement.API+'Team/?UtilisateurId='+id, this.Header())
+    return this.http.get<Team[]>(environement.API+'Team/UserId='+id, this.Header())
   }
   /**
   * Call to API to modify an existing Team
@@ -39,7 +39,7 @@ export class TeamService {
   * @returns Observable<Team>
   */
   postTeam(Team: Team): Observable<Team> {
-    return this.http.post<Team>(environement.API+'Team', Team, this.Header())
+    return this.http.post<Team>(environement.API+'Team/Post',JSON.stringify(Team), this.Header())
   }
   /**
   * Call to API to modify an existing Team
@@ -71,7 +71,7 @@ export class TeamService {
   private Header() {
     let httpOptions = { headers : new HttpHeaders({
       'Content-Type':  'application/json',
-      'Authorization' : this.accessService.getSession("User")??this.accessService.getSession("Anonyme")??""
+      'Authorization' : this.accessService.getSession("User")??this.accessService.getSession("Anonymous")??""
     })};
     return httpOptions;
   }

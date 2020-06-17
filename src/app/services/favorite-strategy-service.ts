@@ -30,7 +30,7 @@ export class FavoriteStrategyService {
   * @returns Observable<FavoriteStrategy[]>
   */
   getFavoritestrategiesByUserId(id:number): Observable<FavoriteStrategy[]> {
-    return this.http.get<FavoriteStrategy[]>(environement.API+'FavoriteStrategy/?UtilisateurId='+id, this.Header())
+    return this.http.get<FavoriteStrategy[]>(environement.API+'FavoriteStrategy/UserId='+id, this.Header())
   }
   /**
   * Call to API to post a new FavoriteStrategy
@@ -64,7 +64,7 @@ export class FavoriteStrategyService {
   private Header() {
     let httpOptions = { headers : new HttpHeaders({
       'Content-Type':  'application/json',
-      'Authorization' : this.accessService.getSession("User")??this.accessService.getSession("Anonyme")??""
+      'Authorization' : this.accessService.getSession("User")??this.accessService.getSession("Anonymous")??""
     })};
     return httpOptions;
   }

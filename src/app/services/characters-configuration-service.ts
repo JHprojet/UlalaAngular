@@ -25,7 +25,7 @@ export class CharactersConfigurationService {
   * @returns Observable<CharactersConfiguration>
   */
   getCharactersConfigurationByClasses(idclasse1:number,idclasse2:number,idclasse3:number,idclasse4:number): Observable<CharactersConfiguration> {
-    return this.http.get<CharactersConfiguration>(environement.API+'CharactersConfiguration/'+'?C1='+idclasse1+'&C2='+idclasse2+'&C3='+idclasse3+'&C4='+idclasse4, this.Header())
+    return this.http.get<CharactersConfiguration>(environement.API+'CharactersConfiguration/'+'C1='+idclasse1+'/C2='+idclasse2+'/C3='+idclasse3+'/C4='+idclasse4, this.Header())
   }
   /**
   * Call to API to get a CharactersConfiguration depending on his id
@@ -68,7 +68,7 @@ export class CharactersConfigurationService {
   private Header() {
     let httpOptions = { headers : new HttpHeaders({
       'Content-Type':  'application/json',
-      'Authorization' : this.accessService.getSession("User")??this.accessService.getSession("Anonyme")??""
+      'Authorization' : this.accessService.getSession("User")??this.accessService.getSession("Anonymous")??""
     })};
     return httpOptions;
   }

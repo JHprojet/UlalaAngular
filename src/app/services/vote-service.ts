@@ -30,7 +30,7 @@ export class VoteService {
   * @return Observable<Vote[]>
   */
   getVotesByUser(id:number): Observable<Vote[]> {
-    return this.http.get<Vote[]>(environement.API+'Vote/?UtilisateurId='+id, this.Header())
+    return this.http.get<Vote[]>(environement.API+'Vote/UserId='+id, this.Header())
   }
   /**
   * Call to API to post a new Vote
@@ -64,7 +64,7 @@ export class VoteService {
   private Header() {
     let httpOptions = { headers : new HttpHeaders({
       'Content-Type':  'application/json',
-      'Authorization' : this.accessService.getSession("User")??this.accessService.getSession("Anonyme")??""
+      'Authorization' : this.accessService.getSession("User")??this.accessService.getSession("Anonymous")??""
     })};
     return httpOptions;
   }

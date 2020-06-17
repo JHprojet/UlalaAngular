@@ -23,7 +23,7 @@ export class FollowService {
   * @returns Observable<Follow>
   */
   getFollowbyFollowedFollower(FollowerId:number, FollowedId:number): Observable<number> {
-    return this.http.get<number>(environement.API+'Follow/?FollowerId='+FollowerId+'&FollowedId='+FollowedId, this.Header())
+    return this.http.get<number>(environement.API+'Follow/FollowerId='+FollowerId+'/FollowedId='+FollowedId, this.Header())
   }
   /**
   * Call to API to get a Follow depending on his id
@@ -57,7 +57,7 @@ export class FollowService {
   private Header() {
     let httpOptions = { headers : new HttpHeaders({
       'Content-Type':  'application/json',
-      'Authorization' : this.accessService.getSession("User")??this.accessService.getSession("Anonyme")??""
+      'Authorization' : this.accessService.getSession("User")??this.accessService.getSession("Anonymous")??""
     })};
     return httpOptions;
   }

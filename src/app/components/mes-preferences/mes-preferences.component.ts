@@ -105,7 +105,7 @@ export class MesPreferencesComponent implements OnInit {
     let teamAdd = new Team({
       User: new User({Id:this.accessService.getSession("Info").Id}),
       TeamName: this.TeamForm.value.NomTeam,
-      Zone: new Zone({Id:this.TeamForm.value.Zone}),
+      Zone: new Zone({Id:Number(this.TeamForm.value.Zone)}),
       CharactersConfiguration: new CharactersConfiguration({})
     });
     //Hide messages
@@ -117,6 +117,7 @@ export class MesPreferencesComponent implements OnInit {
       //Get Team Id and add to teamAdd variable
       this.ccService.getCharactersConfigurationByClasses(this.TeamForm.value.Classe1,this.TeamForm.value.Classe2,this.TeamForm.value.Classe3,this.TeamForm.value.Classe4).subscribe(result => {
         teamAdd.CharactersConfiguration.Id = result.Id;
+        console.log(teamAdd);
         //Post team to API
         this.teamService.postTeam(teamAdd).subscribe(() => {
           //On success : Get teams of the current user + update table + update Session + reset form + Display success message (5s)

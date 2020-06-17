@@ -1,4 +1,4 @@
-import {Injectable} from "@angular/core";
+import { Injectable } from "@angular/core";
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';  
 import { Image } from '../models';
@@ -16,7 +16,7 @@ export class ImageService {
   * @returns Observable<any>
   */
   uploadImage(image:Image):Observable<any> {
-      return this.http.post<Image>(environement.API+'image', image, this.Header());
+      return this.http.post<Image>(environement.API+'image', JSON.stringify(image), this.Header());
   }
   /**
   * Create the httpOptions header with Authorization
@@ -25,7 +25,7 @@ export class ImageService {
   private Header() {
     let httpOptions = { headers : new HttpHeaders({
       'Content-Type':  'application/json',
-      'Authorization' : this.accessService.getSession("User")??this.accessService.getSession("Anonyme")??""
+      'Authorization' : this.accessService.getSession("User")??this.accessService.getSession("Anonymous")??""
     })};
     return httpOptions;
   }
