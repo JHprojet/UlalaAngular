@@ -11,7 +11,7 @@ import { MesInfosComponent } from './components/mes-infos/mes-infos.component';
 import { ChangerPasswordComponent } from './components/changer-password/changer-password.component';
 import { MesPreferencesComponent } from './components/mes-preferences/mes-preferences.component';
 import { AddStrategieComponent } from './components/add-strategie/add-strategie.component';
-import { SearchStrategieComponent } from './components/search-strategie/search-strategie.component';
+import { SearchStrategiesComponent } from './components/search-strategie/search-strategie.component';
 import { InscriptionComponent } from './components/inscription/inscription.component';
 import { ActivationComponent } from './components/activation/activation.component';
 import { RetrievePasswordComponent } from './components/retrieve-password/retrieve-password.component';
@@ -38,10 +38,10 @@ const routes: Routes = [];
     {path : 'prefs', component: MesPreferencesComponent, canActivate: [IsUser]},
     {path : 'pass', component: ChangerPasswordComponent, canActivate: [IsUser]},
     {path : 'myinfos', component: MesInfosComponent, canActivate: [IsUser]},
-    {path : 'mystrat', component: SearchStrategieComponent, canActivate: [IsAnonyme]},
+    {path : 'mystrat', component: SearchStrategiesComponent, canActivate: [IsAnonyme]},
     {path : 'addstrat', component: AddStrategieComponent, canActivate: [IsAnonyme]},
-    {path : 'searchstrat', component: SearchStrategieComponent, canActivate: [IsAnonyme]},
-    {path : 'favstrat', component: SearchStrategieComponent, canActivate: [IsAnonyme]},
+    {path : 'searchstrat', component: SearchStrategiesComponent, canActivate: [IsAnonyme]},
+    {path : 'favstrat', component: SearchStrategiesComponent, canActivate: [IsAnonyme]},
     {path : 'inscription', component: InscriptionComponent, canActivate: [IsAnonyme]},
     {path : 'activation', component: ActivationComponent, canActivate: [IsToActivate]},
     {path : 'RetrievePassword', component: RetrievePasswordComponent, canActivate: [IsAnonyme]},

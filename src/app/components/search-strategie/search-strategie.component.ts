@@ -13,7 +13,7 @@ import { Classe, BossesPerZone, Team, Strategy, FavoriteStrategy, Vote, User } f
   templateUrl: './search-strategie.component.html',
   styleUrls: ['./search-strategie.component.css']
 })
-export class SearchStrategieComponent implements OnInit {
+export class SearchStrategiesComponent implements OnInit {
   //Research form with custom parameters
   SearchForm = this.fb.group({
     Continent: ['', {

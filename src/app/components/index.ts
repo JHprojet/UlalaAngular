@@ -14,14 +14,14 @@ import { MesPreferencesComponent } from './mes-preferences/mes-preferences.compo
 import { PaginatorComponent } from './paginator/paginator.component'
 import { RetrievePasswordComponent } from './retrieve-password/retrieve-password.component'
 import { RgpdComponent } from './rgpd/rgpd.component'
-import { SearchStrategieComponent } from './search-strategie/search-strategie.component'
+import { SearchStrategiesComponent } from './search-strategie/search-strategie.component'
 import { SkillsComponent } from './skills/skills.component'
 import { TestComponent } from './test/test.component'
 
 export const components:any[] = [ActivationComponent,AddStrategieComponent,AdminStratComponent,AdminUsersComponent,ChangerPasswordComponent,
                                 ClasseComponent,ContactComponent,HomeComponent,InscriptionComponent,JouetsComponent,ListBossComponent,
                                 MesInfosComponent,MesPreferencesComponent,PaginatorComponent,RetrievePasswordComponent,RgpdComponent,
-                                ,SearchStrategieComponent,SkillsComponent,TestComponent]
+                                ,SearchStrategiesComponent,SkillsComponent,TestComponent]
 
 export * from './activation/activation.component'
 export * from './add-strategie/add-strategie.component'

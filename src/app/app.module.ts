@@ -30,7 +30,7 @@ export function createTranslateLoader(http: HttpClient) {
     C.ChangerPasswordComponent,
     C.MesInfosComponent,
     C.AddStrategieComponent,
-    C.SearchStrategieComponent,
+    C.SearchStrategiesComponent,
     C.InscriptionComponent,
     C.ActivationComponent,
     C.RetrievePasswordComponent,
