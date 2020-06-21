@@ -11,6 +11,7 @@ export class Strategy {
     ImagePath2 : string;
     ImagePath3 : string;
     ImagePath4 : string;
+    Description : string;
     Note: number;
     Active: number;
     constructor(attachment) {
@@ -22,6 +23,7 @@ export class Strategy {
       this.ImagePath2 = attachment.ImagePath2;
       this.ImagePath3 = attachment.ImagePath3;
       this.ImagePath4 = attachment.ImagePath4;
+      this.Description = attachment.Description;
       this.Note = attachment.Note;
       this.Active = attachment.Active;
     }

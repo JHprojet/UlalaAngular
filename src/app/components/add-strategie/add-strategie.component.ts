@@ -25,13 +25,15 @@ export class AddStrategieComponent implements OnInit {
     Classe1: [''],
     Classe2: [''],
     Classe3: [''],
-    Classe4: ['']
+    Classe4: [''],
+    Description: ['']
   },{
     updateOn: 'change', validators: [this.v.CheckContinent, this.v.CheckZone, this.v.CheckBoss, this.v.CheckClasses]});
   //Upload form with personal Team  
   AddFormWithTeam = this.fb.group({
     Team: ['', { validators: [Validators.required]}],
     Boss: ['', { validators: [Validators.required]}],
+    Description: ['']
   },{
     updateOn: 'change', validators: [this.v.CheckBossWithTeam, this.v.CheckTeam]});
 
@@ -205,6 +207,8 @@ export class AddStrategieComponent implements OnInit {
   onSubmitWithTeam() {
     //Create strategy to send and add init internal objects **(Must be changed via API to simplify)**
     let E:Strategy = new Strategy({User:new User({Id:1}), BossZone:new BossesPerZone({Id:Number(this.AddFormWithTeam.value.Boss)}), CharactersConfiguration:new CharactersConfiguration({})})
+    //Add Description;
+    E.Description = this.AddFormWithTeam.value.Description;
     //Feeling Team.Id via form value
     E.CharactersConfiguration.Id = this.selectMyTeams.find(CharactersConfiguration => CharactersConfiguration.Id == this.AddFormWithTeam.value.Team).CharactersConfiguration.Id;
     //Adding User Id to the strategy if its a connected user (else Id = 1 is Anonymous player in DB)
@@ -238,12 +242,14 @@ export class AddStrategieComponent implements OnInit {
   {
     //Create strategy to send and add init internal objects **(Must be changed via API to simplify)**
     let E:Strategy = new Strategy({User:new User({Id:1}), BossZone:new BossesPerZone({}), CharactersConfiguration:new CharactersConfiguration({})})
+    //Add Description
+    E.Description = this.AddForm.value.Description;
     //Add BossZone Id
-    E.BossZone.Id = this.AddForm.value.Boss;
+    E.BossZone.Id = Number(this.AddForm.value.Boss);
     //Add Team Id
     let Team$ = new Subject<boolean>();
     //Get team Id depending on 4 classes
-    this.ccService.getCharactersConfigurationByClasses(this.AddForm.value.Classe1,this.AddForm.value.Classe2,this.AddForm.value.Classe3,this.AddForm.value.Classe4).subscribe(result => {
+    this.ccService.getCharactersConfigurationByClasses(Number(this.AddForm.value.Classe1),Number(this.AddForm.value.Classe2),Number(this.AddForm.value.Classe3),Number(this.AddForm.value.Classe4)).subscribe(result => {
       E.CharactersConfiguration.Id = result.Id;
       Team$.next(true);
     });
@@ -290,7 +296,6 @@ export class AddStrategieComponent implements OnInit {
     let reader = new FileReader();
     reader.onload = () => {
       IMG.fileAsBase64 = reader.result.toString(); //Store base64 encoded representation of file
-      console.log(IMG);
       this.imageService.uploadImage(IMG) // POST to API
         .subscribe(resp => { }); // **PROCESS TO ADD**
     }  

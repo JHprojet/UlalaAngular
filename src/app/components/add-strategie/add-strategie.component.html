@@ -42,6 +42,12 @@
                 </option>
             </select>
         </div>
+        <div class="form-group row">
+            <label class="col-sm-1 col-form-label">{{ 'KEYWORD.COMMENT' | translate }}</label>
+            <div class="col-sm-11">
+                <input id="Description" type="text" class="form-control" formControlName="Description">
+            </div>
+        </div>
         <div *ngIf="AddFormWithTeam.errors?.BossIsNeeded" class="cross-validation-error-message alert alert-danger">
             {{ 'ERRORMESSAGES.SELECTBOSS' | translate }}
         </div>
@@ -152,6 +158,12 @@
                     <ng-container *ngIf="Lang == 'en'">{{elem.NameEN}}</ng-container>
                 </option>
             </select>
+        </div>
+    </div>
+    <div class="form-group row">
+        <label class="col-sm-1 col-form-label">{{ 'KEYWORD.COMMENT' | translate }}</label>
+        <div class="col-sm-11">
+            <input id="Description" type="text" class="form-control" formControlName="Description">
         </div>
     </div>
     <div *ngIf="AddForm.errors?.AllClassesNeeded" class="cross-validation-error-message alert alert-danger">
