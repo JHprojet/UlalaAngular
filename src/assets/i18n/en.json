@@ -130,7 +130,9 @@
         "TEAM" : "Team",
         "DESC" : "Description",
         "COST" : "Cost",
-        "NAME" : "Name"
+        "NAME" : "Name",
+        "COMMENT" : "Comment",
+        "POSTEDBY" : "Posted by"
     },
     "ADMINSTRAT" : {
         "TITLE" : "Strategy Management",

@@ -69,12 +69,9 @@ export class AppComponent implements OnInit {
     this.MessageLostPassword = false;
     this.ErrorLogin = false;
     this.OkLogin = false;
-    console.log(this.login);
-    console.log(this.password);
     //Check via API if username and password match
     this.userService.CheckUser(new User({Username:this.login, Password:this.password})).subscribe(result => {
       //If match
-      console.log(result);
       //Set Token in session and local table (for displaying button purpose)
       this.accessService.setSession("User",result);
       this.data["User"] = result;
@@ -82,10 +79,8 @@ export class AppComponent implements OnInit {
 
       this.userService.getUserByPseudo(this.login).subscribe(result2 => {
         //If user need to be activated via activation token
-        console.log(result2.ActivationToken);
         if (result2.ActivationToken != "")
         {
-          console.log(result2);
           //Write Id and username in session and local table
           this.accessService.setSession("Id",result2.Id);
           this.accessService.setSession("Pseudo",result2.Username);
@@ -97,11 +92,9 @@ export class AppComponent implements OnInit {
         //If user is allready activated
         else
         {
-
           //Store user information in session and local table
           this.accessService.setSession("Info",result2);
           this.data["Info"] = result2;
-          console.log(result2);
           //Get all favorite strategies of user and store
           this.favService.getFavoritestrategiesByUserId(result2.Id).subscribe(result => {
             this.accessService.setSession("Fav",result);

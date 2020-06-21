@@ -69,28 +69,10 @@ export class SearchStrategieComponent implements OnInit {
   Lang:string;
   //EndPoint image server
   BaseURL:string;
-  //Getter and Setter for strategies (The getter allow to filter strategy depending on route)
-  private _strategies: Strategy[];
-  get Strategies():Strategy[] {
-    
-    if (this.currentRoute == "favstrat")
-    {
-      let newTab:Strategy[] = new Array<Strategy>();
-      for (let elem of this._strategies)
-      {
-        for (let fav of this.myFavs) 
-        {
-          if (elem && fav.Strategy && elem.Id == fav.Strategy.Id) newTab.push(elem);
-        }
-      }
-      return newTab;
-    }
-    else return this._strategies;
-  };
-  set Strategies(P:Strategy[]) {
-    this._strategies = P;
-  }
-  
+  //Tableaux de strat à afficher
+  StrategiesFav:Strategy[];
+  Strategies:Strategy[];
+   
   ngOnInit(): void {
     this.BaseURL = environement.ImagePath;
     //Get language
@@ -187,14 +169,23 @@ export class SearchStrategieComponent implements OnInit {
     this.stratService.getStrategiesByInfos(User, BossZoneId, C1, C2, C3, C4).subscribe(result => {
       this.Strategies = [];
       this.displayStrategies = [];
-      this.Strategies = result;
-      if(this.Strategies.length == 0) this.DisplayNoStrategyMessage = true;
+      if(this.currentRoute == "favstrat")
+      {
+        this.StrategiesFav = new Array<Strategy>();
+        result.forEach(strat => {
+          this.myFavs.forEach(fav => {
+            if(strat.Id == fav.Strategy.Id) this.StrategiesFav.push(strat);
+          })
+        })
+      }
+      else this.Strategies = result;
+      if(this.Strategies.length == 0 && this.StrategiesFav.length == 0) this.DisplayNoStrategyMessage = true;
     }, error => 
     {
       this.Strategies = [];
       this.displayStrategies = [];
       this.DisplayNoStrategyMessage = true;
-    });                                            
+    });
   }
 
   /** Fill in options of Zone's select */

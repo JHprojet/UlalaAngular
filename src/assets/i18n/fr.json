@@ -131,7 +131,9 @@
         "TEAM" : "Team",
         "DESC" : "Description",
         "COST" : "Coût",
-        "NAME" : "Nom"
+        "NAME" : "Nom",
+        "COMMENT" : "Commentaire",
+        "POSTEDBY" : "Posté par"
     },
     "ADMINSTRAT" : {
         "TITLE" : "Gestion des stratégies",
